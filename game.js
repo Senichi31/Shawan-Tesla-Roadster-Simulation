@@ -1,7 +1,7 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=21';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=21';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=22';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=22';
 const wheelRadius=91*160/1200;
 const W=1400,H=600,L=65,R=1335,T=100,B=510;
 // A circular wall meets the 15-degree uphill ceiling with a continuous tangent.
@@ -18,8 +18,16 @@ const trackEnd=arc.at(-1).s;
 function pathAt(distance){if(distance<=rampStart)return {x:distance,y:B,angle:0};const i=arc.findIndex(p=>p.s>=distance);if(i<0)return arc.at(-1);const a=arc[i-1],b=arc[i],u=(distance-a.s)/(b.s-a.s);return {x:a.x+(b.x-a.x)*u,y:a.y+(b.y-a.y)*u,angle:a.angle+(b.angle-a.angle)*u};}
 function placeOnTrack(){const p=pathAt(car.s);car.angle=p.angle;car.x=p.x+17*Math.sin(p.angle);car.y=p.y-17*Math.cos(p.angle);}
 const ceilingRing=pathAt(ceilingStart+70);
-// Finite, two-sided road surfaces. Scaffold and exhaust are decorative.
-const flightRoads=[{a:{x:L,y:B},b:{x:R,y:B}},...arc.slice(1).map((b,i)=>({a:arc[i],b}))];
+// One closed obstacle: road face, scaffold roof/rear/end cap, and stage floor.
+// The opaque collision boundary blocks the whole scaffold footprint, including its open-looking bays.
+const scaffoldTop=arc.at(-1).y-10,scaffoldBack=rampStart+rx+72;
+const scaffoldBoundary=[{x:ceilingLeft,y:scaffoldTop},{x:scaffoldBack,y:scaffoldTop},{x:scaffoldBack,y:B},{x:rampStart,y:B},...arc.slice(1)];
+const scaffoldEdges=[
+ {a:scaffoldBoundary[0],b:scaffoldBoundary[1]},
+ {a:scaffoldBoundary[1],b:scaffoldBoundary[2]},
+ {a:arc.at(-1),b:scaffoldBoundary[0]}
+];
+const flightRoads=[{a:{x:L,y:B},b:{x:R,y:B}},...arc.slice(1).map((b,i)=>({a:arc[i],b})),...scaffoldEdges];
 const bodyOutline=[[-74,-16],[-42,-18],[-12,-26],[26,-23],[61,-11],[74,-2],[74,10],[58,17],[-63,17],[-74,8]];
 function flightBody(){const c=Math.cos(car.angle),s=Math.sin(car.angle);return bodyOutline.map(([x,y])=>{x*=car.facing;return {x:car.x+x*c-y*s,y:car.y+x*s+y*c};});}
 function roadOutline(road){const {a,b}=road,dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy),nx=-dy/len*6,ny=dx/len*6;return [{x:a.x+nx,y:a.y+ny},{x:b.x+nx,y:b.y+ny},{x:b.x-nx,y:b.y-ny},{x:a.x-nx,y:a.y-ny}];}
@@ -96,6 +104,8 @@ if(!flight&&car.surface===null&&!(attachedBefore&&car.launched)){for(let i=1;i<a
 }}
 if(car.x<L+55){car.x=L+55;car.vx=Math.max(0,car.vx);}if(car.x>R-55){car.x=R-55;car.vx=Math.min(0,car.vx);}
 if(car.y<35){car.y=35;car.vy=Math.max(0,car.vy);}if(car.y>B-17&&car.surface!=='track'){car.y=B-17;car.vy=0;if(!flight){car.angle=0;car.surface=car.x<=rampStart?'track':'ground';car.s=car.x;car.speed=car.vx;}}
+// Recheck after arena clamps, so a screen-edge correction cannot force the body into steelwork.
+if(flight)resolveFlightContacts();
 // Rolling angle follows signed distance along the surface, including the ceiling.
 if(oldSurface==='track'&&car.surface==='track'){car.wheelVelocity=(car.s-oldDistance)/dt/wheelRadius||0;}
 else if(oldSurface==='ground'&&car.surface==='ground'){car.wheelVelocity=(car.x-oldX)/dt/wheelRadius||0;}
@@ -117,7 +127,7 @@ line(100,B+14,790,B+14,'#f34b40',2);line(100,B+19,790,B+19,'#f34b402a',3);
 // Grounded rectangular scaffold behind the ramp, as in the reference stage.
 // Clip the steelwork to the region outside the driving face so no brace crosses the road.
 // The top beam meets the outer edge of the ceiling endpoint instead of cutting below it.
-const frameTop=arc.at(-1).y-10,frameBack=rampStart+rx+72;
+const frameTop=scaffoldTop,frameBack=scaffoldBack;
 ctx.save();ctx.beginPath();ctx.moveTo(ceilingLeft,frameTop);ctx.lineTo(frameBack,frameTop);ctx.lineTo(frameBack,B);ctx.lineTo(rampStart,B);
 for(const p of arc.slice(1))ctx.lineTo(p.x,p.y);
 ctx.closePath();ctx.clip();
