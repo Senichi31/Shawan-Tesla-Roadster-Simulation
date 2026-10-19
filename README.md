@@ -14,15 +14,17 @@ Open `http://localhost:8000` in your browser. The game uses Canvas and plain Jav
 
 ## Controls
 
-- **W / Up / D / Right:** accelerate; in flight, W/Up goes up and D/Right goes right.
-- **S / Down / A / Left:** reverse/brake; in flight, S/Down goes down and A/Left goes left.
+- **Up arrow:** automatically enables flight and ascends.
+- **Down arrow:** descends in flight; has no ground-driving action. Touching the ground automatically exits flight.
+- **W / D / Right:** accelerate on the track; in flight W ascends and D/Right moves right.
+- **S / A / Left:** reverse/brake on the track; in flight S descends and A/Left moves left.
 - **Automatic air grip:** always available, with no M key or manual switch. The car automatically adheres to walls and the ceiling while on the track, even at rest. Flying suspends surface attachment; driving past the open endpoint releases it naturally.
 - **F:** toggle flight. Use WASD or arrow keys to move in four directions.
 - **Shift:** hold for extra thrust.
 - **P / Escape:** pause/resume.
 - **R:** reset the run.
 
-Hold D/Right or W/Up to build speed, then climb the half-circle wall and drive fully upside down along the ceiling. Release directions to coast with inertia; hold Space to stop while attached. Air grip holds the car only while road exists. Driving past the ceiling’s open end releases it with its current velocity; press F for flight. Hold Shift for more launch speed; press F in the air for sustained flight. Collect all five rings in any order. Air grip and flight are mutually exclusive; their buttons also toggle the modes. Keyboard play is intended for desktop browsers.
+Hold D/Right or W to build speed, then climb the half-circle wall and drive fully upside down along the ceiling. Release directions to coast with inertia; hold Space to stop while attached. Air grip holds the car only while road exists. Driving past the ceiling’s open end releases it with its current velocity; press F for flight. Hold Shift for more launch speed; press F in the air for sustained flight. Collect all five rings in any order. Air grip and flight are mutually exclusive; their buttons also toggle the modes. Keyboard play is intended for desktop browsers.
 
 This is a fictional arcade simulation, not a model of real vehicle capabilities or an official Tesla product.
 
@@ -161,3 +163,7 @@ Current entry: `play-ceiling-v34.html` (`V34 · RISING CONTACT VAPOR`). Contact 
 ## V35: ground-rolling vapor with rising wisps
 
 Current entry: `play-ceiling-v35.html` (`V35 · GROUND-ROLLING VAPOR`). Ground contact now creates mostly low, rolling smoke that drifts sideways near the road, plus a smaller fraction of rising wisps. Ground-bound puffs gently settle toward a low layer instead of all rising away from the surface. Round, soft vapor particles and floor clipping are retained; no flat glow/cone overlay is introduced. Pressure jets remain unchanged. Validation confirms a majority near-floor layer, both sideways directions, some lifted wisps and no high-altitude contact fog. Rebuild with `python3 scripts/build-release.py`.
+
+## V36: arrow-key takeoff and automatic touchdown
+
+Current entry: `play-ceiling-v36.html` (`V36 · ↑ TAKEOFF / ↓ DESCEND`). Up arrow now enables flight on keydown and controls ascent; Down arrow controls descent without reversing on the ground. A descending full-body contact with the stage floor automatically disables flight and restores ground driving. Initial takeoff contact and contacts with walls/scaffold do not count as touchdown. Left/Right, WASD, Shift, F and the flight button retain their roles. Validation covers ground Down, Up-only takeoff/ascent, Down descent, automatic flight exit, ground driving and taking off again. Rebuild with `python3 scripts/build-release.py`.
