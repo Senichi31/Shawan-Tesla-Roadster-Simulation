@@ -133,3 +133,7 @@ Current entry: `play-ceiling-v27.html`. Extends the lower red accent and its glo
 ## V28: compressed-air vapor appearance
 
 Current entry: `play-ceiling-v28.html` (`V28 · COMPRESSED-AIR VAPOR`). Replaces the solid blue triangular jets and hard smoke discs with soft white/pale-blue vapor particles emitted from underbody and rear nozzles. Narrow jets widen and drift as they travel; floor contact turns them into spreading low fog. Particle origins and directions follow vehicle facing, pitch and axial roll. Emission stops with flight disabled while existing vapor fades out. A reusable radial texture keeps the cloud soft and particle lifetimes keep the count bounded. Validation covers underbody/rear emission, floor spread, dissipation after flight is turned off and browser rendering. Vehicle physics and collision remain unchanged. Rebuild with `python3 scripts/build-release.py`.
+
+## V29: restrained vapor with proximity-gated ground fog
+
+Current entry: `play-ceiling-v29.html` (`V29 · LIGHT VAPOR / LOW-ALTITUDE FOG`). Shortens vapor lifetime, reduces emission and limits plume widening. High-altitude jets dissipate before reaching the floor. Floor spread is only created for underbody vapor emitted near the ground while the vehicle is still within 90 arena units of it; intensity fades with distance. Rear vapor never creates floor fog. Close-range spread has less drift and a shorter lifetime. High/mid/low-altitude and post-flight dissipation checks pass. Rebuild with `python3 scripts/build-release.py`.
