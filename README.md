@@ -129,3 +129,7 @@ Current entry: `play-ceiling-v26.html`. Increases the underside view's transvers
 ## V27: full-length red ground line
 
 Current entry: `play-ceiling-v27.html`. Extends the lower red accent and its glow from L to R, matching both endpoints of the ground road line. Driving and collision behavior are unchanged. Rebuild with `python3 scripts/build-release.py`.
+
+## V28: compressed-air vapor appearance
+
+Current entry: `play-ceiling-v28.html` (`V28 · COMPRESSED-AIR VAPOR`). Replaces the solid blue triangular jets and hard smoke discs with soft white/pale-blue vapor particles emitted from underbody and rear nozzles. Narrow jets widen and drift as they travel; floor contact turns them into spreading low fog. Particle origins and directions follow vehicle facing, pitch and axial roll. Emission stops with flight disabled while existing vapor fades out. A reusable radial texture keeps the cloud soft and particle lifetimes keep the count bounded. Validation covers underbody/rear emission, floor spread, dissipation after flight is turned off and browser rendering. Vehicle physics and collision remain unchanged. Rebuild with `python3 scripts/build-release.py`.

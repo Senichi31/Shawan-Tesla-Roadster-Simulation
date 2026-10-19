@@ -1,8 +1,12 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=27';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=27';
-const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=27';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=28';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=28';
+const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=28';
+// Soft, transparent vapor texture; no solid cones or hard-edged smoke discs.
+const vaporTexture=document.createElement('canvas');vaporTexture.width=vaporTexture.height=64;
+const vaporCtx=vaporTexture.getContext('2d'),vaporGradient=vaporCtx.createRadialGradient(32,32,0,32,32,32);
+vaporGradient.addColorStop(0,'#f1faffd0');vaporGradient.addColorStop(.2,'#dceef7a0');vaporGradient.addColorStop(.55,'#9fbdce50');vaporGradient.addColorStop(1,'#a9c9db00');vaporCtx.fillStyle=vaporGradient;vaporCtx.fillRect(0,0,64,64);
 const wheelRadius=91*160/1200;
 const W=1400,H=600,L=65,R=1335,T=100,B=510;
 // A circular wall meets the 15-degree uphill ceiling with a continuous tangent.
@@ -125,8 +129,8 @@ function moveFlight(dt,targetAngle,turnRate=5,allowLanding=false){
 }
 const keys=new Set(),rings=[{x:340,y:480},{x:780,y:480},{x:1055,y:365},{x:1040,y:230},{x:ceilingRing.x+17*Math.sin(ceilingAngle),y:ceilingRing.y-17*Math.cos(ceilingAngle)}];
 const magnet=true; // Surface adhesion is always available; no manual toggle.
-let car,flight=false,paused=false,score=0,last=0,time=0,toastUntil=6,particles=[];
-function reset(){car={x:500,y:B-17,vx:0,vy:0,angle:0,facing:1,roll:0,rollActive:false,rollElapsed:0,rollAxisAngle:0,surface:'track',wheelRotation:0,wheelVelocity:0,speed:0,s:500,launched:false};score=0;rings.forEach(r=>r.hit=false);particles=[];flight=false;paused=false;keys.clear();toastUntil=time+6;document.querySelector('#toast').textContent='← / A drives left. → / D drives right. Space brakes. F flies.';sync();}
+let car,flight=false,paused=false,score=0,last=0,time=0,toastUntil=6,particles=[],vaporEmission=0;
+function reset(){car={x:500,y:B-17,vx:0,vy:0,angle:0,facing:1,roll:0,rollActive:false,rollElapsed:0,rollAxisAngle:0,surface:'track',wheelRotation:0,wheelVelocity:0,speed:0,s:500,launched:false};score=0;rings.forEach(r=>r.hit=false);particles=[];vaporEmission=0;flight=false;paused=false;keys.clear();toastUntil=time+6;document.querySelector('#toast').textContent='← / A drives left. → / D drives right. Space brakes. F flies.';sync();}
 function sync(){document.querySelector('#magnet').classList.toggle('active',!flight);document.querySelector('#flight').classList.toggle('active',flight);document.querySelector('#mode').textContent=flight?'● FLIGHT MODE':magnet?(car.surface==='track'&&Math.cos(car.angle)<-.9?'● INVERTED / AIR GRIP':'● AIR GRIP'):'● GROUND DRIVE';document.querySelector('#status').textContent=flight?'THRUSTERS ENGAGED':magnet?(car.surface==='track'?'AUTO GRIP / GRAVITY OFF':'AIR GRIP READY / OFF TRACK'):'GRIP SYSTEM READY';document.querySelector('#pause').textContent=paused?'▶':'Ⅱ';}
 function toggleFlight(){flight=!flight;if(flight){car.surface=null;car.vy=Math.min(car.vy,-95);}sync();}
 document.querySelector('#reset').onclick=reset;document.querySelector('#flight').onclick=toggleFlight;document.querySelector('#pause').onclick=()=>{paused=!paused;keys.clear();sync();};
@@ -166,8 +170,21 @@ car.wheelRotation+=car.wheelVelocity*dt;
 const headingSpeed=(car.surface==='track'?car.speed:car.vx);
 if(!car.rollActive&&Math.abs(headingSpeed)>2){const facing=headingSpeed<0?-1:1;if(car.facing!==facing){car.facing=facing;if(car.surface==='track')placeOnTrack();else resolveFlightContacts();}}
 for(const r of rings)if(!r.hit&&Math.hypot(car.x-r.x,car.y-r.y)<45){r.hit=true;score++;toastUntil=time+4;document.querySelector('#toast').textContent=score===5?'All checkpoints cleared. The sky is yours. R to run again.':`Checkpoint ${score} / 5 collected. Keep exploring.`;for(let i=0;i<22;i++)particles.push({x:r.x,y:r.y,vx:(Math.random()-.5)*240,vy:(Math.random()-.5)*240,life:1});}
-if(flight&&Math.random()<dt*35){particles.push({x:car.x+(Math.random()-.5)*80,y:car.y+30,vx:-car.vx*.1+(Math.random()-.5)*25,vy:45+Math.random()*50,life:1.3,smoke:true});}
-particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;});particles=particles.filter(p=>p.life>0);sync();document.querySelector('#speed').textContent=String(Math.round(Math.hypot(car.vx,car.vy)*.36)).padStart(3,'0');document.querySelector('#score').textContent=`0${score} / 05`;document.querySelector('#toast').style.opacity=time<toastUntil?'1':'0';}
+if(flight){
+ vaporEmission+=dt*70;
+ const c=Math.cos(car.angle),s=Math.sin(car.angle),vertical=Math.cos(car.roll||0),lateral=Math.sin(car.roll||0);
+ const project=(x,y,z=0)=>{x*=car.facing;const py=y*vertical+z*lateral;return {x:car.x+x*c-py*s,y:car.y+x*s+py*c};};
+ const emit=(point,dx,dy,tail=false)=>{const life=tail?.65+Math.random()*.25:1.5+Math.random()*.3,speed=tail?230+Math.random()*80:340+Math.random()*80;
+  particles.push({x:point.x+(Math.random()-.5)*2,y:point.y+(Math.random()-.5)*2,vx:dx*speed+car.vx*.25+(Math.random()-.5)*(tail?10:40),vy:dy*speed+car.vy*.15+(Math.random()-.5)*(tail?24:8),life,maxLife:life,age:0,gas:true,tail,radius:tail?2.2:3,growth:tail?16:28,seed:Math.random()*100,spread:false});};
+ while(vaporEmission>=1){vaporEmission--;for(const x of [-43,42])for(const z of [-8,8])emit(project(x,12,z),-s*vertical,c*vertical);emit(project(-69,0),-c*car.facing,-s*car.facing,true);}
+}
+particles.forEach(p=>{
+ p.life-=dt;
+ if(p.gas){p.age+=dt;p.radius+=p.growth*dt;const drag=Math.exp(-(p.spread?1.1:.35)*dt);p.vx=p.vx*drag+Math.sin(time*9+p.seed+p.age*7)*10*dt;p.vy=p.vy*drag+Math.cos(time*8+p.seed)*5*dt;
+  p.x+=p.vx*dt;p.y+=p.vy*dt;
+  if(!p.spread&&p.y>=B-7&&p.vy>0){p.spread=true;p.y=B-7;p.vx+=(Math.random()<.5?-1:1)*(55+Math.random()*85);p.vy=-6-Math.random()*10;p.radius=Math.max(12,p.radius);p.growth=20;p.life=Math.max(.55,p.life);p.maxLife=Math.max(p.maxLife,p.age+p.life);}
+ }else{p.x+=p.vx*dt;p.y+=p.vy*dt;}
+});particles=particles.filter(p=>p.life>0);sync();document.querySelector('#speed').textContent=String(Math.round(Math.hypot(car.vx,car.vy)*.36)).padStart(3,'0');document.querySelector('#score').textContent=`0${score} / 05`;document.querySelector('#toast').style.opacity=time<toastUntil?'1':'0';}
 function line(x,y,x2,y2,color,width=1){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();}
 function draw(){const dpr=devicePixelRatio||1,cw=canvas.clientWidth,ch=canvas.clientHeight;if(canvas.width!==cw*dpr||canvas.height!==ch*dpr){canvas.width=cw*dpr;canvas.height=ch*dpr;}ctx.setTransform(canvas.width/W,0,0,canvas.height/H,0,0);ctx.fillStyle='#030609';ctx.fillRect(0,0,W,H);
 const glow=ctx.createRadialGradient(1000,400,15,1000,400,600);glow.addColorStop(0,'#14202a');glow.addColorStop(1,'#030609');ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
@@ -205,15 +222,14 @@ for(let i=15;i<arc.length;i+=20){const p=arc[i];ctx.save();ctx.translate(p.x,p.y
 ctx.font='bold 56px Arial';ctx.fillStyle='#b6cddd0b';ctx.fillText('THE RAMP',155,310);
 ctx.fillStyle='#8495a3';ctx.font='10px monospace';ctx.fillText('01 / ACCELERATION',130,552);ctx.fillStyle='#ee8175';ctx.fillText('02 / CURVED WALL',1000,552);ctx.fillStyle='#80cddf';ctx.fillText('03 / CEILING +15°',ceilingLeft-12,frameTop-12);
 for(let i=0;i<rings.length;i++){const r=rings[i];if(r.hit)continue;const pulse=Math.sin(time*3+i)*3;ctx.save();ctx.translate(r.x,r.y);ctx.shadowColor='#f3bc69';ctx.shadowBlur=17;ctx.strokeStyle='#f2bd72';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,0,18+pulse/2,27+pulse,0,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;ctx.strokeStyle='#f2bd7240';ctx.beginPath();ctx.ellipse(0,0,24+pulse/2,33+pulse,0,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#f2bd72';ctx.font='9px monospace';ctx.textAlign='center';ctx.fillText(String(i+1).padStart(2,'0'),0,-43);ctx.restore();}
-for(const p of particles){ctx.globalAlpha=Math.min(1,p.life)*(p.smoke?.16:1);ctx.fillStyle=p.smoke?'#b6d2dc':'#ffd69a';if(p.smoke){ctx.beginPath();ctx.arc(p.x,p.y,7+(1.3-p.life)*20,0,Math.PI*2);ctx.fill();}else ctx.fillRect(p.x,p.y,3,3);}ctx.globalAlpha=1;
+for(const p of particles){
+ if(p.gas){const fade=Math.min(1,p.age/.045)*Math.min(1,p.life/.55);ctx.globalAlpha=fade*(p.tail?.28:p.spread?.15:.34);const rx=p.radius*(p.spread?2:1),ry=p.radius*(p.spread?.48:1.35);ctx.drawImage(vaporTexture,p.x-rx,p.y-ry,rx*2,ry*2);}
+ else{ctx.globalAlpha=Math.min(1,p.life);ctx.fillStyle='#ffd69a';ctx.fillRect(p.x,p.y,3,3);}
+}ctx.globalAlpha=1;
 ctx.save();ctx.globalAlpha=Math.max(.07,.3-(B-car.y)/1800);ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(car.x,B+2,72+(B-car.y)*.1,5,0,0,Math.PI*2);ctx.fill();ctx.restore();
 ctx.save();ctx.translate(car.x,car.y);ctx.rotate(car.angle);ctx.scale(car.facing,1);
 const rollCos=Math.cos(car.roll||0),rollUnderside=Math.abs(Math.sin(car.roll||0));
 ctx.save();ctx.scale(1,Math.abs(rollCos)<.015?.015:rollCos);
-if(flight){
- for(const x of [-43,42]){const length=55+Math.sin(time*27+x)*9+(keys.has('shift')?35:0);const plume=ctx.createLinearGradient(x,10,x,10+length);plume.addColorStop(0,'#dcfaff');plume.addColorStop(.12,'#80e7ffdd');plume.addColorStop(.55,'#24a4e580');plume.addColorStop(1,'#73d9f500');ctx.fillStyle=plume;ctx.beginPath();ctx.moveTo(x-3,11);ctx.bezierCurveTo(x-6,32,x-11,50,x-13,10+length);ctx.lineTo(x+13,10+length);ctx.bezierCurveTo(x+8,45,x+4,25,x+3,11);ctx.fill();}
- const jet=ctx.createLinearGradient(-70,0,-150,0);jet.addColorStop(0,'#caf7ffdd');jet.addColorStop(.4,'#3fc2ef80');jet.addColorStop(1,'#7ce6ff00');ctx.fillStyle=jet;ctx.beginPath();ctx.moveTo(-67,-6);ctx.lineTo(-150,4);ctx.lineTo(-67,6);ctx.fill();
-}
 if(magnet&&car.surface==='track'){ctx.strokeStyle='#69e4ee99';ctx.beginPath();ctx.ellipse(0,17,62,5,0,0,Math.PI*2);ctx.stroke();for(const x of [-42,0,42]){line(x,6,x,15,'#8ae5f0aa',1.5);line(x,15,x-3,11,'#8ae5f0aa',1.5);line(x,15,x+3,11,'#8ae5f0aa',1.5);}}
 // Detailed silver Roadster study based on the supplied video close-ups.
 if(roadsterImage.complete&&roadsterImage.naturalWidth){ctx.drawImage(roadsterImage,-80,-26,160,42.67);
