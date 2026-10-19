@@ -190,8 +190,10 @@ car.wheelRotation+=car.wheelVelocity*dt;
 // Turn the body to follow signed travel along the road, including reversed wall driving.
 const headingSpeed=(onDrivingSurface()?car.speed:car.vx);
 if(!car.rollActive&&Math.abs(headingSpeed)>2){const facing=headingSpeed<0?-1:1;if(car.facing!==facing){car.facing=facing;if(car.surface==='track')placeOnTrack();else if(car.surface==='scaffold')placeOnScaffold();else resolveFlightContacts();}}
-// The stage remains fixed until the car nears the left edge; then reveal the finite extension.
-const cameraTarget=Math.max(cameraMin,Math.min(0,car.x-280));
+// Keep world objects at a uniform scale; narrow viewports follow the car on either side.
+const viewWidth=canvas.clientWidth*H/canvas.clientHeight;
+const edgeMargin=Math.min(280,viewWidth*.3);
+const cameraTarget=Math.max(cameraMin,Math.min(Math.max(0,W-viewWidth),Math.max(car.x-viewWidth+edgeMargin,Math.min(0,car.x-edgeMargin))));
 cameraX+=(cameraTarget-cameraX)*(1-Math.exp(-6*dt));
 for(const r of rings)if(!r.hit&&Math.hypot(car.x-r.x,car.y-r.y)<45){r.hit=true;score++;toastUntil=time+4;document.querySelector('#toast').textContent=score===5?'All checkpoints cleared. The sky is yours. R to run again.':`Checkpoint ${score} / 5 collected. Keep exploring.`;for(let i=0;i<22;i++)particles.push({x:r.x,y:r.y,vx:(Math.random()-.5)*240,vy:(Math.random()-.5)*240,life:1});}
 if(flight||car.rollActive){
@@ -239,8 +241,8 @@ particles.forEach(p=>{
  }else{p.x+=p.vx*step;p.y+=p.vy*step;}
 });particles=particles.filter(p=>p.life>0);sync();document.querySelector('#speed').textContent=String(Math.round(Math.hypot(car.vx,car.vy)*.36)).padStart(3,'0');document.querySelector('#score').textContent=`0${score} / 05`;document.querySelector('#toast').style.opacity=time<toastUntil?'1':'0';}
 function line(x,y,x2,y2,color,width=1){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();}
-function draw(){const dpr=devicePixelRatio||1,cw=canvas.clientWidth,ch=canvas.clientHeight;if(canvas.width!==cw*dpr||canvas.height!==ch*dpr){canvas.width=cw*dpr;canvas.height=ch*dpr;}ctx.setTransform(canvas.width/W,0,0,canvas.height/H,0,0);ctx.fillStyle='#030609';ctx.fillRect(0,0,W,H);
-const glow=ctx.createRadialGradient(1000,400,15,1000,400,600);glow.addColorStop(0,'#14202a');glow.addColorStop(1,'#030609');ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
+function draw(){const dpr=devicePixelRatio||1,cw=canvas.clientWidth,ch=canvas.clientHeight;if(canvas.width!==cw*dpr||canvas.height!==ch*dpr){canvas.width=cw*dpr;canvas.height=ch*dpr;}const scale=canvas.height/H,viewWidth=canvas.width/scale;ctx.setTransform(scale,0,0,scale,0,0);ctx.fillStyle='#030609';ctx.fillRect(0,0,viewWidth,H);
+const glow=ctx.createRadialGradient(1000,400,15,1000,400,600);glow.addColorStop(0,'#14202a');glow.addColorStop(1,'#030609');ctx.fillStyle=glow;ctx.fillRect(0,0,viewWidth,H);
 ctx.save();ctx.translate(-cameraX,0);
 // Dark demonstration stage with ground lights and an exposed curved steel truss.
 ctx.fillStyle='#0c1117';ctx.fillRect(worldLeft,B,R-worldLeft,H-B);line(worldLeft,B,R,B,'#89939d',2);
@@ -296,7 +298,7 @@ ctx.fillStyle='#8495a3';ctx.font='10px monospace';ctx.fillText('FLIGHT LIMIT',wo
 ctx.restore();
 ctx.font='bold 56px Arial';ctx.fillStyle='#b6cddd0b';ctx.fillText('THE RAMP',155,310);
 ctx.fillStyle='#8495a3';ctx.font='10px monospace';ctx.fillText('01 / ACCELERATION',130,552);ctx.fillStyle='#ee8175';ctx.fillText('02 / CURVED WALL',1000,552);ctx.fillStyle='#80cddf';ctx.fillText('03 / CEILING +15°',ceilingLeft-stageShift-12,scaffoldTop-12);
-if(paused){ctx.fillStyle='#080d17bb';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 36px Arial';ctx.fillText('PAUSED',W/2,H/2);ctx.font='14px Arial';ctx.fillStyle='#acb7c9';ctx.fillText('Press P or click the play icon to continue',W/2,H/2+34);ctx.textAlign='left';}}
+if(paused){ctx.fillStyle='#080d17bb';ctx.fillRect(0,0,viewWidth,H);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 36px Arial';ctx.fillText('PAUSED',viewWidth/2,H/2);ctx.font='14px Arial';ctx.fillStyle='#acb7c9';ctx.fillText('Press P or click the play icon to continue',viewWidth/2,H/2+34);ctx.textAlign='left';}}
 function frame(ts){const dt=Math.min((ts-last)/1000||0,.033);last=ts;if(!paused)update(dt);draw();requestAnimationFrame(frame);}reset();requestAnimationFrame(frame);
 // Read-only telemetry for automated smoke checks and development tools.
 window.roadsterState=()=>({cameraX,worldLeft,leftStop,rampStart,scaffoldBack,x:car.x,y:car.y,vx:car.vx,vy:car.vy,surface:car.surface,launched:car.launched,angle:car.angle,distance:car.s,ceilingStart,trackEnd,facing:car.facing,roll:car.roll,rollActive:car.rollActive,rollElapsed:car.rollElapsed,undersideVisible:Math.abs(Math.sin(car.roll||0)),noseAngle:car.angle+(car.facing<0?Math.PI:0),wheelRotation:car.wheelRotation,wheelVelocity:car.wheelVelocity,inverted:car.surface==='track'&&Math.cos(car.angle)<-.9,magnet,flight,paused,score});
