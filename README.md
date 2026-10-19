@@ -177,3 +177,8 @@ Current entry: `play-ceiling-v37.html`. Leaving the ceiling keeps the existing a
 ## V38: four-corner vapor during the axial roll
 
 Current entry: `play-ceiling-v38.html`. All four underside nozzles now emit during the ceiling-exit roll, with their positions following the projected undertray and their jets fanning apart as the underside becomes visible. The downward front-wheel roll jet is retained. Normal side-view flight keeps its two overlapping pairs of jets, and completing the roll still engages flight automatically. Rebuild with `python3 scripts/build-release.py`.
+
+
+## V39: rearward flight exhaust
+
+Current entry: `play-ceiling-v39.html`. Normal flight jets angle behind horizontal movement, increasing gradually with speed and leaning up to about 29 degrees during Shift boost. Leftward and rightward movement mirror the effect; hovering keeps the exhaust vertical. The four-corner axial-roll jets and front-wheel roll jet retain their directions. Rebuild with `python3 scripts/build-release.py`.

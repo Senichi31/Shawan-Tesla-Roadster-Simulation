@@ -1,8 +1,8 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=38';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=38';
-const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=38';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=39';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=39';
+const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=39';
 // Soft, transparent vapor texture; no solid cones or hard-edged smoke discs.
 const vaporTexture=document.createElement('canvas');vaporTexture.width=vaporTexture.height=64;
 const vaporCtx=vaporTexture.getContext('2d'),vaporGradient=vaporCtx.createRadialGradient(32,32,0,32,32,32);
@@ -202,6 +202,11 @@ particles.forEach(p=>{
     const length=Math.hypot(along,outward);
     dx=(along*c-outward*s)/length;dy=(along*s+outward*c)/length;
    }else if(p.rollJet){dx=0;dy=1;}
+   else{
+    // Aim normal flight exhaust behind horizontal motion, with a stronger cant during boost.
+    const tilt=-Math.max(-1,Math.min(1,car.vx/650))*(boost?.5:.32);
+    dx=Math.sin(tilt);dy=Math.cos(tilt);
+   }
    p.travel+=p.jetSpeed*step;
    const spread=(2+p.travel*.055)*p.scatter+Math.sin(time*25+p.seed)*p.travel*.008;
    p.x=car.x+px*c-py*s+dx*p.travel-dy*spread;p.y=car.y+px*s+py*c+dy*p.travel+dx*spread;
