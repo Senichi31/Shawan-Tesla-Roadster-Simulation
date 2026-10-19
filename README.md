@@ -192,3 +192,8 @@ Current entry: `play-ceiling-v40.html`. The curved/ceiling track, scaffold, chec
 ## V41: scaffold roof driving and fixed scene labels
 
 Current entry: `play-ceiling-v41.html`. Landing on the scaffold roof switches to surface driving with automatic adhesion, the same acceleration/coasting/braking as the road, and distance-driven wheel rotation. Left/Right work on the roof; Up takes off again and leaving its edge releases the car. Full-body scaffold collision remains active. Scene captions return to their pre-shift screen positions and stay fixed during camera scrolling; the ramp, ground and checkpoints retain their V40 locations. Rebuild with `python3 scripts/build-release.py`.
+
+
+## V42: graphical pause control and English interface
+
+Current entry: `play-ceiling-v42.html`. The pause button uses a circular SVG pause/play icon with accessible state labels instead of a Roman-numeral character. The decorative grip ellipse and arrows beneath attached cars are removed; adhesion physics remain active. All Chinese page captions and control descriptions are translated into English. Rebuild with `python3 scripts/build-release.py`.

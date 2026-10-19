@@ -1,8 +1,8 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=41';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=41';
-const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=41';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=42';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=42';
+const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=42';
 // Soft, transparent vapor texture; no solid cones or hard-edged smoke discs.
 const vaporTexture=document.createElement('canvas');vaporTexture.width=vaporTexture.height=64;
 const vaporCtx=vaporTexture.getContext('2d'),vaporGradient=vaporCtx.createRadialGradient(32,32,0,32,32,32);
@@ -145,7 +145,7 @@ const keys=new Set(),rings=[{x:340+stageShift,y:480},{x:780+stageShift,y:480},{x
 const magnet=true; // Surface adhesion is always available; no manual toggle.
 let car,flight=false,paused=false,score=0,last=0,time=0,toastUntil=6,particles=[],vaporEmission=0,cameraX=0;
 function reset(){car={x:500+stageShift,y:B-17,vx:0,vy:0,angle:0,facing:1,roll:0,rollActive:false,rollElapsed:0,rollAxisAngle:0,surface:'track',wheelRotation:0,wheelVelocity:0,speed:0,s:500+stageShift,launched:false};score=0;rings.forEach(r=>r.hit=false);particles=[];vaporEmission=0;cameraX=0;flight=false;paused=false;keys.clear();toastUntil=time+6;document.querySelector('#toast').textContent='← → drive. ↑ takes off / rises. ↓ descends. Touch down to exit flight.';sync();}
-function sync(){document.querySelector('#magnet').classList.toggle('active',!flight);document.querySelector('#flight').classList.toggle('active',flight);document.querySelector('#mode').textContent=flight?'● FLIGHT MODE':magnet?(car.surface==='track'&&Math.cos(car.angle)<-.9?'● INVERTED / AIR GRIP':'● AIR GRIP'):'● GROUND DRIVE';document.querySelector('#status').textContent=flight?'THRUSTERS ENGAGED':magnet?(onDrivingSurface()?'AUTO GRIP / GRAVITY OFF':'AIR GRIP READY / OFF TRACK'):'GRIP SYSTEM READY';document.querySelector('#pause').textContent=paused?'▶':'Ⅱ';}
+function sync(){document.querySelector('#magnet').classList.toggle('active',!flight);document.querySelector('#flight').classList.toggle('active',flight);document.querySelector('#mode').textContent=flight?'● FLIGHT MODE':magnet?(car.surface==='track'&&Math.cos(car.angle)<-.9?'● INVERTED / AIR GRIP':'● AIR GRIP'):'● GROUND DRIVE';document.querySelector('#status').textContent=flight?'THRUSTERS ENGAGED':magnet?(onDrivingSurface()?'AUTO GRIP / GRAVITY OFF':'AIR GRIP READY / OFF TRACK'):'GRIP SYSTEM READY';const pauseButton=document.querySelector('#pause');pauseButton.setAttribute('aria-pressed',String(paused));pauseButton.setAttribute('aria-label',paused?'Resume game':'Pause game');pauseButton.title=paused?'Resume game':'Pause game';}
 function toggleFlight(){flight=!flight;if(flight){car.surface=null;car.vy=Math.min(car.vy,-95);}sync();}
 document.querySelector('#reset').onclick=reset;document.querySelector('#flight').onclick=toggleFlight;document.querySelector('#pause').onclick=()=>{paused=!paused;keys.clear();sync();};
 window.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();const k=e.key.toLowerCase();if(!e.repeat){if(k==='arrowup'&&!flight)toggleFlight();if(k==='f')toggleFlight();if(k==='r')reset();if(k==='p'||k==='escape'){paused=!paused;sync();}}keys.add(k);});
@@ -280,7 +280,6 @@ ctx.save();ctx.globalAlpha=Math.max(.07,.3-(B-car.y)/1800);ctx.fillStyle='#000';
 ctx.save();ctx.translate(car.x,car.y);ctx.rotate(car.angle);ctx.scale(car.facing,1);
 const rollCos=Math.cos(car.roll||0),rollUnderside=Math.abs(Math.sin(car.roll||0));
 ctx.save();ctx.scale(1,Math.abs(rollCos)<.015?.015:rollCos);
-if(magnet&&onDrivingSurface()){ctx.strokeStyle='#69e4ee99';ctx.beginPath();ctx.ellipse(0,17,62,5,0,0,Math.PI*2);ctx.stroke();for(const x of [-42,0,42]){line(x,6,x,15,'#8ae5f0aa',1.5);line(x,15,x-3,11,'#8ae5f0aa',1.5);line(x,15,x+3,11,'#8ae5f0aa',1.5);}}
 // Detailed silver Roadster study based on the supplied video close-ups.
 if(roadsterImage.complete&&roadsterImage.naturalWidth){ctx.drawImage(roadsterImage,-80,-26,160,42.67);
  if(wheelImage.complete&&wheelImage.naturalWidth){for(const [x,y] of [[-50.4,2],[46.1333,1.6]]){ctx.save();ctx.translate(x,y);ctx.rotate(car.wheelRotation*car.facing*(rollCos<0?-1:1));ctx.drawImage(wheelImage,-13.3333,-13.3333,26.6667,26.6667);ctx.restore();}}
@@ -295,7 +294,7 @@ ctx.fillStyle='#8495a3';ctx.font='10px monospace';ctx.fillText('FLIGHT LIMIT',wo
 ctx.restore();
 ctx.font='bold 56px Arial';ctx.fillStyle='#b6cddd0b';ctx.fillText('THE RAMP',155,310);
 ctx.fillStyle='#8495a3';ctx.font='10px monospace';ctx.fillText('01 / ACCELERATION',130,552);ctx.fillStyle='#ee8175';ctx.fillText('02 / CURVED WALL',1000,552);ctx.fillStyle='#80cddf';ctx.fillText('03 / CEILING +15°',ceilingLeft-stageShift-12,scaffoldTop-12);
-if(paused){ctx.fillStyle='#080d17bb';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 36px Arial';ctx.fillText('PAUSED',W/2,H/2);ctx.font='14px Arial';ctx.fillStyle='#acb7c9';ctx.fillText('Press P or click ▶ to continue',W/2,H/2+34);ctx.textAlign='left';}}
+if(paused){ctx.fillStyle='#080d17bb';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 36px Arial';ctx.fillText('PAUSED',W/2,H/2);ctx.font='14px Arial';ctx.fillStyle='#acb7c9';ctx.fillText('Press P or click the play icon to continue',W/2,H/2+34);ctx.textAlign='left';}}
 function frame(ts){const dt=Math.min((ts-last)/1000||0,.033);last=ts;if(!paused)update(dt);draw();requestAnimationFrame(frame);}reset();requestAnimationFrame(frame);
 // Read-only telemetry for automated smoke checks and development tools.
 window.roadsterState=()=>({cameraX,worldLeft,leftStop,rampStart,scaffoldBack,x:car.x,y:car.y,vx:car.vx,vy:car.vy,surface:car.surface,launched:car.launched,angle:car.angle,distance:car.s,ceilingStart,trackEnd,facing:car.facing,roll:car.roll,rollActive:car.rollActive,rollElapsed:car.rollElapsed,undersideVisible:Math.abs(Math.sin(car.roll||0)),noseAngle:car.angle+(car.facing<0?Math.PI:0),wheelRotation:car.wheelRotation,wheelVelocity:car.wheelVelocity,inverted:car.surface==='track'&&Math.cos(car.angle)<-.9,magnet,flight,paused,score});
