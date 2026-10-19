@@ -1,8 +1,8 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=37';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=37';
-const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=37';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=38';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=38';
+const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=38';
 // Soft, transparent vapor texture; no solid cones or hard-edged smoke discs.
 const vaporTexture=document.createElement('canvas');vaporTexture.width=vaporTexture.height=64;
 const vaporCtx=vaporTexture.getContext('2d'),vaporGradient=vaporCtx.createRadialGradient(32,32,0,32,32,32);
@@ -178,17 +178,31 @@ if(!car.rollActive&&Math.abs(headingSpeed)>2){const facing=headingSpeed<0?-1:1;i
 for(const r of rings)if(!r.hit&&Math.hypot(car.x-r.x,car.y-r.y)<45){r.hit=true;score++;toastUntil=time+4;document.querySelector('#toast').textContent=score===5?'All checkpoints cleared. The sky is yours. R to run again.':`Checkpoint ${score} / 5 collected. Keep exploring.`;for(let i=0;i<22;i++)particles.push({x:r.x,y:r.y,vx:(Math.random()-.5)*240,vy:(Math.random()-.5)*240,life:1});}
 if(flight||car.rollActive){
  const rate=boost?240:120;vaporEmission+=dt*rate;
- const emit=(nozzleX,nozzleZ)=>{const life=boost?.105+Math.random()*.035:.16+Math.random()*.06,speed=boost?850+Math.random()*150:460+Math.random()*80;
-  particles.push({x:car.x,y:car.y,vx:0,vy:0,life,maxLife:life,age:0,gas:true,newborn:true,anchored:true,rollJet:car.rollActive,nozzleX,nozzleZ,jetSpeed:speed,travel:0,boosted:boost,axis:0,radius:2.5,growth:16,scatter:(Math.random()-.5)*2,seed:Math.random()*100,spread:false});};
- while(vaporEmission>=1){vaporEmission--;if(car.rollActive){emit(42,Math.sin(car.roll)*Math.cos(car.angle)<0?-30:30);}else{for(const x of [-43,42])for(const z of [-8,8])emit(x,z);}}
+ const emit=(nozzleX,nozzleZ,rollJet=false)=>{const life=boost?.105+Math.random()*.035:.16+Math.random()*.06,speed=boost?850+Math.random()*150:460+Math.random()*80;
+  particles.push({x:car.x,y:car.y,vx:0,vy:0,life,maxLife:life,age:0,gas:true,newborn:true,anchored:true,rollJet,rollCorner:car.rollActive&&!rollJet,nozzleX,nozzleZ,jetSpeed:speed,travel:0,boosted:boost,axis:0,radius:2.5,growth:16,scatter:(Math.random()-.5)*2,seed:Math.random()*100,spread:false});};
+ while(vaporEmission>=1){vaporEmission--;
+  if(car.rollActive){
+   // Match the four nozzle centers painted on the underside; the two rows open out with the roll.
+   for(const x of [-47.33,50.4])for(const z of [-16,16])emit(x,z);
+   emit(42,Math.sin(car.roll)*Math.cos(car.angle)<0?-30:30,true);
+  }else{for(const x of [-43,42])for(const z of [-8,8])emit(x,z);}
+ }
 }
 particles.forEach(p=>{
  const step=p.gas&&p.newborn?Math.random()*dt:dt;p.newborn=false;p.life-=step;
  if(p.gas){p.age+=step;
-  if(p.anchored&&(p.rollJet?car.rollActive:flight)){
+  if(p.anchored&&((p.rollJet||p.rollCorner)?car.rollActive:flight)){
    // A short pressure-driven jet follows its current nozzle, rather than lagging behind the car.
    const c=Math.cos(car.angle),s=Math.sin(car.angle),vertical=Math.cos(car.roll||0),lateral=Math.sin(car.roll||0),px=p.nozzleX*car.facing,py=12*vertical+p.nozzleZ*lateral;
-   const dx=p.rollJet?0:-s*vertical,dy=p.rollJet?1:c*vertical;p.travel+=p.jetSpeed*step;
+   let dx=-s*vertical,dy=c*vertical;
+   if(p.rollCorner){
+    // Splay the two transverse rows during the underside view, rather than collapsing jets edge-on.
+    const along=Math.sign(p.nozzleX)*Math.abs(lateral)*.28*car.facing;
+    const outward=vertical+Math.sign(p.nozzleZ)*lateral*.9;
+    const length=Math.hypot(along,outward);
+    dx=(along*c-outward*s)/length;dy=(along*s+outward*c)/length;
+   }else if(p.rollJet){dx=0;dy=1;}
+   p.travel+=p.jetSpeed*step;
    const spread=(2+p.travel*.055)*p.scatter+Math.sin(time*25+p.seed)*p.travel*.008;
    p.x=car.x+px*c-py*s+dx*p.travel-dy*spread;p.y=car.y+px*s+py*c+dy*p.travel+dx*spread;
    p.vx=car.vx+dx*p.jetSpeed;p.vy=car.vy+dy*p.jetSpeed;p.axis=Math.atan2(dy,dx);p.radius=2.5+p.travel*.085;

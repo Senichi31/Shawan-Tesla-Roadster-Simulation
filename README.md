@@ -172,3 +172,8 @@ Current entry: `play-ceiling-v36.html` (`V36 · ↑ TAKEOFF / ↓ DESCEND`). Up 
 ## V37: automatic flight after ceiling roll
 
 Current entry: `play-ceiling-v37.html`. Leaving the ceiling keeps the existing axial roll and momentum, then automatically engages flight once upright. During the roll, a downward pressure jet emits at the lower front-wheel position; normal underbody jets resume after the roll. Up/Down ascent/descent and automatic flight exit on touchdown remain available.
+
+
+## V38: four-corner vapor during the axial roll
+
+Current entry: `play-ceiling-v38.html`. All four underside nozzles now emit during the ceiling-exit roll, with their positions following the projected undertray and their jets fanning apart as the underside becomes visible. The downward front-wheel roll jet is retained. Normal side-view flight keeps its two overlapping pairs of jets, and completing the roll still engages flight automatically. Rebuild with `python3 scripts/build-release.py`.
