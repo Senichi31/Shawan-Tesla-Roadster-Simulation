@@ -1,7 +1,8 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=23';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=23';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=24';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=24';
+const roofImage=new Image();roofImage.src='assets/roadster-top.svg?v=24';
 const wheelRadius=91*160/1200;
 const W=1400,H=600,L=65,R=1335,T=100,B=510;
 // A circular wall meets the 15-degree uphill ceiling with a continuous tangent.
@@ -16,7 +17,7 @@ for(let distance=10;distance<=140;distance+=10){arc.push({x:ceilingJoin.x+distan
 const ceilingLeft=arc.at(-1).x;
 const trackEnd=arc.at(-1).s;
 function pathAt(distance){if(distance<=rampStart)return {x:distance,y:B,angle:0};const i=arc.findIndex(p=>p.s>=distance);if(i<0)return arc.at(-1);const a=arc[i-1],b=arc[i],u=(distance-a.s)/(b.s-a.s);return {x:a.x+(b.x-a.x)*u,y:a.y+(b.y-a.y)*u,angle:a.angle+(b.angle-a.angle)*u};}
-function placeOnTrack(){const p=pathAt(car.s);car.angle=p.angle;
+function placeOnTrack(){car.roll=0;car.rollActive=false;const p=pathAt(car.s);car.angle=p.angle;
  const position=offset=>{car.x=p.x+offset*Math.sin(p.angle);car.y=p.y-offset*Math.cos(p.angle);};
  position(17);
  // A long, rigid body also needs clearance where the straight upper road meets the curve.
@@ -34,7 +35,24 @@ const scaffoldEdges=[
 ];
 const flightRoads=[{a:{x:L,y:B},b:{x:R,y:B}},...arc.slice(1).map((b,i)=>({a:arc[i],b})),...scaffoldEdges];
 const bodyOutline=[[-74,-16],[-42,-18],[-12,-26],[26,-23],[61,-11],[74,-2],[74,10],[58,17],[-63,17],[-74,8]];
-function flightBody(){const c=Math.cos(car.angle),s=Math.sin(car.angle);return bodyOutline.map(([x,y])=>{x*=car.facing;return {x:car.x+x*c-y*s,y:car.y+x*s+y*c};});}
+function convexHull(points){
+ const sorted=points.sort((a,b)=>a.x-b.x||a.y-b.y),cross=(a,b,c)=>(b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
+ const lower=[],upper=[];for(const p of sorted){while(lower.length>1&&cross(lower.at(-2),lower.at(-1),p)<=1e-8)lower.pop();lower.push(p);}
+ for(const p of [...sorted].reverse()){while(upper.length>1&&cross(upper.at(-2),upper.at(-1),p)<=1e-8)upper.pop();upper.push(p);}return [...lower.slice(0,-1),...upper.slice(0,-1)];
+}
+function flightBody(){const c=Math.cos(car.angle),s=Math.sin(car.angle),roll=car.roll||0,vertical=Math.cos(roll),width=26*Math.abs(Math.sin(roll));
+ const points=bodyOutline.flatMap(([x,y])=>{x*=car.facing;return (width>1e-6?[-width,width]:[0]).map(offset=>{const projectedY=y*vertical+offset;return {x:car.x+x*c-projectedY*s,y:car.y+x*s+projectedY*c};});});
+ return width>1e-6?convexHull(points):points;
+}
+function beginAutoRoll(){
+ if(Math.cos(car.angle)>=0)return;
+ // Equivalent starting pose: retain the nose direction while rolling around the long axis.
+ car.angle+=Math.PI;car.facing*=-1;car.roll=Math.PI;car.rollElapsed=0;car.rollActive=true;car.rollAxisAngle=car.angle;
+}
+function updateAutoRoll(dt){
+ if(!car.rollActive)return;car.rollElapsed+=dt;const t=Math.min(1,car.rollElapsed/1.05),smooth=t*t*(3-2*t);car.roll=Math.PI*(1-smooth);
+ if(t===1){car.roll=0;car.rollActive=false;}
+}
 function bodyEntersScaffold(body){
  if(Math.max(...body.map(p=>p.x))<ceilingLeft||Math.min(...body.map(p=>p.x))>scaffoldBack)return false;
  const cross=(a,b,c)=>(b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
@@ -84,7 +102,9 @@ function resolveFlightContacts(){
  }
  return contacts;
 }
+// Keep the automatic roll continuous while clearing the lip; contact still blocks penetration.
 function landOnRoad(contacts){
+ if(car.rollActive&&car.launched)return false;
  for(const hit of contacts){
   if(hit.index===0&&hit.ny<-.5){car.surface=car.x<=rampStart?'track':'ground';car.s=car.x;car.speed=car.vx;car.vy=0;car.angle=0;car.launched=false;if(car.surface==='track')placeOnTrack();return true;}
   if(hit.index>0&&hit.index<arc.length){
@@ -106,7 +126,7 @@ function moveFlight(dt,targetAngle,turnRate=5,allowLanding=false){
 const keys=new Set(),rings=[{x:340,y:480},{x:780,y:480},{x:1055,y:365},{x:1040,y:230},{x:ceilingRing.x+17*Math.sin(ceilingAngle),y:ceilingRing.y-17*Math.cos(ceilingAngle)}];
 const magnet=true; // Surface adhesion is always available; no manual toggle.
 let car,flight=false,paused=false,score=0,last=0,time=0,toastUntil=6,particles=[];
-function reset(){car={x:500,y:B-17,vx:0,vy:0,angle:0,facing:1,surface:'track',wheelRotation:0,wheelVelocity:0,speed:0,s:500,launched:false};score=0;rings.forEach(r=>r.hit=false);particles=[];flight=false;paused=false;keys.clear();toastUntil=time+6;document.querySelector('#toast').textContent='← / A drives left. → / D drives right. Space brakes. F flies.';sync();}
+function reset(){car={x:500,y:B-17,vx:0,vy:0,angle:0,facing:1,roll:0,rollActive:false,rollElapsed:0,rollAxisAngle:0,surface:'track',wheelRotation:0,wheelVelocity:0,speed:0,s:500,launched:false};score=0;rings.forEach(r=>r.hit=false);particles=[];flight=false;paused=false;keys.clear();toastUntil=time+6;document.querySelector('#toast').textContent='← / A drives left. → / D drives right. Space brakes. F flies.';sync();}
 function sync(){document.querySelector('#magnet').classList.toggle('active',!flight);document.querySelector('#flight').classList.toggle('active',flight);document.querySelector('#mode').textContent=flight?'● FLIGHT MODE':magnet?(car.surface==='track'&&Math.cos(car.angle)<-.9?'● INVERTED / AIR GRIP':'● AIR GRIP'):'● GROUND DRIVE';document.querySelector('#status').textContent=flight?'THRUSTERS ENGAGED':magnet?(car.surface==='track'?'AUTO GRIP / GRAVITY OFF':'AIR GRIP READY / OFF TRACK'):'GRIP SYSTEM READY';document.querySelector('#pause').textContent=paused?'▶':'Ⅱ';}
 function toggleFlight(){flight=!flight;if(flight){car.surface=null;car.vy=Math.min(car.vy,-95);}sync();}
 document.querySelector('#reset').onclick=reset;document.querySelector('#flight').onclick=toggleFlight;document.querySelector('#pause').onclick=()=>{paused=!paused;keys.clear();sync();};
@@ -114,7 +134,8 @@ window.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','Arr
 window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>keys.clear());
 function update(dt){time+=dt;const right=keys.has('d')||keys.has('arrowright'),left=keys.has('a')||keys.has('arrowleft'),up=keys.has('w')||keys.has('arrowup'),down=keys.has('s')||keys.has('arrowdown'),boost=keys.has('shift'),power=boost?820:420,brake=keys.has(' ');
 const oldX=car.x,oldDistance=car.s,oldSurface=car.surface;
-if(flight){car.surface=null;car.vx+=(Number(right)-Number(left))*power*dt;car.vy+=(Number(down)-Number(up))*power*dt;car.vx*=Math.exp(-.7*dt);car.vy*=Math.exp(-.7*dt);moveFlight(dt,(car.vx/650)*.18);}
+updateAutoRoll(dt);
+if(flight){car.surface=null;car.vx+=(Number(right)-Number(left))*power*dt;car.vy+=(Number(down)-Number(up))*power*dt;car.vx*=Math.exp(-.7*dt);car.vy*=Math.exp(-.7*dt);moveFlight(dt,car.rollActive?car.rollAxisAngle:(car.vx/650)*.18);}
 else if(car.surface==='track'){
  const angle=pathAt(car.s).angle,drive=Number(right||up)-Number(left||down);
  car.speed+=((brake?0:drive)*(boost?1270:880))*dt;
@@ -124,13 +145,13 @@ else if(car.surface==='track'){
  car.speed*=Math.exp(-(drive?.48:2.4)*dt);car.speed=Math.max(-650,Math.min(950,car.speed));car.s=Math.max(L+55,car.s+car.speed*dt);
  if(car.s<=L+55)car.speed=Math.max(0,car.speed);
  placeOnTrack();car.vx=car.speed*Math.cos(car.angle);car.vy=car.speed*Math.sin(car.angle);
- if(car.s>=trackEnd){const overshoot=car.s-trackEnd;car.x+=overshoot*Math.cos(car.angle);car.y+=overshoot*Math.sin(car.angle);car.surface=null;car.launched=true;toastUntil=time+5;document.querySelector('#toast').textContent='CEILING EXIT / Press F for flight, or fall back to the ground.';}
+ if(car.s>=trackEnd){const overshoot=car.s-trackEnd;car.x+=overshoot*Math.cos(car.angle);car.y+=overshoot*Math.sin(car.angle);car.surface=null;car.launched=true;beginAutoRoll();toastUntil=time+5;document.querySelector('#toast').textContent='AUTO ROLL / Rolling upright. Press F to engage flight.';}
 }else if(car.surface==='ground'){
  car.vx+=(Number(right||up)-Number(left||down))*(boost?1150:760)*dt;car.vx*=Math.exp(-((right||up||left||down)?.48:2.4)*dt);if(!right&&!up&&!left&&!down&&Math.abs(car.vx)<.4)car.vx=0;car.angle=0;car.vy=0;moveFlight(dt,0);
  if(car.x<rampStart){car.surface='track';car.s=car.x;car.speed=car.vx;}
 }else{
  car.vx+=(Number(right)-Number(left))*power*.25*dt;car.vy+=420*dt;
- moveFlight(dt,0,1.5,true);
+ moveFlight(dt,car.rollActive?car.rollAxisAngle:0,1.5,true);
 }
 if(car.x<L+55){car.x=L+55;car.vx=Math.max(0,car.vx);}if(car.x>R-55){car.x=R-55;car.vx=Math.min(0,car.vx);}
 if(car.y<35){car.y=35;car.vy=Math.max(0,car.vy);}if(car.y>B-17&&car.surface!=='track'){car.y=B-17;car.vy=0;if(!flight){car.angle=0;car.surface=car.x<=rampStart?'track':'ground';car.s=car.x;car.speed=car.vx;}}
@@ -143,7 +164,7 @@ else {car.wheelVelocity*=Math.exp(-1.5*dt);}
 car.wheelRotation+=car.wheelVelocity*dt;
 // Turn the body to follow signed travel along the road, including reversed wall driving.
 const headingSpeed=(car.surface==='track'?car.speed:car.vx);
-if(Math.abs(headingSpeed)>2){const facing=headingSpeed<0?-1:1;if(car.facing!==facing){car.facing=facing;if(car.surface==='track')placeOnTrack();else resolveFlightContacts();}}
+if(!car.rollActive&&Math.abs(headingSpeed)>2){const facing=headingSpeed<0?-1:1;if(car.facing!==facing){car.facing=facing;if(car.surface==='track')placeOnTrack();else resolveFlightContacts();}}
 for(const r of rings)if(!r.hit&&Math.hypot(car.x-r.x,car.y-r.y)<45){r.hit=true;score++;toastUntil=time+4;document.querySelector('#toast').textContent=score===5?'All checkpoints cleared. The sky is yours. R to run again.':`Checkpoint ${score} / 5 collected. Keep exploring.`;for(let i=0;i<22;i++)particles.push({x:r.x,y:r.y,vx:(Math.random()-.5)*240,vy:(Math.random()-.5)*240,life:1});}
 if(flight&&Math.random()<dt*35){particles.push({x:car.x+(Math.random()-.5)*80,y:car.y+30,vx:-car.vx*.1+(Math.random()-.5)*25,vy:45+Math.random()*50,life:1.3,smoke:true});}
 particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;});particles=particles.filter(p=>p.life>0);sync();document.querySelector('#speed').textContent=String(Math.round(Math.hypot(car.vx,car.vy)*.36)).padStart(3,'0');document.querySelector('#score').textContent=`0${score} / 05`;document.querySelector('#toast').style.opacity=time<toastUntil?'1':'0';}
@@ -187,6 +208,8 @@ for(let i=0;i<rings.length;i++){const r=rings[i];if(r.hit)continue;const pulse=M
 for(const p of particles){ctx.globalAlpha=Math.min(1,p.life)*(p.smoke?.16:1);ctx.fillStyle=p.smoke?'#b6d2dc':'#ffd69a';if(p.smoke){ctx.beginPath();ctx.arc(p.x,p.y,7+(1.3-p.life)*20,0,Math.PI*2);ctx.fill();}else ctx.fillRect(p.x,p.y,3,3);}ctx.globalAlpha=1;
 ctx.save();ctx.globalAlpha=Math.max(.07,.3-(B-car.y)/1800);ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(car.x,B+2,72+(B-car.y)*.1,5,0,0,Math.PI*2);ctx.fill();ctx.restore();
 ctx.save();ctx.translate(car.x,car.y);ctx.rotate(car.angle);ctx.scale(car.facing,1);
+const rollCos=Math.cos(car.roll||0),rollTop=Math.abs(Math.sin(car.roll||0));
+ctx.save();ctx.scale(1,Math.abs(rollCos)<.015?.015:rollCos);
 if(flight){
  for(const x of [-43,42]){const length=55+Math.sin(time*27+x)*9+(keys.has('shift')?35:0);const plume=ctx.createLinearGradient(x,10,x,10+length);plume.addColorStop(0,'#dcfaff');plume.addColorStop(.12,'#80e7ffdd');plume.addColorStop(.55,'#24a4e580');plume.addColorStop(1,'#73d9f500');ctx.fillStyle=plume;ctx.beginPath();ctx.moveTo(x-3,11);ctx.bezierCurveTo(x-6,32,x-11,50,x-13,10+length);ctx.lineTo(x+13,10+length);ctx.bezierCurveTo(x+8,45,x+4,25,x+3,11);ctx.fill();}
  const jet=ctx.createLinearGradient(-70,0,-150,0);jet.addColorStop(0,'#caf7ffdd');jet.addColorStop(.4,'#3fc2ef80');jet.addColorStop(1,'#7ce6ff00');ctx.fillStyle=jet;ctx.beginPath();ctx.moveTo(-67,-6);ctx.lineTo(-150,4);ctx.lineTo(-67,6);ctx.fill();
@@ -194,10 +217,13 @@ if(flight){
 if(magnet&&car.surface==='track'){ctx.strokeStyle='#69e4ee99';ctx.beginPath();ctx.ellipse(0,17,62,5,0,0,Math.PI*2);ctx.stroke();for(const x of [-42,0,42]){line(x,6,x,15,'#8ae5f0aa',1.5);line(x,15,x-3,11,'#8ae5f0aa',1.5);line(x,15,x+3,11,'#8ae5f0aa',1.5);}}
 // Detailed silver Roadster study based on the supplied video close-ups.
 if(roadsterImage.complete&&roadsterImage.naturalWidth){ctx.drawImage(roadsterImage,-80,-26,160,42.67);
- if(wheelImage.complete&&wheelImage.naturalWidth){for(const [x,y] of [[-50.4,2],[46.1333,1.6]]){ctx.save();ctx.translate(x,y);ctx.rotate(car.wheelRotation*car.facing);ctx.drawImage(wheelImage,-13.3333,-13.3333,26.6667,26.6667);ctx.restore();}}
+ if(wheelImage.complete&&wheelImage.naturalWidth){for(const [x,y] of [[-50.4,2],[46.1333,1.6]]){ctx.save();ctx.translate(x,y);ctx.rotate(car.wheelRotation*car.facing*(rollCos<0?-1:1));ctx.drawImage(wheelImage,-13.3333,-13.3333,26.6667,26.6667);ctx.restore();}}
 }else{ctx.fillStyle='#b7ccd5';ctx.fillRect(-60,-12,120,24);}
+ctx.restore();
+// The top view expands between the two side views, making the axial roll visible in 2D.
+if(rollTop>.01&&roofImage.complete&&roofImage.naturalWidth){ctx.globalAlpha=rollTop;ctx.drawImage(roofImage,-80,-28*rollTop,160,56*rollTop);ctx.globalAlpha=1;}
 ctx.restore();
 if(paused){ctx.fillStyle='#080d17bb';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 36px Arial';ctx.fillText('PAUSED',W/2,H/2);ctx.font='14px Arial';ctx.fillStyle='#acb7c9';ctx.fillText('Press P or click ▶ to continue',W/2,H/2+34);ctx.textAlign='left';}}
 function frame(ts){const dt=Math.min((ts-last)/1000||0,.033);last=ts;if(!paused)update(dt);draw();requestAnimationFrame(frame);}reset();requestAnimationFrame(frame);
 // Read-only telemetry for automated smoke checks and development tools.
-window.roadsterState=()=>({x:car.x,y:car.y,vx:car.vx,vy:car.vy,surface:car.surface,launched:car.launched,angle:car.angle,distance:car.s,ceilingStart,trackEnd,facing:car.facing,wheelRotation:car.wheelRotation,wheelVelocity:car.wheelVelocity,inverted:car.surface==='track'&&Math.cos(car.angle)<-.9,magnet,flight,paused,score});
+window.roadsterState=()=>({x:car.x,y:car.y,vx:car.vx,vy:car.vy,surface:car.surface,launched:car.launched,angle:car.angle,distance:car.s,ceilingStart,trackEnd,facing:car.facing,roll:car.roll,rollActive:car.rollActive,rollElapsed:car.rollElapsed,roofVisible:Math.abs(Math.sin(car.roll||0)),noseAngle:car.angle+(car.facing<0?Math.PI:0),wheelRotation:car.wheelRotation,wheelVelocity:car.wheelVelocity,inverted:car.surface==='track'&&Math.cos(car.angle)<-.9,magnet,flight,paused,score});
