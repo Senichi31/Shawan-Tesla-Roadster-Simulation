@@ -69,3 +69,7 @@ Current entry: `play-ceiling-v11.html` (`V11 · INERTIA / OPEN TRACK EXIT`). Rel
 ## V12: automatic surface adhesion
 
 Current entry: `play-ceiling-v12.html` (`V12 · AUTOMATIC AIR GRIP`). Removes the M key and clickable air-grip toggle. Surface adhesion is always available automatically, including after leaving flight mode. Wall/ceiling driving remains gravity-free. Short taps still coast with inertia, Space brakes, the ceiling end releases naturally, and F toggles flight. The grip card now displays status rather than acting as a control. Rebuild V12 with `python3 scripts/build-release.py`. Earlier version notes describe historical behavior.
+
+## V13: grounded steel scaffold
+
+Current entry: `play-ceiling-v13.html` (`V13 · GROUNDED STEEL SCAFFOLD`). Replaces the narrow curved truss with a rectangular rear steel tower: vertical grounded columns, a straight top beam, horizontal cross members, X braces and foot plates. Steelwork is clipped behind the road face. Track geometry, automatic grip, inertia, open-end exit and vehicle artwork are unchanged. Rebuild V13 with `python3 scripts/build-release.py`.

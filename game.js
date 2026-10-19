@@ -1,7 +1,7 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=12';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=12';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=13';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=13';
 const wheelRadius=91*160/1200;
 const W=1400,H=600,L=65,R=1335,T=100,B=510;
 // Arc-length parametrization: ground, full 180-degree wall, horizontal ceiling.
@@ -69,10 +69,25 @@ const glow=ctx.createRadialGradient(1000,400,15,1000,400,600);glow.addColorStop(
 ctx.fillStyle='#0c1117';ctx.fillRect(0,B,W,H-B);line(L,B,R,B,'#89939d',2);
 for(let x=100;x<1350;x+=45){ctx.fillStyle='#c1dbeb';ctx.shadowColor='#addefb';ctx.shadowBlur=8;ctx.fillRect(x,B+5,3,2);}ctx.shadowBlur=0;
 line(100,B+14,790,B+14,'#f34b40',2);line(100,B+19,790,B+19,'#f34b402a',3);
-const outer=arc.map(p=>({x:p.x-33*Math.sin(p.angle),y:p.y+33*Math.cos(p.angle)}));
-for(let i=1;i<arc.length;i+=12){const p=arc[i],o=outer[i],next=outer[Math.min(i+12,arc.length-1)];line(p.x,p.y,o.x,o.y,'#697681',2);line(p.x,p.y,next.x,next.y,'#3d4d5c',1.5);}
-const cutEnd=arc.at(-1),cutOuter=outer.at(-1);line(cutEnd.x,cutEnd.y,cutOuter.x,cutOuter.y,'#697681',2);
-ctx.beginPath();outer.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.strokeStyle='#485560';ctx.lineWidth=2;ctx.stroke();
+// Grounded rectangular scaffold behind the ramp, as in the reference stage.
+// Clip the steelwork to the region outside the driving face so no brace crosses the road.
+const frameTop=B-2*ry-38,frameBack=rampStart+rx+72;
+ctx.save();ctx.beginPath();ctx.moveTo(ceilingLeft,frameTop);ctx.lineTo(frameBack,frameTop);ctx.lineTo(frameBack,B);ctx.lineTo(rampStart,B);
+for(const p of arc.slice(1,181))ctx.lineTo(p.x,p.y);
+ctx.lineTo(ceilingLeft,B-2*ry);ctx.closePath();ctx.clip();
+const beam=(x,y,x2,y2,width=2.6)=>{line(x,y,x2,y2,'#71808c',width);line(x-1,y,x2-1,y2,'#c3cdd533',.8);};
+const columns=[];for(let x=ceilingLeft;x<frameBack;x+=65)columns.push(x);columns.push(frameBack);
+const levels=[frameTop,B-2*ry];for(let y=B-2*ry+60;y<B;y+=60)levels.push(y);levels.push(B);
+// Uprights stay vertical; cross members and X braces form rectangular bays.
+for(const x of columns)beam(x,frameTop,x,B,3);
+for(const y of levels)beam(ceilingLeft,y,frameBack,y,2.8);
+for(let i=0;i<columns.length-1;i++)for(let j=0;j<levels.length-1;j++){
+ const x=columns[i],x2=columns[i+1],y=levels[j],y2=levels[j+1];
+ beam(x+3,y+3,x2-3,y2-3,1.6);beam(x2-3,y+3,x+3,y2-3,1.6);
+}
+beam(frameBack,frameTop,frameBack,B,4);beam(ceilingLeft,frameTop,frameBack,frameTop,4);ctx.restore();
+// Foot plates anchor the rear tower and the lower ramp supports on the stage floor.
+for(const x of columns.filter(x=>x>=rampStart)){ctx.fillStyle='#61707c';ctx.fillRect(x-9,B,18,4);line(x-7,B+4,x+7,B+4,'#a0aeb8',1);}
 const deck=()=>{ctx.moveTo(L,B);ctx.lineTo(rampStart,B);arc.forEach(p=>ctx.lineTo(p.x,p.y));};
 ctx.beginPath();deck();ctx.strokeStyle='#343e47';ctx.lineWidth=11;ctx.stroke();
 ctx.beginPath();deck();ctx.strokeStyle='#afb8c1';ctx.lineWidth=1.5;ctx.stroke();
