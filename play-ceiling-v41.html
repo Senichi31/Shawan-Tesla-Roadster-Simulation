@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Roadster / Beyond the road</title><style>
+:root{color-scheme:dark;--red:#ff493f;--muted:#82868f}*{box-sizing:border-box}body{margin:0;background:#101114;color:#f4f4f5;font-family:'DM Sans',Arial,sans-serif}main{max-width:1440px;margin:auto;padding:0 58px}header{height:96px;border-bottom:1px solid #282a2f;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:17px;color:inherit;text-decoration:none;font-weight:700;letter-spacing:4px;font-size:16px}.mark{color:var(--red);font-size:32px;font-weight:800;font-family:serif}.edition{font-size:9px;color:var(--muted);letter-spacing:2px;margin-left:17px}.live{font-size:9px;letter-spacing:1.7px;color:#aaaeb5}.live i{display:inline-block;width:6px;height:6px;background:#a5e9b6;border-radius:50%;margin-right:8px}.intro{display:flex;align-items:center;justify-content:space-between;padding:40px 0 30px}.eyebrow{color:var(--red);letter-spacing:3px;font-size:10px;font-weight:bold}h1{font-size:64px;letter-spacing:-2px;line-height:1;margin:12px 0 14px;font-family:'Barlow Condensed','Arial Narrow',sans-serif;font-weight:700}h1 span{color:var(--red)}.intro p{color:#969aa3;font-size:13px;margin:0}button{font:inherit;color:inherit;cursor:pointer}#reset{background:#1b1d22;border:1px solid #35373d;border-radius:5px;padding:12px 14px;font-size:12px}kbd{font:10px 'DM Sans',sans-serif;border:1px solid #44474e;border-radius:3px;padding:3px 5px;color:#d7d9dd;display:inline-block;margin:0 2px}#reset kbd{margin-left:18px}.sim{height:490px;position:relative;border:1px solid #353740;border-radius:8px;overflow:hidden;background:#141a24}canvas{width:100%;height:100%;display:block;outline:none}.arena-label{position:absolute;top:24px;left:25px;letter-spacing:2px;font-size:10px;color:#d1d5df;pointer-events:none}.arena-label span{display:block;font-size:8px;color:#657185;letter-spacing:1px;margin-top:7px}.hud{position:absolute;top:24px;right:26px;display:flex;gap:20px;align-items:center}.small{display:block;color:#8993a6;font-size:8px;letter-spacing:2px}.hud strong{font-size:39px;font-family:'Barlow Condensed',monospace;font-weight:600;display:inline-block;min-width:64px}.unit{font-size:8px;color:#8d97a9;margin-left:6px}.hud b{display:block;font-size:16px;font-weight:500;margin-top:10px}.hud-line{height:45px;width:1px;background:#343d4b}.mode-badge{position:absolute;left:26px;top:89px;font-size:9px;letter-spacing:1.4px;color:#abc6dd;border:1px solid #385063;background:#172634c9;padding:8px 11px;border-radius:4px}.toast{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);font-size:11px;color:#c0c6d0;background:#151a23d9;border:1px solid #303947;border-radius:30px;padding:10px 20px;white-space:nowrap;pointer-events:none}.canvas-footer{position:absolute;bottom:0;left:0;right:0;height:34px;padding:0 24px;display:flex;justify-content:space-between;align-items:center;background:#10151de6;border-top:1px solid #29303b;color:#758195;font-size:8px;letter-spacing:1.4px}#status{color:#8ea99c}#pause{position:absolute;right:23px;bottom:53px;background:#1e2633;border:1px solid #3c4555;border-radius:5px;width:33px;height:30px}.controls{display:grid;grid-template-columns:1.15fr 1fr 1fr 1fr;margin-top:20px;border:1px solid #2d3036;border-radius:6px;padding:23px 0}.control{background:none;border:0;border-right:1px solid #2d3036;display:flex;align-items:center;text-align:left;gap:14px;padding:0 24px}.control:last-child{border-right:0}.control-icon{font-size:27px;color:#8d929e}.control h2{font-size:11px;font-weight:500;margin:0 0 9px}.control p{color:#7e8490;font-size:10px;margin:0}.control p kbd{padding:2px 4px;font-size:8px}.control p span{margin-left:5px}.control h2 kbd{font-size:8px;margin-left:8px}.mode-control i{width:6px;height:6px;flex-shrink:0;background:#41454e;border-radius:50%;margin-left:auto}.mode-control.active i{background:var(--red);box-shadow:0 0 10px #ff493f99}.mode-control.active .control-icon{color:var(--red)}footer{display:flex;justify-content:space-between;padding:24px 0;color:#686d77;font-size:10px}footer>span:last-child{font-size:8px;letter-spacing:1.5px}.dot{margin:0 12px;color:var(--red)}@media(max-width:800px){main{padding:0 18px}header{height:72px}.edition,.live{display:none}h1{font-size:45px}.intro{padding:30px 0}.sim{height:470px}.controls{grid-template-columns:1fr 1fr;gap:24px 0}.control:nth-child(2){border-right:0}.control{padding:0 14px;gap:10px}.arena-label span{display:none}.hud{gap:10px;right:15px}.arena-label{left:15px;font-size:8px}.toast{font-size:9px;padding:10px}.canvas-footer span:first-child{display:none}footer>span:last-child{display:none}#reset{font-size:0}#reset kbd{font-size:11px;margin:0}}
+
+.vehicle-detail{margin-top:22px;padding:22px 30px;display:flex;align-items:center;justify-content:space-between;gap:30px;border:1px solid #2d3036;border-radius:6px;background:radial-gradient(ellipse at 75% 70%,#24303a55,transparent 65%)}.vehicle-detail h2{font-size:25px;letter-spacing:-.8px;margin:12px 0}.vehicle-detail p{font-size:11px;color:#8696a2}.vehicle-detail img{width:47%;max-width:540px;filter:drop-shadow(0 15px 8px #0008)}@media(max-width:800px){.vehicle-detail{flex-direction:column;padding:22px;align-items:flex-start}.vehicle-detail img{width:100%}.vehicle-detail h2{font-size:23px}}
+</style></head>
+<body><main><header><a class="brand" href="./"><span class="mark">T</span> ROADSTER <span class="edition">EXPERIMENTAL / 01</span></a><span class="live"><i></i> SIMULATION ONLINE</span></header>
+<section class="intro"><div><div class="eyebrow">NO ROADS. NO RULES.</div><h1>Beyond the road<span>.</span></h1><p>Drive up the wall. Hang upside down. Take flight.</p></div><button id="reset">↻ &nbsp; Reset run <kbd>R</kbd></button></section>
+<section class="sim" aria-label="Interactive 2D driving game"><canvas id="game" aria-label="Roadster test arena: use arrow keys or WASD to drive, automatic surface grip, Up arrow for takeoff/ascent, Down arrow for descent, touchdown exits flight" tabindex="0"></canvas><div class="arena-label">THE RAMP / ROADSTER <span>V41 · SCAFFOLD DRIVE</span></div><div class="hud"><div><span class="small">VELOCITY</span><strong id="speed">000</strong><span class="unit">KM/H</span></div><div class="hud-line"></div><div><span class="small">CHECKPOINTS</span><b id="score">00 / 05</b></div></div><div class="mode-badge" id="mode">● GROUND DRIVE</div><div class="toast" id="toast">Tap arrows to roll. Space brakes. Drive off the open ceiling end.</div><div class="canvas-footer"><span>INFINITE POSSIBILITIES. ONE ROADSTER.</span><span id="status">GRIP SYSTEM READY</span></div><button id="pause" aria-label="Pause game">Ⅱ</button></section>
+<section class="controls"><div class="control"><span class="control-icon">↔</span><div><h2>← / A 向左 · → / D 向右</h2><p><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> <span>or arrow keys</span></p></div></div><div class="control mode-control" id="magnet"><span class="control-icon">⊓</span><div><h2>自动吸附 · 常驻开启</h2><p>无重力吸附 · Space 刹车</p></div><i></i></div><button class="control mode-control" id="flight"><span class="control-icon">↗</span><div><h2>↑ 起飞 / 上升</h2><p>↓ 下降 · 着地自动退出飞行</p></div><i></i></button><div class="control"><span class="control-icon">ϟ</span><div><h2>Extra thrust <kbd>SHIFT</kbd></h2><p>Hold to boost your speed</p></div></div></section><section class="vehicle-detail"><div><div class="eyebrow">THE RAMP / SILVER EDITION</div><h2>Built to leave the ground.</h2><p>楔形车头 · 银灰车身 · 黑色侧窗 · 六辐大轮毂</p></div><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjMyMCIgdmlld0JveD0iMCAwIDEyMDAgMzIwIj4KPGRlZnM+CiA8bGluZWFyR3JhZGllbnQgaWQ9ImJvZHkiIHgxPSIwIiB5MT0iMCIgeDI9Ii4xNSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiNmMGYwZWQiLz48c3RvcCBvZmZzZXQ9Ii4yMyIgc3RvcC1jb2xvcj0iI2Q2ZDdkNSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjYWFhY2FjIi8+PHN0b3Agb2Zmc2V0PSIuOCIgc3RvcC1jb2xvcj0iIzhiOGQ5MCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzU2NWI1ZiIvPjwvbGluZWFyR3JhZGllbnQ+CiA8bGluZWFyR3JhZGllbnQgaWQ9InNpZGUiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjYTZhN2E4Ii8+PHN0b3Agb2Zmc2V0PSIuNTIiIHN0b3AtY29sb3I9IiM5YjlkOWYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM2MjY2NmEiLz48L2xpbmVhckdyYWRpZW50PgogPGxpbmVhckdyYWRpZW50IGlkPSJmcm9udCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9Ii44Ij48c3RvcCBzdG9wLWNvbG9yPSIjZDVkNmQyIi8+PHN0b3Agb2Zmc2V0PSIuNDUiIHN0b3AtY29sb3I9IiNhY2FmYWYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM2YTcxNzQiLz48L2xpbmVhckdyYWRpZW50PgogPGxpbmVhckdyYWRpZW50IGlkPSJnbGFzcyIgeDE9IjAiIHkxPSIwIiB4Mj0iLjQiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjMWIyMjI0Ii8+PHN0b3Agb2Zmc2V0PSIuNiIgc3RvcC1jb2xvcj0iIzAzMGEwYyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzBjMTExMyIvPjwvbGluZWFyR3JhZGllbnQ+CiA8bGluZWFyR3JhZGllbnQgaWQ9InJlZmxlY3Rpb24iIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIuMyI+PHN0b3Agc3RvcC1jb2xvcj0iI2JjYmZiZSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjZjdmNmVmIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZDBkMWNlIi8+PC9saW5lYXJHcmFkaWVudD4KIDxsaW5lYXJHcmFkaWVudCBpZD0icmltIiB4MT0iMCIgeTE9IjAiIHgyPSIuOCIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiNjN2NhYzkiLz48c3RvcCBvZmZzZXQ9Ii40IiBzdG9wLWNvbG9yPSIjYTNhOGE4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNTM1YzYyIi8+PC9saW5lYXJHcmFkaWVudD4KIDxyYWRpYWxHcmFkaWVudCBpZD0icnViYmVyIj48c3RvcCBvZmZzZXQ9Ii43MiIgc3RvcC1jb2xvcj0iIzA4MGMwZSIvPjxzdG9wIG9mZnNldD0iLjg1IiBzdG9wLWNvbG9yPSIjMTcxZDIwIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQwODA5Ii8+PC9yYWRpYWxHcmFkaWVudD4KIDxnIGlkPSJ3aGVlbCIgdHJhbnNmb3JtPSJyb3RhdGUoLTIzKSI+CiAgPGNpcmNsZSByPSI5MSIgZmlsbD0idXJsKCNydWJiZXIpIiBzdHJva2U9IiMyMDI5MmMiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxjaXJjbGUgcj0iNzQiIGZpbGw9IiMwYjExMTUiIHN0cm9rZT0iIzQyNGI1MCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPCEtLSBTaXggYnJvYWQgYnJ1c2hlZC1zaWx2ZXIgcGFuZWxzIHNlcGFyYXRlZCBieSBzdHJhaWdodCwgaGVhdnkgYmxhY2sgc3Bva2VzLiAtLT4KICA8ZyBmaWxsPSJ1cmwoI3JpbSkiIHN0cm9rZT0iIzQyNGI1MCIgc3Ryb2tlLXdpZHRoPSIxLjUiPgogICA8cGF0aCBpZD0icGFuZWwiIGQ9Ik0tMTUtNjlBNzEgNzEgMCAwIDEgNDMtNTZMMTYtMTkgMS0yNFoiLz4KICAgPHVzZSBocmVmPSIjcGFuZWwiIHRyYW5zZm9ybT0icm90YXRlKDYwKSIvPjx1c2UgaHJlZj0iI3BhbmVsIiB0cmFuc2Zvcm09InJvdGF0ZSgxMjApIi8+PHVzZSBocmVmPSIjcGFuZWwiIHRyYW5zZm9ybT0icm90YXRlKDE4MCkiLz48dXNlIGhyZWY9IiNwYW5lbCIgdHJhbnNmb3JtPSJyb3RhdGUoMjQwKSIvPjx1c2UgaHJlZj0iI3BhbmVsIiB0cmFuc2Zvcm09InJvdGF0ZSgzMDApIi8+CiAgPC9nPgogIDxnIGZpbGw9IiMwOTEyMTYiIHN0cm9rZT0iIzMwM2EzZiIgc3Ryb2tlLXdpZHRoPSIxLjUiPgogICA8cGF0aCBpZD0ic3Bva2UiIGQ9Im0tOC0xNy04LTU0IDEzLTMgMTUgNTYgMyAxNi0xMyAxMFoiLz4KICAgPHVzZSBocmVmPSIjc3Bva2UiIHRyYW5zZm9ybT0icm90YXRlKDYwKSIvPjx1c2UgaHJlZj0iI3Nwb2tlIiB0cmFuc2Zvcm09InJvdGF0ZSgxMjApIi8+PHVzZSBocmVmPSIjc3Bva2UiIHRyYW5zZm9ybT0icm90YXRlKDE4MCkiLz48dXNlIGhyZWY9IiNzcG9rZSIgdHJhbnNmb3JtPSJyb3RhdGUoMjQwKSIvPjx1c2UgaHJlZj0iI3Nwb2tlIiB0cmFuc2Zvcm09InJvdGF0ZSgzMDApIi8+CiAgPC9nPgogIDxnIHN0cm9rZT0iIzY0NzA3NiIgc3Ryb2tlLXdpZHRoPSIxLjgiIG9wYWNpdHk9Ii44NSI+PHBhdGggaWQ9ImVkZ2UiIGQ9Im0tNi0yOC03LTM3Ii8+PHVzZSBocmVmPSIjZWRnZSIgdHJhbnNmb3JtPSJyb3RhdGUoNjApIi8+PHVzZSBocmVmPSIjZWRnZSIgdHJhbnNmb3JtPSJyb3RhdGUoMTIwKSIvPjx1c2UgaHJlZj0iI2VkZ2UiIHRyYW5zZm9ybT0icm90YXRlKDE4MCkiLz48dXNlIGhyZWY9IiNlZGdlIiB0cmFuc2Zvcm09InJvdGF0ZSgyNDApIi8+PHVzZSBocmVmPSIjZWRnZSIgdHJhbnNmb3JtPSJyb3RhdGUoMzAwKSIvPjwvZz4KICA8Y2lyY2xlIHI9IjE5IiBmaWxsPSIjMGMxNDE5IiBzdHJva2U9IiM0YTU1NWEiIHN0cm9rZS13aWR0aD0iMiIvPjxjaXJjbGUgcj0iMTEiIGZpbGw9IiMxODIzMjciLz4KICA8ZyBmaWxsPSIjODM4YjhjIj48Y2lyY2xlIGN4PSIwIiBjeT0iLTE0IiByPSIyIi8+PGNpcmNsZSBjeD0iMTMiIGN5PSItNCIgcj0iMiIvPjxjaXJjbGUgY3g9IjgiIGN5PSIxMSIgcj0iMiIvPjxjaXJjbGUgY3g9Ii04IiBjeT0iMTEiIHI9IjIiLz48Y2lyY2xlIGN4PSItMTMiIGN5PSItNCIgcj0iMiIvPjwvZz4KIDwvZz4KPC9kZWZzPgo8IS0tIFRyYWNlZCBwcm9wb3J0aW9ucyBvZiB0aGUgc3VwcGxpZWQgc2lkZSByZWZlcmVuY2UsIG1pcnJvcmVkIHRvIGZhY2UgZm9yd2FyZCBpbi1nYW1lLiAtLT4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTIwMCAwKSBzY2FsZSgtMSAxKSI+CiA8cGF0aCBkPSJNNTkgMTY3UTEyOSAxMTkgMTk3IDk2UTIzMCA4OCAyNzkgODhMNDc3IDIzUTUzNiA0IDYwMyAxMEw3NDQgMTdRODEyIDIxIDg3MyAzOUwxMDA1IDc3IDExMzkgODYgMTEzNSAxMzAgMTEwNCAxNTQgMTExMSAxOTkgMTA4NiAyMjQgMTA0NiAyMzggMTY1IDIzOSA2MSAyMjZaIiBmaWxsPSJ1cmwoI2JvZHkpIiBzdHJva2U9IiM3NDdiN2QiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiA8IS0tIFRoZSBzdHJhaWdodCBzaG91bGRlciBzZXBhcmF0ZXMgdGhlIGxpZ2h0IHJvb2Ygc2tpbiBmcm9tIHRoZSBkYXJrZXIgc2xhYiBzaWRlcy4gLS0+CiA8cGF0aCBkPSJtMzk4IDEyMyAzMjMtMjggMTg2LTE3IDE2OCA4IDI5IDY4LTMxIDY5LTY3NyAxNVoiIGZpbGw9InVybCgjc2lkZSkiLz4KIDxwYXRoIGQ9Ik01OSAxNjcgMTk2IDEwMVEyMzQgOTIgMjc3IDkyTDM5NyAxMjMgNDIwIDIzMCAxNjAgMjMzIDYyIDIyMloiIGZpbGw9InVybCgjZnJvbnQpIi8+CiA8cGF0aCBkPSJNMzA3IDg4IDQ4OSAzMyA1MjkgMjMgNDk2IDc4IDQ1NiA5N1oiIGZpbGw9InVybCgjZ2xhc3MpIi8+CiA8cGF0aCBkPSJNNTAwIDc3IDU0MCAyM1E2MjkgMTcgNzMxIDI2TDg2NyA0OSA3ODkgNjkgNzIyIDgyIDUwNiA5OSA0NTYgOTdaIiBmaWxsPSJ1cmwoI2dsYXNzKSIvPgogPCEtLSBSZWZsZWN0ZWQgbGlnaHQgYmFuZCBhY3Jvc3MgdGhlIGdsYXppbmcsIGV4YWN0bHkgYWJvdmUgdGhlIGRhcmsgc2lkZSB3aW5kb3cuIC0tPgogPHBhdGggZD0ibTUwNCA0MSAzNy0xOHE5OS0zIDE3NyA2bC0yMCAyNy0xNzQtMTRaIiBmaWxsPSJ1cmwoI3JlZmxlY3Rpb24pIi8+CiA8cGF0aCBkPSJtNzM5IDI5IDExMiAxNy02MCAyMS02OS0xMFoiIGZpbGw9InVybCgjcmVmbGVjdGlvbikiLz4KIDxwYXRoIGQ9Im03MTYgMjUgNCAxLTI0IDUxLTUgMloiIGZpbGw9IiM2MjZiNmYiLz4KIDxwYXRoIGQ9Im03MzggMjggNCAxLTIyIDUxLTYgMVoiIGZpbGw9IiM0MjRkNTEiLz4KIDxwYXRoIGQ9Ik0zMDMgODggNDg0IDI5UTU1MiA2IDYwNSAxNUw3MzkgMjEgODY2IDQ3IiBmaWxsPSJub25lIiBzdHJva2U9IiNlYmVkZWIiIHN0cm9rZS13aWR0aD0iMyIvPgogPHBhdGggZD0ibTUyNiAyNCAxMi0xLTQyIDU2LTkgMVoiIGZpbGw9IiM3ZTg3OGEiLz4KIDwhLS0gRmx1c2gsIGFsbW9zdCBmZWF0dXJlbGVzcyBkb29yIGFuZCBhbmd1bGFyIHNodXQgbGluZXMuIC0tPgogPHBhdGggZD0ibTM5OCAxMjMgMjUgMTA4TTcyMiA4NWwtNTMgMTM5TTEwNzMgODdsMjkgNTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzU3NWY2MyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KIDxwYXRoIGQ9Im03MTcgODQgNyAxIDEgMTEtMTIgMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYzBjM2MxIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogPHBhdGggZD0iTTM5NyAxMjMgNzIyIDkzIDkwNyA3OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTNlNWUyIiBzdHJva2Utd2lkdGg9IjIuMiIvPgogPCEtLSBEYXJrIHNpZGUgcmVwZWF0ZXIgYW5kIGl0cyBzbWFsbCBhbWJlciBtYXJrZXIuIC0tPgogPHBhdGggZD0ibTMzMCAxMzAgNjUtOSA0IDEwLTU1IDhaIiBmaWxsPSIjMjUyYjJlIi8+PHBhdGggZD0ibTM3OCAxMjUgMTgtMiIgc3Ryb2tlPSIjZGI5ZDViIiBzdHJva2Utd2lkdGg9IjIuMyIvPgogPCEtLSBPdmVyc2l6ZWQgd2hlZWwgYXJjaGVzOyB0aGUgYm9keSBydW5zIGxldmVsIGJldHdlZW4gdGhlbS4gLS0+CiA8cGF0aCBkPSJNMTU1IDI0MXYtMzVhOTkgOTkgMCAwIDEgMTk4IDB2MzJabTcyNC00di0yN2E5OSA5OSAwIDAgMSAxOTggMHYyOVoiIGZpbGw9IiMwNzBkMTAiLz4KIDxwYXRoIGQ9Ik0xNTYgMjA2YTk4IDk4IDAgMCAxIDE5NiAwTTg4MCAyMTBhOTggOTggMCAwIDEgMTk2IDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzg0OGQ4ZSIgc3Ryb2tlLXdpZHRoPSIxLjgiLz4KIDwhLS0gVGhpY2sgYmxhY2sgcm9ja2VyLCBmcm9udCBzcGxpdHRlciBhbmQgdGFsbCByZWFyIGRpZmZ1c2VyLiAtLT4KIDxwYXRoIGQ9Im0zNTAgMjMyIDMxOC00IDIxMi0yNi0yIDQyLTUwMSAxNC0zMS03WiIgZmlsbD0iIzEwMWIyMCIvPgogPHBhdGggZD0ibTM1MCAyMzQgMzE4LTQgMjA4LTI2IiBmaWxsPSJub25lIiBzdHJva2U9IiMzNDNmNDMiIHN0cm9rZS13aWR0aD0iMiIvPgogPHBhdGggZD0ibTU4IDIyMiA5OSA1LTIgMzQtOTktMTgtMS0xMFoiIGZpbGw9IiMxMDE5MWQiIHN0cm9rZT0iIzM1NDE0NyIvPgogPHBhdGggZD0ibTEwNzcgMTU4IDU1LTI2LTE0IDY0LTE3IDMwLTI3IDEzWiIgZmlsbD0iIzA5MTIxNiIvPgogPHBhdGggZD0ibTEwODAgMTU0IDI3LTEzIiBzdHJva2U9IiNjNmNiY2EiIHN0cm9rZS13aWR0aD0iMS44Ii8+PHBhdGggZD0ibTEwNzcgMTU1IDQtMiIgc3Ryb2tlPSIjZmY2YjY1IiBzdHJva2Utd2lkdGg9IjIuNSIvPgogPHBhdGggZD0ibTYzIDE3MCAxIDM5IiBzdHJva2U9IiNkYWRkZDYiIHN0cm9rZS13aWR0aD0iMiIgb3BhY2l0eT0iLjY1Ii8+CiA8dXNlIGhyZWY9IiN3aGVlbCIgeD0iMjU0IiB5PSIyMDciLz48dXNlIGhyZWY9IiN3aGVlbCIgeD0iOTc4IiB5PSIyMTAiLz4KPC9nPgo8L3N2Zz4K" alt="Silver Roadster side profile with black panoramic roof, six-spoke wheels and red rear light strip"></section><footer><span>A playground for the impossible.</span><span>2D PHYSICS SANDBOX <span class="dot">/</span> BUILT FOR EXPLORATION</span></footer></main><script>'use strict';
+const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
+const roadsterImage=new Image();roadsterImage.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjMyMCIgdmlld0JveD0iMCAwIDEyMDAgMzIwIj4KPGRlZnM+CiA8bGluZWFyR3JhZGllbnQgaWQ9ImJvZHkiIHgxPSIwIiB5MT0iMCIgeDI9Ii4xNSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiNmMGYwZWQiLz48c3RvcCBvZmZzZXQ9Ii4yMyIgc3RvcC1jb2xvcj0iI2Q2ZDdkNSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjYWFhY2FjIi8+PHN0b3Agb2Zmc2V0PSIuOCIgc3RvcC1jb2xvcj0iIzhiOGQ5MCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzU2NWI1ZiIvPjwvbGluZWFyR3JhZGllbnQ+CiA8bGluZWFyR3JhZGllbnQgaWQ9InNpZGUiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjYTZhN2E4Ii8+PHN0b3Agb2Zmc2V0PSIuNTIiIHN0b3AtY29sb3I9IiM5YjlkOWYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM2MjY2NmEiLz48L2xpbmVhckdyYWRpZW50PgogPGxpbmVhckdyYWRpZW50IGlkPSJmcm9udCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9Ii44Ij48c3RvcCBzdG9wLWNvbG9yPSIjZDVkNmQyIi8+PHN0b3Agb2Zmc2V0PSIuNDUiIHN0b3AtY29sb3I9IiNhY2FmYWYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM2YTcxNzQiLz48L2xpbmVhckdyYWRpZW50PgogPGxpbmVhckdyYWRpZW50IGlkPSJnbGFzcyIgeDE9IjAiIHkxPSIwIiB4Mj0iLjQiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjMWIyMjI0Ii8+PHN0b3Agb2Zmc2V0PSIuNiIgc3RvcC1jb2xvcj0iIzAzMGEwYyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzBjMTExMyIvPjwvbGluZWFyR3JhZGllbnQ+CiA8bGluZWFyR3JhZGllbnQgaWQ9InJlZmxlY3Rpb24iIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIuMyI+PHN0b3Agc3RvcC1jb2xvcj0iI2JjYmZiZSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjZjdmNmVmIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZDBkMWNlIi8+PC9saW5lYXJHcmFkaWVudD4KIDxsaW5lYXJHcmFkaWVudCBpZD0icmltIiB4MT0iMCIgeTE9IjAiIHgyPSIuOCIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiNjN2NhYzkiLz48c3RvcCBvZmZzZXQ9Ii40IiBzdG9wLWNvbG9yPSIjYTNhOGE4Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNTM1YzYyIi8+PC9saW5lYXJHcmFkaWVudD4KIDxyYWRpYWxHcmFkaWVudCBpZD0icnViYmVyIj48c3RvcCBvZmZzZXQ9Ii43MiIgc3RvcC1jb2xvcj0iIzA4MGMwZSIvPjxzdG9wIG9mZnNldD0iLjg1IiBzdG9wLWNvbG9yPSIjMTcxZDIwIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDQwODA5Ii8+PC9yYWRpYWxHcmFkaWVudD4KIDxnIGlkPSJ3aGVlbCIgdHJhbnNmb3JtPSJyb3RhdGUoLTIzKSI+CiAgPGNpcmNsZSByPSI5MSIgZmlsbD0idXJsKCNydWJiZXIpIiBzdHJva2U9IiMyMDI5MmMiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxjaXJjbGUgcj0iNzQiIGZpbGw9IiMwYjExMTUiIHN0cm9rZT0iIzQyNGI1MCIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPCEtLSBTaXggYnJvYWQgYnJ1c2hlZC1zaWx2ZXIgcGFuZWxzIHNlcGFyYXRlZCBieSBzdHJhaWdodCwgaGVhdnkgYmxhY2sgc3Bva2VzLiAtLT4KICA8ZyBmaWxsPSJ1cmwoI3JpbSkiIHN0cm9rZT0iIzQyNGI1MCIgc3Ryb2tlLXdpZHRoPSIxLjUiPgogICA8cGF0aCBpZD0icGFuZWwiIGQ9Ik0tMTUtNjlBNzEgNzEgMCAwIDEgNDMtNTZMMTYtMTkgMS0yNFoiLz4KICAgPHVzZSBocmVmPSIjcGFuZWwiIHRyYW5zZm9ybT0icm90YXRlKDYwKSIvPjx1c2UgaHJlZj0iI3BhbmVsIiB0cmFuc2Zvcm09InJvdGF0ZSgxMjApIi8+PHVzZSBocmVmPSIjcGFuZWwiIHRyYW5zZm9ybT0icm90YXRlKDE4MCkiLz48dXNlIGhyZWY9IiNwYW5lbCIgdHJhbnNmb3JtPSJyb3RhdGUoMjQwKSIvPjx1c2UgaHJlZj0iI3BhbmVsIiB0cmFuc2Zvcm09InJvdGF0ZSgzMDApIi8+CiAgPC9nPgogIDxnIGZpbGw9IiMwOTEyMTYiIHN0cm9rZT0iIzMwM2EzZiIgc3Ryb2tlLXdpZHRoPSIxLjUiPgogICA8cGF0aCBpZD0ic3Bva2UiIGQ9Im0tOC0xNy04LTU0IDEzLTMgMTUgNTYgMyAxNi0xMyAxMFoiLz4KICAgPHVzZSBocmVmPSIjc3Bva2UiIHRyYW5zZm9ybT0icm90YXRlKDYwKSIvPjx1c2UgaHJlZj0iI3Nwb2tlIiB0cmFuc2Zvcm09InJvdGF0ZSgxMjApIi8+PHVzZSBocmVmPSIjc3Bva2UiIHRyYW5zZm9ybT0icm90YXRlKDE4MCkiLz48dXNlIGhyZWY9IiNzcG9rZSIgdHJhbnNmb3JtPSJyb3RhdGUoMjQwKSIvPjx1c2UgaHJlZj0iI3Nwb2tlIiB0cmFuc2Zvcm09InJvdGF0ZSgzMDApIi8+CiAgPC9nPgogIDxnIHN0cm9rZT0iIzY0NzA3NiIgc3Ryb2tlLXdpZHRoPSIxLjgiIG9wYWNpdHk9Ii44NSI+PHBhdGggaWQ9ImVkZ2UiIGQ9Im0tNi0yOC03LTM3Ii8+PHVzZSBocmVmPSIjZWRnZSIgdHJhbnNmb3JtPSJyb3RhdGUoNjApIi8+PHVzZSBocmVmPSIjZWRnZSIgdHJhbnNmb3JtPSJyb3RhdGUoMTIwKSIvPjx1c2UgaHJlZj0iI2VkZ2UiIHRyYW5zZm9ybT0icm90YXRlKDE4MCkiLz48dXNlIGhyZWY9IiNlZGdlIiB0cmFuc2Zvcm09InJvdGF0ZSgyNDApIi8+PHVzZSBocmVmPSIjZWRnZSIgdHJhbnNmb3JtPSJyb3RhdGUoMzAwKSIvPjwvZz4KICA8Y2lyY2xlIHI9IjE5IiBmaWxsPSIjMGMxNDE5IiBzdHJva2U9IiM0YTU1NWEiIHN0cm9rZS13aWR0aD0iMiIvPjxjaXJjbGUgcj0iMTEiIGZpbGw9IiMxODIzMjciLz4KICA8ZyBmaWxsPSIjODM4YjhjIj48Y2lyY2xlIGN4PSIwIiBjeT0iLTE0IiByPSIyIi8+PGNpcmNsZSBjeD0iMTMiIGN5PSItNCIgcj0iMiIvPjxjaXJjbGUgY3g9IjgiIGN5PSIxMSIgcj0iMiIvPjxjaXJjbGUgY3g9Ii04IiBjeT0iMTEiIHI9IjIiLz48Y2lyY2xlIGN4PSItMTMiIGN5PSItNCIgcj0iMiIvPjwvZz4KIDwvZz4KPC9kZWZzPgo8IS0tIFRyYWNlZCBwcm9wb3J0aW9ucyBvZiB0aGUgc3VwcGxpZWQgc2lkZSByZWZlcmVuY2UsIG1pcnJvcmVkIHRvIGZhY2UgZm9yd2FyZCBpbi1nYW1lLiAtLT4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTIwMCAwKSBzY2FsZSgtMSAxKSI+CiA8cGF0aCBkPSJNNTkgMTY3UTEyOSAxMTkgMTk3IDk2UTIzMCA4OCAyNzkgODhMNDc3IDIzUTUzNiA0IDYwMyAxMEw3NDQgMTdRODEyIDIxIDg3MyAzOUwxMDA1IDc3IDExMzkgODYgMTEzNSAxMzAgMTEwNCAxNTQgMTExMSAxOTkgMTA4NiAyMjQgMTA0NiAyMzggMTY1IDIzOSA2MSAyMjZaIiBmaWxsPSJ1cmwoI2JvZHkpIiBzdHJva2U9IiM3NDdiN2QiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiA8IS0tIFRoZSBzdHJhaWdodCBzaG91bGRlciBzZXBhcmF0ZXMgdGhlIGxpZ2h0IHJvb2Ygc2tpbiBmcm9tIHRoZSBkYXJrZXIgc2xhYiBzaWRlcy4gLS0+CiA8cGF0aCBkPSJtMzk4IDEyMyAzMjMtMjggMTg2LTE3IDE2OCA4IDI5IDY4LTMxIDY5LTY3NyAxNVoiIGZpbGw9InVybCgjc2lkZSkiLz4KIDxwYXRoIGQ9Ik01OSAxNjcgMTk2IDEwMVEyMzQgOTIgMjc3IDkyTDM5NyAxMjMgNDIwIDIzMCAxNjAgMjMzIDYyIDIyMloiIGZpbGw9InVybCgjZnJvbnQpIi8+CiA8cGF0aCBkPSJNMzA3IDg4IDQ4OSAzMyA1MjkgMjMgNDk2IDc4IDQ1NiA5N1oiIGZpbGw9InVybCgjZ2xhc3MpIi8+CiA8cGF0aCBkPSJNNTAwIDc3IDU0MCAyM1E2MjkgMTcgNzMxIDI2TDg2NyA0OSA3ODkgNjkgNzIyIDgyIDUwNiA5OSA0NTYgOTdaIiBmaWxsPSJ1cmwoI2dsYXNzKSIvPgogPCEtLSBSZWZsZWN0ZWQgbGlnaHQgYmFuZCBhY3Jvc3MgdGhlIGdsYXppbmcsIGV4YWN0bHkgYWJvdmUgdGhlIGRhcmsgc2lkZSB3aW5kb3cuIC0tPgogPHBhdGggZD0ibTUwNCA0MSAzNy0xOHE5OS0zIDE3NyA2bC0yMCAyNy0xNzQtMTRaIiBmaWxsPSJ1cmwoI3JlZmxlY3Rpb24pIi8+CiA8cGF0aCBkPSJtNzM5IDI5IDExMiAxNy02MCAyMS02OS0xMFoiIGZpbGw9InVybCgjcmVmbGVjdGlvbikiLz4KIDxwYXRoIGQ9Im03MTYgMjUgNCAxLTI0IDUxLTUgMloiIGZpbGw9IiM2MjZiNmYiLz4KIDxwYXRoIGQ9Im03MzggMjggNCAxLTIyIDUxLTYgMVoiIGZpbGw9IiM0MjRkNTEiLz4KIDxwYXRoIGQ9Ik0zMDMgODggNDg0IDI5UTU1MiA2IDYwNSAxNUw3MzkgMjEgODY2IDQ3IiBmaWxsPSJub25lIiBzdHJva2U9IiNlYmVkZWIiIHN0cm9rZS13aWR0aD0iMyIvPgogPHBhdGggZD0ibTUyNiAyNCAxMi0xLTQyIDU2LTkgMVoiIGZpbGw9IiM3ZTg3OGEiLz4KIDwhLS0gRmx1c2gsIGFsbW9zdCBmZWF0dXJlbGVzcyBkb29yIGFuZCBhbmd1bGFyIHNodXQgbGluZXMuIC0tPgogPHBhdGggZD0ibTM5OCAxMjMgMjUgMTA4TTcyMiA4NWwtNTMgMTM5TTEwNzMgODdsMjkgNTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzU3NWY2MyIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KIDxwYXRoIGQ9Im03MTcgODQgNyAxIDEgMTEtMTIgMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYzBjM2MxIiBzdHJva2Utd2lkdGg9IjEuMiIvPgogPHBhdGggZD0iTTM5NyAxMjMgNzIyIDkzIDkwNyA3OCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTNlNWUyIiBzdHJva2Utd2lkdGg9IjIuMiIvPgogPCEtLSBEYXJrIHNpZGUgcmVwZWF0ZXIgYW5kIGl0cyBzbWFsbCBhbWJlciBtYXJrZXIuIC0tPgogPHBhdGggZD0ibTMzMCAxMzAgNjUtOSA0IDEwLTU1IDhaIiBmaWxsPSIjMjUyYjJlIi8+PHBhdGggZD0ibTM3OCAxMjUgMTgtMiIgc3Ryb2tlPSIjZGI5ZDViIiBzdHJva2Utd2lkdGg9IjIuMyIvPgogPCEtLSBPdmVyc2l6ZWQgd2hlZWwgYXJjaGVzOyB0aGUgYm9keSBydW5zIGxldmVsIGJldHdlZW4gdGhlbS4gLS0+CiA8cGF0aCBkPSJNMTU1IDI0MXYtMzVhOTkgOTkgMCAwIDEgMTk4IDB2MzJabTcyNC00di0yN2E5OSA5OSAwIDAgMSAxOTggMHYyOVoiIGZpbGw9IiMwNzBkMTAiLz4KIDxwYXRoIGQ9Ik0xNTYgMjA2YTk4IDk4IDAgMCAxIDE5NiAwTTg4MCAyMTBhOTggOTggMCAwIDEgMTk2IDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzg0OGQ4ZSIgc3Ryb2tlLXdpZHRoPSIxLjgiLz4KIDwhLS0gVGhpY2sgYmxhY2sgcm9ja2VyLCBmcm9udCBzcGxpdHRlciBhbmQgdGFsbCByZWFyIGRpZmZ1c2VyLiAtLT4KIDxwYXRoIGQ9Im0zNTAgMjMyIDMxOC00IDIxMi0yNi0yIDQyLTUwMSAxNC0zMS03WiIgZmlsbD0iIzEwMWIyMCIvPgogPHBhdGggZD0ibTM1MCAyMzQgMzE4LTQgMjA4LTI2IiBmaWxsPSJub25lIiBzdHJva2U9IiMzNDNmNDMiIHN0cm9rZS13aWR0aD0iMiIvPgogPHBhdGggZD0ibTU4IDIyMiA5OSA1LTIgMzQtOTktMTgtMS0xMFoiIGZpbGw9IiMxMDE5MWQiIHN0cm9rZT0iIzM1NDE0NyIvPgogPHBhdGggZD0ibTEwNzcgMTU4IDU1LTI2LTE0IDY0LTE3IDMwLTI3IDEzWiIgZmlsbD0iIzA5MTIxNiIvPgogPHBhdGggZD0ibTEwODAgMTU0IDI3LTEzIiBzdHJva2U9IiNjNmNiY2EiIHN0cm9rZS13aWR0aD0iMS44Ii8+PHBhdGggZD0ibTEwNzcgMTU1IDQtMiIgc3Ryb2tlPSIjZmY2YjY1IiBzdHJva2Utd2lkdGg9IjIuNSIvPgogPHBhdGggZD0ibTYzIDE3MCAxIDM5IiBzdHJva2U9IiNkYWRkZDYiIHN0cm9rZS13aWR0aD0iMiIgb3BhY2l0eT0iLjY1Ii8+CiAKPC9nPgo8L3N2Zz4K';
+const wheelImage=new Image();wheelImage.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9Ii0xMDAgLTEwMCAyMDAgMjAwIj48ZGVmcz4KIDxsaW5lYXJHcmFkaWVudCBpZD0iYm9keSIgeDE9IjAiIHkxPSIwIiB4Mj0iLjE1IiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2YwZjBlZCIvPjxzdG9wIG9mZnNldD0iLjIzIiBzdG9wLWNvbG9yPSIjZDZkN2Q1Ii8+PHN0b3Agb2Zmc2V0PSIuNDUiIHN0b3AtY29sb3I9IiNhYWFjYWMiLz48c3RvcCBvZmZzZXQ9Ii44IiBzdG9wLWNvbG9yPSIjOGI4ZDkwIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNTY1YjVmIi8+PC9saW5lYXJHcmFkaWVudD4KIDxsaW5lYXJHcmFkaWVudCBpZD0ic2lkZSIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiNhNmE3YTgiLz48c3RvcCBvZmZzZXQ9Ii41MiIgc3RvcC1jb2xvcj0iIzliOWQ5ZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzYyNjY2YSIvPjwvbGluZWFyR3JhZGllbnQ+CiA8bGluZWFyR3JhZGllbnQgaWQ9ImZyb250IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iLjgiPjxzdG9wIHN0b3AtY29sb3I9IiNkNWQ2ZDIiLz48c3RvcCBvZmZzZXQ9Ii40NSIgc3RvcC1jb2xvcj0iI2FjYWZhZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzZhNzE3NCIvPjwvbGluZWFyR3JhZGllbnQ+CiA8bGluZWFyR3JhZGllbnQgaWQ9ImdsYXNzIiB4MT0iMCIgeTE9IjAiIHgyPSIuNCIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiMxYjIyMjQiLz48c3RvcCBvZmZzZXQ9Ii42IiBzdG9wLWNvbG9yPSIjMDMwYTBjIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGMxMTEzIi8+PC9saW5lYXJHcmFkaWVudD4KIDxsaW5lYXJHcmFkaWVudCBpZD0icmVmbGVjdGlvbiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9Ii4zIj48c3RvcCBzdG9wLWNvbG9yPSIjYmNiZmJlIi8+PHN0b3Agb2Zmc2V0PSIuNDUiIHN0b3AtY29sb3I9IiNmN2Y2ZWYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNkMGQxY2UiLz48L2xpbmVhckdyYWRpZW50PgogPGxpbmVhckdyYWRpZW50IGlkPSJyaW0iIHgxPSIwIiB5MT0iMCIgeDI9Ii44IiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2M3Y2FjOSIvPjxzdG9wIG9mZnNldD0iLjQiIHN0b3AtY29sb3I9IiNhM2E4YTgiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM1MzVjNjIiLz48L2xpbmVhckdyYWRpZW50PgogPHJhZGlhbEdyYWRpZW50IGlkPSJydWJiZXIiPjxzdG9wIG9mZnNldD0iLjcyIiBzdG9wLWNvbG9yPSIjMDgwYzBlIi8+PHN0b3Agb2Zmc2V0PSIuODUiIHN0b3AtY29sb3I9IiMxNzFkMjAiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwNDA4MDkiLz48L3JhZGlhbEdyYWRpZW50PgogPGcgaWQ9IndoZWVsIiB0cmFuc2Zvcm09InJvdGF0ZSgtMjMpIj4KICA8Y2lyY2xlIHI9IjkxIiBmaWxsPSJ1cmwoI3J1YmJlcikiIHN0cm9rZT0iIzIwMjkyYyIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPGNpcmNsZSByPSI3NCIgZmlsbD0iIzBiMTExNSIgc3Ryb2tlPSIjNDI0YjUwIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8IS0tIFNpeCBicm9hZCBicnVzaGVkLXNpbHZlciBwYW5lbHMgc2VwYXJhdGVkIGJ5IHN0cmFpZ2h0LCBoZWF2eSBibGFjayBzcG9rZXMuIC0tPgogIDxnIGZpbGw9InVybCgjcmltKSIgc3Ryb2tlPSIjNDI0YjUwIiBzdHJva2Utd2lkdGg9IjEuNSI+CiAgIDxwYXRoIGlkPSJwYW5lbCIgZD0iTS0xNS02OUE3MSA3MSAwIDAgMSA0My01NkwxNi0xOSAxLTI0WiIvPgogICA8dXNlIGhyZWY9IiNwYW5lbCIgdHJhbnNmb3JtPSJyb3RhdGUoNjApIi8+PHVzZSBocmVmPSIjcGFuZWwiIHRyYW5zZm9ybT0icm90YXRlKDEyMCkiLz48dXNlIGhyZWY9IiNwYW5lbCIgdHJhbnNmb3JtPSJyb3RhdGUoMTgwKSIvPjx1c2UgaHJlZj0iI3BhbmVsIiB0cmFuc2Zvcm09InJvdGF0ZSgyNDApIi8+PHVzZSBocmVmPSIjcGFuZWwiIHRyYW5zZm9ybT0icm90YXRlKDMwMCkiLz4KICA8L2c+CiAgPGcgZmlsbD0iIzA5MTIxNiIgc3Ryb2tlPSIjMzAzYTNmIiBzdHJva2Utd2lkdGg9IjEuNSI+CiAgIDxwYXRoIGlkPSJzcG9rZSIgZD0ibS04LTE3LTgtNTQgMTMtMyAxNSA1NiAzIDE2LTEzIDEwWiIvPgogICA8dXNlIGhyZWY9IiNzcG9rZSIgdHJhbnNmb3JtPSJyb3RhdGUoNjApIi8+PHVzZSBocmVmPSIjc3Bva2UiIHRyYW5zZm9ybT0icm90YXRlKDEyMCkiLz48dXNlIGhyZWY9IiNzcG9rZSIgdHJhbnNmb3JtPSJyb3RhdGUoMTgwKSIvPjx1c2UgaHJlZj0iI3Nwb2tlIiB0cmFuc2Zvcm09InJvdGF0ZSgyNDApIi8+PHVzZSBocmVmPSIjc3Bva2UiIHRyYW5zZm9ybT0icm90YXRlKDMwMCkiLz4KICA8L2c+CiAgPGcgc3Ryb2tlPSIjNjQ3MDc2IiBzdHJva2Utd2lkdGg9IjEuOCIgb3BhY2l0eT0iLjg1Ij48cGF0aCBpZD0iZWRnZSIgZD0ibS02LTI4LTctMzciLz48dXNlIGhyZWY9IiNlZGdlIiB0cmFuc2Zvcm09InJvdGF0ZSg2MCkiLz48dXNlIGhyZWY9IiNlZGdlIiB0cmFuc2Zvcm09InJvdGF0ZSgxMjApIi8+PHVzZSBocmVmPSIjZWRnZSIgdHJhbnNmb3JtPSJyb3RhdGUoMTgwKSIvPjx1c2UgaHJlZj0iI2VkZ2UiIHRyYW5zZm9ybT0icm90YXRlKDI0MCkiLz48dXNlIGhyZWY9IiNlZGdlIiB0cmFuc2Zvcm09InJvdGF0ZSgzMDApIi8+PC9nPgogIDxjaXJjbGUgcj0iMTkiIGZpbGw9IiMwYzE0MTkiIHN0cm9rZT0iIzRhNTU1YSIgc3Ryb2tlLXdpZHRoPSIyIi8+PGNpcmNsZSByPSIxMSIgZmlsbD0iIzE4MjMyNyIvPgogIDxnIGZpbGw9IiM4MzhiOGMiPjxjaXJjbGUgY3g9IjAiIGN5PSItMTQiIHI9IjIiLz48Y2lyY2xlIGN4PSIxMyIgY3k9Ii00IiByPSIyIi8+PGNpcmNsZSBjeD0iOCIgY3k9IjExIiByPSIyIi8+PGNpcmNsZSBjeD0iLTgiIGN5PSIxMSIgcj0iMiIvPjxjaXJjbGUgY3g9Ii0xMyIgY3k9Ii00IiByPSIyIi8+PC9nPgogPC9nPgo8L2RlZnM+PHVzZSBocmVmPSIjd2hlZWwiLz48L3N2Zz4=';
+const undersideImage=new Image();undersideImage.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAwIiBoZWlnaHQ9IjQyMCIgdmlld0JveD0iMCAwIDEyMDAgNDIwIj4KPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJlZGdlIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiM5YWE2YWIiLz48c3RvcCBvZmZzZXQ9Ii4zIiBzdG9wLWNvbG9yPSIjY2NkMmQwIi8+PHN0b3Agb2Zmc2V0PSIuNiIgc3RvcC1jb2xvcj0iIzdhODk4ZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2I4YzNjNyIvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJmbG9vciIgeDI9IjAiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjMjYzNDNlIi8+PHN0b3Agb2Zmc2V0PSIuNSIgc3RvcC1jb2xvcj0iIzQzNTI1YSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzE3MjMyYyIvPjwvbGluZWFyR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJmYW4iPjxzdG9wIHN0b3AtY29sb3I9IiMxNzI0MmQiLz48c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjNjg3ZDg3Ii8+PHN0b3Agb2Zmc2V0PSIuNzUiIHN0b3AtY29sb3I9IiMyODNmNGIiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwYjE1MWUiLz48L3JhZGlhbEdyYWRpZW50PjxnIGlkPSJub3p6bGUiPjxjaXJjbGUgcj0iMzYiIGZpbGw9IiMxMTFlMjgiIHN0cm9rZT0iI2E0YjhjMCIgc3Ryb2tlLXdpZHRoPSI0Ii8+PGNpcmNsZSByPSIyNiIgZmlsbD0idXJsKCNmYW4pIiBzdHJva2U9IiM0ZDZhNzkiIHN0cm9rZS13aWR0aD0iMyIvPjxjaXJjbGUgcj0iMTIiIGZpbGw9IiMwYjFjMjgiLz48cGF0aCBkPSJNLTIyLTRIMjJNLTQtMjJWMjIiIHN0cm9rZT0iIzhjYThiNSIgc3Ryb2tlLXdpZHRoPSIzIi8+PC9nPjwvZGVmcz4KPCEtLSBTdHlsaXplZCBmbGF0IHVuZGVydHJheSBhbmQgc3RydWN0dXJhbCBkZXRhaWxzLCBub3NlIHJpZ2h0LiAtLT4KPGcgZmlsbD0iIzA4MGUxMyIgc3Ryb2tlPSIjM2I0NjRlIiBzdHJva2Utd2lkdGg9IjIiPjxyZWN0IHg9IjE3NSIgeT0iMjYiIHdpZHRoPSIxMzAiIGhlaWdodD0iNjAiIHJ4PSIxMiIvPjxyZWN0IHg9IjE3NSIgeT0iMzM0IiB3aWR0aD0iMTMwIiBoZWlnaHQ9IjYwIiByeD0iMTIiLz48cmVjdCB4PSI5MTUiIHk9IjI2IiB3aWR0aD0iMTMwIiBoZWlnaHQ9IjYwIiByeD0iMTIiLz48cmVjdCB4PSI5MTUiIHk9IjMzNCIgd2lkdGg9IjEzMCIgaGVpZ2h0PSI2MCIgcng9IjEyIi8+PC9nPgo8cGF0aCBkPSJNNjEgNzZRMTgwIDM1IDI5MyA0OEw0MTYgNjYgNzQ0IDY3UTk3MyAyNCAxMDgwIDcyTDExNTQgMTM5IDExNzMgMjEwIDExNTQgMjgxIDEwODAgMzQ4UTk3MyAzOTYgNzQ0IDM1M0w0MTYgMzU0IDI5MyAzNzJRMTgwIDM4NSA2MSAzNDRMNDIgMjc5IDQyIDE0MVoiIGZpbGw9InVybCgjZWRnZSkiIHN0cm9rZT0iIzU2NmI3NiIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxwYXRoIGQ9Ik05NSA5OSAxOTYgNzAgMzE5IDg4IDg0OSA4NSAxMDUwIDEwNSAxMTE2IDE2MiAxMTI4IDIxMCAxMTE2IDI1OCAxMDUwIDMxNSA4NDkgMzM1IDMxOSAzMzIgMTk2IDM1MCA5NSAzMjEgNzYgMjcyIDc2IDE0OFoiIGZpbGw9IiMxMTFlMjgiLz4KPHBhdGggZD0ibTMyNyA5NSA1MzAgMCAzMSA0M3YxNDRsLTMxIDQzSDMyN2wtMjQtMzhWMTMzWiIgZmlsbD0idXJsKCNmbG9vcikiIHN0cm9rZT0iIzcxODU5MCIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxwYXRoIGQ9Ik0zNjUgMTExdjE5OE00NzAgMTExdjE5OE01NzUgMTExdjE5OE02ODAgMTExdjE5OE03ODUgMTExdjE5OE0zMjAgMTc0aDU0OE0zMjAgMjQ2aDU0OCIgc3Ryb2tlPSIjNzU4NjhjIiBzdHJva2Utd2lkdGg9IjIiIG9wYWNpdHk9Ii41NSIvPgo8cGF0aCBkPSJNMjMzIDkzdjIzNE05ODEgODZ2MjQ4IiBzdHJva2U9IiM4OTliYTMiIHN0cm9rZS13aWR0aD0iMTMiLz4KPHBhdGggZD0ibTE4NSA5MSA5NCA3MC05NCAxNjhNMTAzMCA4OWwtOTggNzMgOTggMTY5IiBmaWxsPSJub25lIiBzdHJva2U9IiM2NjdmOGQiIHN0cm9rZS13aWR0aD0iOSIvPgo8cGF0aCBkPSJNOTggMTUxaDk1djExOEg5OE0xMDUyIDE0NWg0NnYxMzBoLTQ2IiBmaWxsPSIjMWQyZTM5IiBzdHJva2U9IiM3NThiOTYiIHN0cm9rZS13aWR0aD0iMyIvPgo8ZyBzdHJva2U9IiM3NTk1YTQiIHN0cm9rZS13aWR0aD0iMyI+PHBhdGggZD0iTTExMCAxNjB2MTAwTTEyNyAxNjB2MTAwTTE0NCAxNjB2MTAwTTE2MSAxNjB2MTAwTTE3OCAxNjB2MTAwTTEwNjIgMTYwdjEwME0xMDc2IDE2MHYxMDBNMTA5MCAxNjB2MTAwIi8+PC9nPgo8dXNlIGhyZWY9IiNub3p6bGUiIHg9IjI0NSIgeT0iMTIzIi8+PHVzZSBocmVmPSIjbm96emxlIiB4PSIyNDUiIHk9IjI5NyIvPjx1c2UgaHJlZj0iI25venpsZSIgeD0iOTc4IiB5PSIxMjAiLz48dXNlIGhyZWY9IiNub3p6bGUiIHg9Ijk3OCIgeT0iMzAwIi8+CjxwYXRoIGQ9Ik04NSA5MHYyNDAiIHN0cm9rZT0iI2U4NDc1MiIgc3Ryb2tlLXdpZHRoPSI1Ii8+CjxwYXRoIGQ9Ik0xMTM4IDE1NnYxMDgiIHN0cm9rZT0iI2I3ZDdkZiIgc3Ryb2tlLXdpZHRoPSI0Ii8+Cjwvc3ZnPgo=';
+// Soft, transparent vapor texture; no solid cones or hard-edged smoke discs.
+const vaporTexture=document.createElement('canvas');vaporTexture.width=vaporTexture.height=64;
+const vaporCtx=vaporTexture.getContext('2d'),vaporGradient=vaporCtx.createRadialGradient(32,32,0,32,32,32);
+vaporGradient.addColorStop(0,'#f1faffd0');vaporGradient.addColorStop(.2,'#dceef7a0');vaporGradient.addColorStop(.55,'#9fbdce50');vaporGradient.addColorStop(1,'#a9c9db00');vaporCtx.fillStyle=vaporGradient;vaporCtx.fillRect(0,0,64,64);
+const wheelRadius=91*160/1200;
+const W=1400,H=600,L=65,R=1335,T=100,B=510;
+const stageShift=110,worldLeft=-1600,leftStop=worldLeft+80;
+const cameraMin=worldLeft-L;
+// A circular wall meets the 15-degree uphill ceiling with a continuous tangent.
+const ceilingTilt=15*Math.PI/180;
+const rampStart=950+stageShift,rx=180,ry=180,endTheta=Math.PI-ceilingTilt;
+const arc=[{x:rampStart,y:B,s:rampStart,angle:0}];
+for(let i=1;i<=180;i++){const t=endTheta*i/180,prev=arc.at(-1),x=rampStart+rx*Math.sin(t),y=B-ry*(1-Math.cos(t));arc.push({x,y,s:prev.s+Math.hypot(x-prev.x,y-prev.y),angle:-Math.atan2(ry*Math.sin(t),rx*Math.cos(t))});}
+const ceilingStart=arc.at(-1).s;
+// Keep the shortened upper section 140 units long; rotate it uphill toward the exit.
+const ceilingJoin=arc.at(-1),ceilingAngle=-Math.PI+ceilingTilt;
+for(let distance=10;distance<=140;distance+=10){arc.push({x:ceilingJoin.x+distance*Math.cos(ceilingAngle),y:ceilingJoin.y+distance*Math.sin(ceilingAngle),s:ceilingStart+distance,angle:ceilingAngle});}
+const ceilingLeft=arc.at(-1).x;
+const trackEnd=arc.at(-1).s;
+function pathAt(distance){if(distance<=rampStart)return {x:distance,y:B,angle:0};const i=arc.findIndex(p=>p.s>=distance);if(i<0)return arc.at(-1);const a=arc[i-1],b=arc[i],u=(distance-a.s)/(b.s-a.s);return {x:a.x+(b.x-a.x)*u,y:a.y+(b.y-a.y)*u,angle:a.angle+(b.angle-a.angle)*u};}
+function placeOnTrack(){car.roll=0;car.rollActive=false;const p=pathAt(car.s);car.angle=p.angle;
+ const position=offset=>{car.x=p.x+offset*Math.sin(p.angle);car.y=p.y-offset*Math.cos(p.angle);};
+ position(17);
+ // A long, rigid body also needs clearance where the straight upper road meets the curve.
+ if(bodyEntersScaffold(flightBody())){let low=17,high=65;for(let i=0;i<9;i++){const middle=(low+high)/2;position(middle);if(bodyEntersScaffold(flightBody()))low=middle;else high=middle;}position(high+.03);}
+}
+const ceilingRing=pathAt(ceilingStart+70);
+// One closed obstacle: road face, scaffold roof/rear/end cap, and stage floor.
+// The opaque collision boundary blocks the whole scaffold footprint, including its open-looking bays.
+const scaffoldTop=arc.at(-1).y-10,scaffoldBack=rampStart+rx+72;
+const scaffoldBoundary=[{x:ceilingLeft,y:scaffoldTop},{x:scaffoldBack,y:scaffoldTop},{x:scaffoldBack,y:B},{x:rampStart,y:B},...arc.slice(1)];
+const scaffoldEdges=[
+ {a:scaffoldBoundary[0],b:scaffoldBoundary[1]},
+ {a:scaffoldBoundary[1],b:scaffoldBoundary[2]},
+ {a:arc.at(-1),b:scaffoldBoundary[0]}
+];
+const flightRoads=[{a:{x:worldLeft,y:B},b:{x:R,y:B}},...arc.slice(1).map((b,i)=>({a:arc[i],b})),...scaffoldEdges];
+const bodyOutline=[[-74,-16],[-42,-18],[-12,-26],[26,-23],[61,-11],[74,-2],[74,10],[58,17],[-63,17],[-74,8]];
+function convexHull(points){
+ const sorted=points.sort((a,b)=>a.x-b.x||a.y-b.y),cross=(a,b,c)=>(b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
+ const lower=[],upper=[];for(const p of sorted){while(lower.length>1&&cross(lower.at(-2),lower.at(-1),p)<=1e-8)lower.pop();lower.push(p);}
+ for(const p of [...sorted].reverse()){while(upper.length>1&&cross(upper.at(-2),upper.at(-1),p)<=1e-8)upper.pop();upper.push(p);}return [...lower.slice(0,-1),...upper.slice(0,-1)];
+}
+function flightBody(){const c=Math.cos(car.angle),s=Math.sin(car.angle),roll=car.roll||0,vertical=Math.cos(roll),width=36*Math.abs(Math.sin(roll));
+ const points=bodyOutline.flatMap(([x,y])=>{x*=car.facing;return (width>1e-6?[-width,width]:[0]).map(offset=>{const projectedY=y*vertical+offset;return {x:car.x+x*c-projectedY*s,y:car.y+x*s+projectedY*c};});});
+ return width>1e-6?convexHull(points):points;
+}
+function placeOnScaffold(){car.roll=0;car.rollActive=false;car.x=car.s;car.y=scaffoldTop-17;car.angle=0;}
+function onDrivingSurface(){return car.surface==='track'||car.surface==='scaffold';}
+function beginAutoRoll(){
+ if(Math.cos(car.angle)>=0)return;
+ // Equivalent starting pose: retain the nose direction while rolling around the long axis.
+ car.angle+=Math.PI;car.facing*=-1;car.roll=-Math.PI;car.rollElapsed=0;car.rollActive=true;car.rollAxisAngle=car.angle;
+}
+function updateAutoRoll(dt){
+ if(!car.rollActive)return;car.rollElapsed+=dt;const t=Math.min(1,car.rollElapsed/1.05),smooth=t*t*(3-2*t);car.roll=-Math.PI*(1-smooth);
+ if(t===1){car.roll=0;car.rollActive=false;flight=true;car.surface=null;}
+}
+function bodyEntersScaffold(body){
+ if(Math.max(...body.map(p=>p.x))<ceilingLeft||Math.min(...body.map(p=>p.x))>scaffoldBack)return false;
+ const cross=(a,b,c)=>(b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
+ for(const point of body){let inside=false,onEdge=false;
+  for(let i=0,j=scaffoldBoundary.length-1;i<scaffoldBoundary.length;j=i++){
+   const a=scaffoldBoundary[j],b=scaffoldBoundary[i],dx=b.x-a.x,dy=b.y-a.y;
+   const u=Math.max(0,Math.min(1,((point.x-a.x)*dx+(point.y-a.y)*dy)/(dx*dx+dy*dy)));
+   if(Math.hypot(point.x-a.x-u*dx,point.y-a.y-u*dy)<.03)onEdge=true;
+   if((a.y>point.y)!==(b.y>point.y)&&point.x<(b.x-a.x)*(point.y-a.y)/(b.y-a.y)+a.x)inside=!inside;
+  }if(inside&&!onEdge)return true;
+ }
+ for(let i=0;i<body.length;i++)for(let j=0;j<scaffoldBoundary.length;j++){
+  const a=body[i],b=body[(i+1)%body.length],c=scaffoldBoundary[j],d=scaffoldBoundary[(j+1)%scaffoldBoundary.length];
+  if(cross(a,b,c)*cross(a,b,d)<-1e-7&&cross(c,d,a)*cross(c,d,b)<-1e-7)return true;
+ }
+ return false;
+}
+function roadOutline(road){const {a,b}=road,dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy),nx=-dy/len*6,ny=dx/len*6;return [{x:a.x+nx,y:a.y+ny},{x:b.x+nx,y:b.y+ny},{x:b.x-nx,y:b.y-ny},{x:a.x-nx,y:a.y-ny}];}
+const flightRoadShapes=flightRoads.map((road,index)=>index===arc.length?
+ [{x:ceilingLeft,y:scaffoldTop},{x:scaffoldBack,y:scaffoldTop},{x:scaffoldBack,y:scaffoldTop+6},{x:ceilingLeft,y:scaffoldTop+6}]:roadOutline(road));
+function polygonContact(a,b){let depth=Infinity,normal=null;
+ for(const polygon of [a,b])for(let i=0;i<polygon.length;i++){
+  const p=polygon[i],q=polygon[(i+1)%polygon.length],len=Math.hypot(q.x-p.x,q.y-p.y),nx=-(q.y-p.y)/len,ny=(q.x-p.x)/len;
+  let amin=Infinity,amax=-Infinity,bmin=Infinity,bmax=-Infinity;
+  for(const p of a){const d=p.x*nx+p.y*ny;amin=Math.min(amin,d);amax=Math.max(amax,d);}
+  for(const p of b){const d=p.x*nx+p.y*ny;bmin=Math.min(bmin,d);bmax=Math.max(bmax,d);}
+  if(amax<=bmin||bmax<=amin)return null;
+  const positive=bmax-amin,negative=amax-bmin,d=Math.min(positive,negative);
+  if(d<depth){depth=d;const sign=positive<negative?1:-1;normal={x:nx*sign,y:ny*sign};}
+ }
+ return {...normal,depth};
+}
+function resolveFlightContacts(){
+ const contacts=[];
+ for(let pass=0;pass<6;pass++){
+  let corrected=false;
+  for(let index=0;index<flightRoadShapes.length;index++){
+   const road=flightRoadShapes[index],body=flightBody();
+   const minX=Math.min(...body.map(p=>p.x)),maxX=Math.max(...body.map(p=>p.x)),minY=Math.min(...body.map(p=>p.y)),maxY=Math.max(...body.map(p=>p.y));
+   if(Math.max(...road.map(p=>p.x))<minX||Math.min(...road.map(p=>p.x))>maxX||Math.max(...road.map(p=>p.y))<minY||Math.min(...road.map(p=>p.y))>maxY)continue;
+   const hit=polygonContact(body,road);if(!hit)continue;
+   contacts.push({index,nx:hit.x,ny:hit.y});
+   car.x+=hit.x*(hit.depth+.02);car.y+=hit.y*(hit.depth+.02);
+   const inward=car.vx*hit.x+car.vy*hit.y;if(inward<0){car.vx-=inward*hit.x;car.vy-=inward*hit.y;}
+   corrected=true;
+  }
+  if(!corrected)break;
+ }
+ return contacts;
+}
+// Keep the automatic roll continuous while clearing the lip; contact still blocks penetration.
+function landOnRoad(contacts){
+ if(car.rollActive&&car.launched)return false;
+ for(const hit of contacts){
+  if(hit.index===0&&hit.ny<-.5){car.surface=car.x<=rampStart?'track':'ground';car.s=car.x;car.speed=car.vx;car.vy=0;car.angle=0;car.launched=false;if(car.surface==='track')placeOnTrack();return true;}
+  if(hit.index===arc.length&&hit.ny<-.5&&car.x>=ceilingLeft&&car.x<=scaffoldBack){
+   car.surface='scaffold';car.s=car.x;car.speed=car.vx;car.vy=0;car.launched=false;placeOnScaffold();return true;
+  }
+  if(hit.index>0&&hit.index<arc.length){
+   const a=arc[hit.index-1],b=arc[hit.index],dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy);
+   // Only the inner driving face can reattach; steel roof/rear contacts remain ordinary supports.
+   if(hit.nx*dy/len-hit.ny*dx/len<.5)continue;
+   const u=Math.max(0,Math.min(1,((car.x-a.x)*dx+(car.y-a.y)*dy)/(len*len)));
+   car.s=a.s+u*len;car.speed=(car.vx*dx+car.vy*dy)/len;car.surface='track';car.launched=false;placeOnTrack();return true;
+  }
+ }
+ return false;
+}
+function moveFlight(dt,targetAngle,turnRate=5,allowLanding=false){
+ const turn=(targetAngle-car.angle)*Math.min(1,dt*turnRate);
+ // Short linear and angular steps prevent boosted motion and rotation tunnelling through the road.
+ const steps=Math.max(1,Math.ceil(Math.hypot(car.vx,car.vy)*dt/3),Math.ceil(Math.abs(turn)/.025));
+ for(let step=0;step<steps;step++){
+  const descending=car.vy>0;car.x+=car.vx*dt/steps;car.y+=car.vy*dt/steps;car.angle+=turn/steps;const contacts=resolveFlightContacts();
+  if(flight&&descending&&contacts.some(hit=>(hit.index===0||hit.index===arc.length)&&hit.ny<-.5)){
+   flight=false;car.roll=0;car.rollActive=false;landOnRoad(contacts);toastUntil=time+3;document.querySelector('#toast').textContent='LANDED / ← → drive. ↑ takes off again.';break;
+  }
+  if(allowLanding&&landOnRoad(contacts))break;
+ }
+}
+const keys=new Set(),rings=[{x:340+stageShift,y:480},{x:780+stageShift,y:480},{x:1055+stageShift,y:365},{x:1040+stageShift,y:230},{x:ceilingRing.x+17*Math.sin(ceilingAngle),y:ceilingRing.y-17*Math.cos(ceilingAngle)}];
+const magnet=true; // Surface adhesion is always available; no manual toggle.
+let car,flight=false,paused=false,score=0,last=0,time=0,toastUntil=6,particles=[],vaporEmission=0,cameraX=0;
+function reset(){car={x:500+stageShift,y:B-17,vx:0,vy:0,angle:0,facing:1,roll:0,rollActive:false,rollElapsed:0,rollAxisAngle:0,surface:'track',wheelRotation:0,wheelVelocity:0,speed:0,s:500+stageShift,launched:false};score=0;rings.forEach(r=>r.hit=false);particles=[];vaporEmission=0;cameraX=0;flight=false;paused=false;keys.clear();toastUntil=time+6;document.querySelector('#toast').textContent='← → drive. ↑ takes off / rises. ↓ descends. Touch down to exit flight.';sync();}
+function sync(){document.querySelector('#magnet').classList.toggle('active',!flight);document.querySelector('#flight').classList.toggle('active',flight);document.querySelector('#mode').textContent=flight?'● FLIGHT MODE':magnet?(car.surface==='track'&&Math.cos(car.angle)<-.9?'● INVERTED / AIR GRIP':'● AIR GRIP'):'● GROUND DRIVE';document.querySelector('#status').textContent=flight?'THRUSTERS ENGAGED':magnet?(onDrivingSurface()?'AUTO GRIP / GRAVITY OFF':'AIR GRIP READY / OFF TRACK'):'GRIP SYSTEM READY';document.querySelector('#pause').textContent=paused?'▶':'Ⅱ';}
+function toggleFlight(){flight=!flight;if(flight){car.surface=null;car.vy=Math.min(car.vy,-95);}sync();}
+document.querySelector('#reset').onclick=reset;document.querySelector('#flight').onclick=toggleFlight;document.querySelector('#pause').onclick=()=>{paused=!paused;keys.clear();sync();};
+window.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();const k=e.key.toLowerCase();if(!e.repeat){if(k==='arrowup'&&!flight)toggleFlight();if(k==='f')toggleFlight();if(k==='r')reset();if(k==='p'||k==='escape'){paused=!paused;sync();}}keys.add(k);});
+window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>keys.clear());
+function update(dt){time+=dt;const right=keys.has('d')||keys.has('arrowright'),left=keys.has('a')||keys.has('arrowleft'),up=keys.has('w')||keys.has('arrowup'),down=keys.has('s')||keys.has('arrowdown'),boost=keys.has('shift'),power=boost?820:420,brake=keys.has(' ');
+const oldX=car.x,oldDistance=car.s,oldSurface=car.surface;
+updateAutoRoll(dt);
+if(flight){car.surface=null;car.vx+=(Number(right)-Number(left))*power*dt;car.vy+=(Number(down)-Number(up))*power*dt;car.vx*=Math.exp(-.7*dt);car.vy*=Math.exp(-.7*dt);moveFlight(dt,car.rollActive?car.rollAxisAngle:(car.vx/650)*.18);}
+else if(onDrivingSurface()){
+ const drive=Number(right||keys.has('w'))-Number(left||keys.has('s'));
+ car.speed+=((brake?0:drive)*(boost?1270:880))*dt;
+ // Air grip cancels gravity; releasing input keeps inertia. Only Space brakes.
+ if(brake){car.speed*=Math.exp(-10*dt);if(Math.abs(car.speed)<2)car.speed=0;}
+ if(!drive&&Math.abs(car.speed)<.4)car.speed=0;
+ car.speed*=Math.exp(-(drive?.48:2.4)*dt);car.speed=Math.max(-650,Math.min(950,car.speed));car.s=car.s+car.speed*dt;if(car.surface==='track')car.s=Math.max(leftStop,car.s);
+ if(car.s<=leftStop)car.speed=Math.max(0,car.speed);
+ if(car.surface==='scaffold'){
+  placeOnScaffold();car.vx=car.speed;car.vy=0;
+  if(car.s<ceilingLeft||car.s>scaffoldBack){car.surface=null;car.launched=false;}
+ }else{
+ placeOnTrack();car.vx=car.speed*Math.cos(car.angle);car.vy=car.speed*Math.sin(car.angle);
+ if(car.s>=trackEnd){const overshoot=car.s-trackEnd;car.x+=overshoot*Math.cos(car.angle);car.y+=overshoot*Math.sin(car.angle);car.surface=null;car.launched=true;beginAutoRoll();toastUntil=time+5;document.querySelector('#toast').textContent='AUTO ROLL / Rolling upright. Flight engages automatically.';}
+}
+}else if(car.surface==='ground'){
+ car.vx+=(Number(right||keys.has('w'))-Number(left||keys.has('s')))*(boost?1150:760)*dt;car.vx*=Math.exp(-((right||keys.has('w')||left||keys.has('s'))?.48:2.4)*dt);if(!right&&!keys.has('w')&&!left&&!keys.has('s')&&Math.abs(car.vx)<.4)car.vx=0;car.angle=0;car.vy=0;moveFlight(dt,0);
+ if(car.x<rampStart){car.surface='track';car.s=car.x;car.speed=car.vx;}
+}else{
+ car.vx+=(Number(right)-Number(left))*power*.25*dt;car.vy+=420*dt;
+ moveFlight(dt,car.rollActive?car.rollAxisAngle:0,1.5,true);
+}
+if(car.x<leftStop){car.x=leftStop;car.vx=Math.max(0,car.vx);}if(car.x>R-55){car.x=R-55;car.vx=Math.min(0,car.vx);}
+if(car.y<35){car.y=35;car.vy=Math.max(0,car.vy);}if(car.y>B-17&&car.surface!=='track'){car.y=B-17;car.vy=0;if(!flight){car.angle=0;car.surface=car.x<=rampStart?'track':'ground';car.s=car.x;car.speed=car.vx;}}
+// Recheck after world bounds, so a boundary correction cannot force the body into steelwork.
+if(car.surface!=='track')resolveFlightContacts();
+// Rolling angle follows signed distance along the surface, including the ceiling.
+if(oldSurface===car.surface&&onDrivingSurface()){car.wheelVelocity=(car.s-oldDistance)/dt/wheelRadius||0;}
+else if(oldSurface==='ground'&&car.surface==='ground'){car.wheelVelocity=(car.x-oldX)/dt/wheelRadius||0;}
+else {car.wheelVelocity*=Math.exp(-1.5*dt);}
+car.wheelRotation+=car.wheelVelocity*dt;
+// Turn the body to follow signed travel along the road, including reversed wall driving.
+const headingSpeed=(onDrivingSurface()?car.speed:car.vx);
+if(!car.rollActive&&Math.abs(headingSpeed)>2){const facing=headingSpeed<0?-1:1;if(car.facing!==facing){car.facing=facing;if(car.surface==='track')placeOnTrack();else if(car.surface==='scaffold')placeOnScaffold();else resolveFlightContacts();}}
+// The stage remains fixed until the car enters the left third; then reveal the finite extension.
+const cameraTarget=Math.max(cameraMin,Math.min(0,car.x-420));
+cameraX+=(cameraTarget-cameraX)*(1-Math.exp(-6*dt));
+for(const r of rings)if(!r.hit&&Math.hypot(car.x-r.x,car.y-r.y)<45){r.hit=true;score++;toastUntil=time+4;document.querySelector('#toast').textContent=score===5?'All checkpoints cleared. The sky is yours. R to run again.':`Checkpoint ${score} / 5 collected. Keep exploring.`;for(let i=0;i<22;i++)particles.push({x:r.x,y:r.y,vx:(Math.random()-.5)*240,vy:(Math.random()-.5)*240,life:1});}
+if(flight||car.rollActive){
+ const rate=boost?240:120;vaporEmission+=dt*rate;
+ const emit=(nozzleX,nozzleZ,rollJet=false)=>{const life=boost?.105+Math.random()*.035:.16+Math.random()*.06,speed=boost?850+Math.random()*150:460+Math.random()*80;
+  particles.push({x:car.x,y:car.y,vx:0,vy:0,life,maxLife:life,age:0,gas:true,newborn:true,anchored:true,rollJet,rollCorner:car.rollActive&&!rollJet,nozzleX,nozzleZ,jetSpeed:speed,travel:0,boosted:boost,axis:0,radius:2.5,growth:16,scatter:(Math.random()-.5)*2,seed:Math.random()*100,spread:false});};
+ while(vaporEmission>=1){vaporEmission--;
+  if(car.rollActive){
+   // Match the four nozzle centers painted on the underside; the two rows open out with the roll.
+   for(const x of [-47.33,50.4])for(const z of [-16,16])emit(x,z);
+   emit(42,Math.sin(car.roll)*Math.cos(car.angle)<0?-30:30,true);
+  }else{for(const x of [-43,42])for(const z of [-8,8])emit(x,z);}
+ }
+}
+particles.forEach(p=>{
+ const step=p.gas&&p.newborn?Math.random()*dt:dt;p.newborn=false;p.life-=step;
+ if(p.gas){p.age+=step;
+  if(p.anchored&&((p.rollJet||p.rollCorner)?car.rollActive:flight)){
+   // A short pressure-driven jet follows its current nozzle, rather than lagging behind the car.
+   const c=Math.cos(car.angle),s=Math.sin(car.angle),vertical=Math.cos(car.roll||0),lateral=Math.sin(car.roll||0),px=p.nozzleX*car.facing,py=12*vertical+p.nozzleZ*lateral;
+   let dx=-s*vertical,dy=c*vertical;
+   if(p.rollCorner){
+    // Splay the two transverse rows during the underside view, rather than collapsing jets edge-on.
+    const along=Math.sign(p.nozzleX)*Math.abs(lateral)*.28*car.facing;
+    const outward=vertical+Math.sign(p.nozzleZ)*lateral*.9;
+    const length=Math.hypot(along,outward);
+    dx=(along*c-outward*s)/length;dy=(along*s+outward*c)/length;
+   }else if(p.rollJet){dx=0;dy=1;}
+   else{
+    // Aim normal flight exhaust behind horizontal motion, with a stronger cant during boost.
+    const tilt=-Math.max(-1,Math.min(1,car.vx/650))*(boost?.5:.32);
+    dx=Math.sin(tilt);dy=Math.cos(tilt);
+   }
+   p.travel+=p.jetSpeed*step;
+   const spread=(2+p.travel*.055)*p.scatter+Math.sin(time*25+p.seed)*p.travel*.008;
+   p.x=car.x+px*c-py*s+dx*p.travel-dy*spread;p.y=car.y+px*s+py*c+dy*p.travel+dx*spread;
+   p.vx=car.vx+dx*p.jetSpeed;p.vy=car.vy+dy*p.jetSpeed;p.axis=Math.atan2(dy,dx);p.radius=2.5+p.travel*.085;
+  }else{
+   p.anchored=false;p.radius+=p.growth*step;const drag=Math.exp(-(p.spread?.65:.35)*step);p.vx=p.vx*drag+Math.sin(time*9+p.seed+p.age*7)*10*step;p.vy=p.vy*drag+Math.cos(time*8+p.seed)*5*step;if(p.spread){if(p.groundHug)p.vy+=(B-13-p.y)*9*step;else p.vy-=8*step;}p.x+=p.vx*step;p.y+=p.vy*step;
+  }
+  // Ground response is triggered by the visible vapor envelope actually meeting the floor.
+  const verticalExtent=p.radius*Math.hypot(1.8*Math.sin(p.axis),.85*Math.cos(p.axis));
+  if(!p.spread&&p.life>0&&p.y+verticalExtent>=B-7&&p.vy>0){p.spread=true;p.anchored=false;p.y=B-7;p.groundHug=Math.random()<.7;p.vx=car.vx*.1+(Math.random()-.5)*(p.groundHug?150:65);p.vy=p.groundHug?-2-Math.random()*4:-12-Math.random()*16;p.radius=Math.max(6,p.radius*.7);p.growth=p.groundHug?14:11;p.life=Math.max(.55+Math.random()*.3,p.life);p.maxLife=Math.max(p.maxLife,p.age+p.life);}
+  if(!p.spread&&p.y>=B-7)p.life=0;
+ }else{p.x+=p.vx*step;p.y+=p.vy*step;}
+});particles=particles.filter(p=>p.life>0);sync();document.querySelector('#speed').textContent=String(Math.round(Math.hypot(car.vx,car.vy)*.36)).padStart(3,'0');document.querySelector('#score').textContent=`0${score} / 05`;document.querySelector('#toast').style.opacity=time<toastUntil?'1':'0';}
+function line(x,y,x2,y2,color,width=1){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();}
+function draw(){const dpr=devicePixelRatio||1,cw=canvas.clientWidth,ch=canvas.clientHeight;if(canvas.width!==cw*dpr||canvas.height!==ch*dpr){canvas.width=cw*dpr;canvas.height=ch*dpr;}ctx.setTransform(canvas.width/W,0,0,canvas.height/H,0,0);ctx.fillStyle='#030609';ctx.fillRect(0,0,W,H);
+const glow=ctx.createRadialGradient(1000,400,15,1000,400,600);glow.addColorStop(0,'#14202a');glow.addColorStop(1,'#030609');ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
+ctx.save();ctx.translate(-cameraX,0);
+// Dark demonstration stage with ground lights and an exposed curved steel truss.
+ctx.fillStyle='#0c1117';ctx.fillRect(worldLeft,B,R-worldLeft,H-B);line(worldLeft,B,R,B,'#89939d',2);
+for(let x=worldLeft+35;x<R;x+=45){ctx.fillStyle='#c1dbeb';ctx.shadowColor='#addefb';ctx.shadowBlur=8;ctx.fillRect(x,B+5,3,2);}ctx.shadowBlur=0;
+line(worldLeft,B+14,R,B+14,'#f34b40',2);line(worldLeft,B+19,R,B+19,'#f34b402a',3);
+// Grounded rectangular scaffold behind the ramp, as in the reference stage.
+// Clip the steelwork to the region outside the driving face so no brace crosses the road.
+// The top beam meets the outer edge of the ceiling endpoint instead of cutting below it.
+const frameTop=scaffoldTop,frameBack=scaffoldBack;
+ctx.save();ctx.beginPath();ctx.moveTo(ceilingLeft,frameTop);ctx.lineTo(frameBack,frameTop);ctx.lineTo(frameBack,B);ctx.lineTo(rampStart,B);
+for(const p of arc.slice(1))ctx.lineTo(p.x,p.y);
+ctx.closePath();ctx.clip();
+const beam=(x,y,x2,y2,width=2.6)=>{line(x,y,x2,y2,'#71808c',width);line(x-1,y,x2-1,y2,'#c3cdd533',.8);};
+const columns=[];for(let x=ceilingLeft;x<frameBack;x+=65)columns.push(x);columns.push(frameBack);
+// Trim only the excess height, retaining uprights and braces right up to the endpoint.
+const supportTop=frameTop;
+const levels=[supportTop,B-2*ry];for(let y=B-2*ry+60;y<B;y+=60)levels.push(y);levels.push(B);
+// Uprights stay vertical; cross members and X braces form rectangular bays.
+for(const x of columns)beam(x,supportTop,x,B,3);
+for(const y of levels)beam(ceilingLeft,y,frameBack,y,2.8);
+for(let i=0;i<columns.length-1;i++)for(let j=0;j<levels.length-1;j++){
+ const x=columns[i],x2=columns[i+1],y=levels[j],y2=levels[j+1];
+ beam(x+3,y+3,x2-3,y2-3,1.6);beam(x2-3,y+3,x+3,y2-3,1.6);
+}
+beam(frameBack,supportTop,frameBack,B,4);beam(ceilingLeft,supportTop,frameBack,supportTop,4);ctx.restore();
+// Foot plates anchor the rear tower and the lower ramp supports on the stage floor.
+for(const x of columns.filter(x=>x>=rampStart)){ctx.fillStyle='#61707c';ctx.fillRect(x-9,B,18,4);line(x-7,B+4,x+7,B+4,'#a0aeb8',1);}
+const deck=()=>{ctx.moveTo(worldLeft,B);ctx.lineTo(rampStart,B);arc.forEach(p=>ctx.lineTo(p.x,p.y));};
+ctx.beginPath();deck();ctx.strokeStyle='#343e47';ctx.lineWidth=11;ctx.stroke();
+ctx.beginPath();deck();ctx.strokeStyle='#afb8c1';ctx.lineWidth=1.5;ctx.stroke();
+ctx.beginPath();arc.forEach((p,i)=>{const x=p.x-6*Math.sin(p.angle),y=p.y+6*Math.cos(p.angle);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.strokeStyle=magnet?'#72e8ec':'#d14b46';ctx.lineWidth=1.5;ctx.shadowColor=magnet?'#52dfea':'#ff493f';ctx.shadowBlur=6;ctx.stroke();ctx.shadowBlur=0;
+for(let i=15;i<arc.length;i+=20){const p=arc[i];ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.angle);line(-5,-2,0,0,'#d9e2e9',1);line(0,0,-5,2,'#d9e2e9',1);ctx.restore();}
+for(let i=0;i<rings.length;i++){const r=rings[i];if(r.hit)continue;const pulse=Math.sin(time*3+i)*3;ctx.save();ctx.translate(r.x,r.y);ctx.shadowColor='#f3bc69';ctx.shadowBlur=17;ctx.strokeStyle='#f2bd72';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,0,18+pulse/2,27+pulse,0,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;ctx.strokeStyle='#f2bd7240';ctx.beginPath();ctx.ellipse(0,0,24+pulse/2,33+pulse,0,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#f2bd72';ctx.font='9px monospace';ctx.textAlign='center';ctx.fillText(String(i+1).padStart(2,'0'),0,-43);ctx.restore();}
+for(const p of particles){
+ if(p.gas){const fade=Math.min(1,p.age/.012)*Math.min(1,p.life/(p.maxLife*.35));ctx.globalAlpha=fade*(p.spread?(p.groundHug?.065:.055):p.boosted?.62:.5);ctx.save();if(p.spread){ctx.beginPath();ctx.rect(worldLeft-20,0,R-worldLeft+40,B-6);ctx.clip();}ctx.translate(p.x,p.y);if(!p.spread)ctx.rotate(p.axis);const rx=p.radius*(p.spread?(p.groundHug?1.3:1.12)+.08*Math.sin(p.seed+p.age*4):1.8),ry=p.radius*(p.spread?1:.85);ctx.drawImage(vaporTexture,-rx,-ry,rx*2,ry*2);ctx.restore();}
+ else{ctx.globalAlpha=Math.min(1,p.life);ctx.fillStyle='#ffd69a';ctx.fillRect(p.x,p.y,3,3);}
+}ctx.globalAlpha=1;
+ctx.save();ctx.globalAlpha=Math.max(.07,.3-(B-car.y)/1800);ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(car.x,B+2,72+(B-car.y)*.1,5,0,0,Math.PI*2);ctx.fill();ctx.restore();
+ctx.save();ctx.translate(car.x,car.y);ctx.rotate(car.angle);ctx.scale(car.facing,1);
+const rollCos=Math.cos(car.roll||0),rollUnderside=Math.abs(Math.sin(car.roll||0));
+ctx.save();ctx.scale(1,Math.abs(rollCos)<.015?.015:rollCos);
+if(magnet&&onDrivingSurface()){ctx.strokeStyle='#69e4ee99';ctx.beginPath();ctx.ellipse(0,17,62,5,0,0,Math.PI*2);ctx.stroke();for(const x of [-42,0,42]){line(x,6,x,15,'#8ae5f0aa',1.5);line(x,15,x-3,11,'#8ae5f0aa',1.5);line(x,15,x+3,11,'#8ae5f0aa',1.5);}}
+// Detailed silver Roadster study based on the supplied video close-ups.
+if(roadsterImage.complete&&roadsterImage.naturalWidth){ctx.drawImage(roadsterImage,-80,-26,160,42.67);
+ if(wheelImage.complete&&wheelImage.naturalWidth){for(const [x,y] of [[-50.4,2],[46.1333,1.6]]){ctx.save();ctx.translate(x,y);ctx.rotate(car.wheelRotation*car.facing*(rollCos<0?-1:1));ctx.drawImage(wheelImage,-13.3333,-13.3333,26.6667,26.6667);ctx.restore();}}
+}else{ctx.fillStyle='#b7ccd5';ctx.fillRect(-60,-12,120,24);}
+ctx.restore();
+// Roll in the opposite direction to expose the underside between the two side views.
+if(rollUnderside>.01&&undersideImage.complete&&undersideImage.naturalWidth){ctx.globalAlpha=rollUnderside;ctx.drawImage(undersideImage,-80,-38*rollUnderside,160,76*rollUnderside);ctx.globalAlpha=1;}
+ctx.restore();
+// A faint end marker makes the distant invisible boundary understandable.
+ctx.save();ctx.setLineDash([5,9]);line(worldLeft,50,worldLeft,B,'#8495a355',1);ctx.restore();
+ctx.fillStyle='#8495a3';ctx.font='10px monospace';ctx.fillText('FLIGHT LIMIT',worldLeft+12,72);
+ctx.restore();
+ctx.font='bold 56px Arial';ctx.fillStyle='#b6cddd0b';ctx.fillText('THE RAMP',155,310);
+ctx.fillStyle='#8495a3';ctx.font='10px monospace';ctx.fillText('01 / ACCELERATION',130,552);ctx.fillStyle='#ee8175';ctx.fillText('02 / CURVED WALL',1000,552);ctx.fillStyle='#80cddf';ctx.fillText('03 / CEILING +15°',ceilingLeft-stageShift-12,scaffoldTop-12);
+if(paused){ctx.fillStyle='#080d17bb';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 36px Arial';ctx.fillText('PAUSED',W/2,H/2);ctx.font='14px Arial';ctx.fillStyle='#acb7c9';ctx.fillText('Press P or click ▶ to continue',W/2,H/2+34);ctx.textAlign='left';}}
+function frame(ts){const dt=Math.min((ts-last)/1000||0,.033);last=ts;if(!paused)update(dt);draw();requestAnimationFrame(frame);}reset();requestAnimationFrame(frame);
+// Read-only telemetry for automated smoke checks and development tools.
+window.roadsterState=()=>({cameraX,worldLeft,leftStop,rampStart,scaffoldBack,x:car.x,y:car.y,vx:car.vx,vy:car.vy,surface:car.surface,launched:car.launched,angle:car.angle,distance:car.s,ceilingStart,trackEnd,facing:car.facing,roll:car.roll,rollActive:car.rollActive,rollElapsed:car.rollElapsed,undersideVisible:Math.abs(Math.sin(car.roll||0)),noseAngle:car.angle+(car.facing<0?Math.PI:0),wheelRotation:car.wheelRotation,wheelVelocity:car.wheelVelocity,inverted:car.surface==='track'&&Math.cos(car.angle)<-.9,magnet,flight,paused,score});
+</script></body></html>
