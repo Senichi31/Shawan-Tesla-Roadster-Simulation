@@ -53,3 +53,7 @@ The current silver vehicle is redrawn from the supplied side photograph, with a 
 ## V8: independent rolling wheels
 
 The current standalone entry is `play-ceiling-v8.html`, labelled `V8 · FIVE-SPOKE WHEELS / LIVE ROTATION`. The silver car keeps its V7 body shape; the wheel design uses broad silver panels and heavy black five-spoke geometry based on the side reference. The build script derives `roadster-body.svg` and `roadster-wheel.svg` from the complete vehicle illustration. Canvas rotates each wheel independently according to signed surface distance divided by the visible tire radius, including wall/ceiling travel. Reversing reverses wheel rotation, braking stops it, and pause freezes it. Airborne wheels coast with damping. Run `python3 scripts/build-release.py` to regenerate the component assets and standalone V8 page.
+
+## V9: six-spoke reference correction
+
+Current entry: `play-ceiling-v9.html` (`V9 · SIX-SPOKE WHEELS / LIVE ROTATION`). Corrects the previous five-spoke interpretation to **six black spokes and six silver sectors**, spaced at 60 degrees, based on the supplied wheel close-up. Body shape, short ceiling and distance-based wheel rotation are retained. The build script regenerates V9 and both component wheel/body SVGs.

@@ -1,7 +1,7 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=8';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=8';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=9';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=9';
 const wheelRadius=91*160/1200;
 const W=1400,H=600,L=65,R=1335,T=100,B=510;
 // Arc-length parametrization: ground, full 180-degree wall, horizontal ceiling.
