@@ -157,3 +157,7 @@ Current entry: `play-ceiling-v33.html` (`V33 · PARTICLE-ONLY PRESSURE JETS`). R
 ## V34: drifting, rising contact smoke
 
 Current entry: `play-ceiling-v34.html` (`V34 · RISING CONTACT VAPOR`). Contact vapor now rises with upward velocity and buoyancy, drifts gently sideways, expands into soft rounded puffs, and fades. Removes the flattened ground ellipse/glow look; clips vapor below the stage surface. Pressure-jet emission and boosted nozzle behavior are unchanged. Validation confirms upward motion, visible lift, both lateral drift directions and eventual dissipation. Rebuild with `python3 scripts/build-release.py`.
+
+## V35: ground-rolling vapor with rising wisps
+
+Current entry: `play-ceiling-v35.html` (`V35 · GROUND-ROLLING VAPOR`). Ground contact now creates mostly low, rolling smoke that drifts sideways near the road, plus a smaller fraction of rising wisps. Ground-bound puffs gently settle toward a low layer instead of all rising away from the surface. Round, soft vapor particles and floor clipping are retained; no flat glow/cone overlay is introduced. Pressure jets remain unchanged. Validation confirms a majority near-floor layer, both sideways directions, some lifted wisps and no high-altitude contact fog. Rebuild with `python3 scripts/build-release.py`.

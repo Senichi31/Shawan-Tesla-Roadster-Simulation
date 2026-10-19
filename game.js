@@ -1,8 +1,8 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=34';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=34';
-const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=34';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=35';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=35';
+const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=35';
 // Soft, transparent vapor texture; no solid cones or hard-edged smoke discs.
 const vaporTexture=document.createElement('canvas');vaporTexture.width=vaporTexture.height=64;
 const vaporCtx=vaporTexture.getContext('2d'),vaporGradient=vaporCtx.createRadialGradient(32,32,0,32,32,32);
@@ -187,11 +187,11 @@ particles.forEach(p=>{
    p.x=car.x+px*c-py*s+dx*p.travel-dy*spread;p.y=car.y+px*s+py*c+dy*p.travel+dx*spread;
    p.vx=car.vx+dx*p.jetSpeed;p.vy=car.vy+dy*p.jetSpeed;p.axis=Math.atan2(dy,dx);p.radius=2.5+p.travel*.085;
   }else{
-   p.anchored=false;p.radius+=p.growth*step;const drag=Math.exp(-(p.spread?.65:.35)*step);p.vx=p.vx*drag+Math.sin(time*9+p.seed+p.age*7)*10*step;p.vy=p.vy*drag+Math.cos(time*8+p.seed)*5*step;if(p.spread)p.vy-=18*step;p.x+=p.vx*step;p.y+=p.vy*step;
+   p.anchored=false;p.radius+=p.growth*step;const drag=Math.exp(-(p.spread?.65:.35)*step);p.vx=p.vx*drag+Math.sin(time*9+p.seed+p.age*7)*10*step;p.vy=p.vy*drag+Math.cos(time*8+p.seed)*5*step;if(p.spread){if(p.groundHug)p.vy+=(B-13-p.y)*9*step;else p.vy-=8*step;}p.x+=p.vx*step;p.y+=p.vy*step;
   }
   // Ground response is triggered by the visible vapor envelope actually meeting the floor.
   const verticalExtent=p.radius*Math.hypot(1.8*Math.sin(p.axis),.85*Math.cos(p.axis));
-  if(!p.spread&&p.life>0&&p.y+verticalExtent>=B-7&&p.vy>0){p.spread=true;p.anchored=false;p.y=B-10;p.vx=car.vx*.1+(Math.random()-.5)*70;p.vy=-28-Math.random()*20;p.radius=Math.max(6,p.radius*.7);p.growth=11;p.life=Math.max(.55+Math.random()*.3,p.life);p.maxLife=Math.max(p.maxLife,p.age+p.life);}
+  if(!p.spread&&p.life>0&&p.y+verticalExtent>=B-7&&p.vy>0){p.spread=true;p.anchored=false;p.y=B-7;p.groundHug=Math.random()<.7;p.vx=car.vx*.1+(Math.random()-.5)*(p.groundHug?150:65);p.vy=p.groundHug?-2-Math.random()*4:-12-Math.random()*16;p.radius=Math.max(6,p.radius*.7);p.growth=p.groundHug?14:11;p.life=Math.max(.55+Math.random()*.3,p.life);p.maxLife=Math.max(p.maxLife,p.age+p.life);}
   if(!p.spread&&p.y>=B-7)p.life=0;
  }else{p.x+=p.vx*step;p.y+=p.vy*step;}
 });particles=particles.filter(p=>p.life>0);sync();document.querySelector('#speed').textContent=String(Math.round(Math.hypot(car.vx,car.vy)*.36)).padStart(3,'0');document.querySelector('#score').textContent=`0${score} / 05`;document.querySelector('#toast').style.opacity=time<toastUntil?'1':'0';}
@@ -233,7 +233,7 @@ ctx.font='bold 56px Arial';ctx.fillStyle='#b6cddd0b';ctx.fillText('THE RAMP',155
 ctx.fillStyle='#8495a3';ctx.font='10px monospace';ctx.fillText('01 / ACCELERATION',130,552);ctx.fillStyle='#ee8175';ctx.fillText('02 / CURVED WALL',1000,552);ctx.fillStyle='#80cddf';ctx.fillText('03 / CEILING +15°',ceilingLeft-12,frameTop-12);
 for(let i=0;i<rings.length;i++){const r=rings[i];if(r.hit)continue;const pulse=Math.sin(time*3+i)*3;ctx.save();ctx.translate(r.x,r.y);ctx.shadowColor='#f3bc69';ctx.shadowBlur=17;ctx.strokeStyle='#f2bd72';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,0,18+pulse/2,27+pulse,0,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;ctx.strokeStyle='#f2bd7240';ctx.beginPath();ctx.ellipse(0,0,24+pulse/2,33+pulse,0,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#f2bd72';ctx.font='9px monospace';ctx.textAlign='center';ctx.fillText(String(i+1).padStart(2,'0'),0,-43);ctx.restore();}
 for(const p of particles){
- if(p.gas){const fade=Math.min(1,p.age/.012)*Math.min(1,p.life/(p.maxLife*.35));ctx.globalAlpha=fade*(p.spread?.055:p.boosted?.62:.5);ctx.save();if(p.spread){ctx.beginPath();ctx.rect(0,0,W,B-6);ctx.clip();}ctx.translate(p.x,p.y);if(!p.spread)ctx.rotate(p.axis);const rx=p.radius*(p.spread?1.12+.08*Math.sin(p.seed+p.age*4):1.8),ry=p.radius*(p.spread?1:.85);ctx.drawImage(vaporTexture,-rx,-ry,rx*2,ry*2);ctx.restore();}
+ if(p.gas){const fade=Math.min(1,p.age/.012)*Math.min(1,p.life/(p.maxLife*.35));ctx.globalAlpha=fade*(p.spread?(p.groundHug?.065:.055):p.boosted?.62:.5);ctx.save();if(p.spread){ctx.beginPath();ctx.rect(0,0,W,B-6);ctx.clip();}ctx.translate(p.x,p.y);if(!p.spread)ctx.rotate(p.axis);const rx=p.radius*(p.spread?(p.groundHug?1.3:1.12)+.08*Math.sin(p.seed+p.age*4):1.8),ry=p.radius*(p.spread?1:.85);ctx.drawImage(vaporTexture,-rx,-ry,rx*2,ry*2);ctx.restore();}
  else{ctx.globalAlpha=Math.min(1,p.life);ctx.fillStyle='#ffd69a';ctx.fillRect(p.x,p.y,3,3);}
 }ctx.globalAlpha=1;
 ctx.save();ctx.globalAlpha=Math.max(.07,.3-(B-car.y)/1800);ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(car.x,B+2,72+(B-car.y)*.1,5,0,0,Math.PI*2);ctx.fill();ctx.restore();
