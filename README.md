@@ -33,3 +33,13 @@ The tall open arc, rear steel truss, dark demonstration stage, silver bodywork a
 The silver vehicle sprite in `assets/roadster.svg` is a custom vector study of the user-supplied video: a low panoramic canopy, angular rear fascia, red rear light strip, large dark wheels and sculpted silver body. Flight adds blue underbody plumes, a rear jet and drifting vapor. It is a side-view interpretation, not a production CAD model.
 
 **Space** holds the brake. **M** toggles air grip (enabled at reset). Turn air grip off on the ceiling to fall under gravity; turn on **F** for free flight. Air grip and flight are separate arcade mechanics. The ceiling path is tangent-continuous with the 180-degree wall and supports forward and reverse travel.
+
+## Standalone ceiling release
+
+`play-ceiling-v6.html` contains the CSS, JavaScript and vehicle sprite in one file, so a page cannot combine an updated track with old cached assets. Its upper-left arena label reads `V6 · 180° WALL + INVERTED CEILING`. Rebuild it after editing the source files:
+
+```sh
+python3 scripts/build-release.py
+```
+
+The track is a true semicircle (180-unit radius), joined tangentially to the lower straight and an upper horizontal inverted section. Opening the release does not require a package manager or external network requests.

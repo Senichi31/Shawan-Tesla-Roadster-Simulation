@@ -3,7 +3,7 @@ const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
 const roadsterImage=new Image();roadsterImage.src='assets/roadster.svg?v=4';
 const W=1400,H=600,L=65,R=1335,T=100,B=510;
 // Arc-length parametrization: ground, full 180-degree wall, horizontal ceiling.
-const rampStart=950,rx=190,ry=170,endTheta=Math.PI;
+const rampStart=950,rx=180,ry=180,endTheta=Math.PI;
 const arc=[{x:rampStart,y:B,s:rampStart,angle:0}];
 for(let i=1;i<=180;i++){const t=endTheta*i/180,prev=arc.at(-1),x=rampStart+rx*Math.sin(t),y=B-ry*(1-Math.cos(t));arc.push({x,y,s:prev.s+Math.hypot(x-prev.x,y-prev.y),angle:-Math.atan2(ry*Math.sin(t),rx*Math.cos(t))});}
 const ceilingStart=arc.at(-1).s;
@@ -67,8 +67,8 @@ ctx.beginPath();deck();ctx.strokeStyle='#343e47';ctx.lineWidth=11;ctx.stroke();
 ctx.beginPath();deck();ctx.strokeStyle='#afb8c1';ctx.lineWidth=1.5;ctx.stroke();
 ctx.beginPath();arc.forEach((p,i)=>{const x=p.x-6*Math.sin(p.angle),y=p.y+6*Math.cos(p.angle);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.strokeStyle=magnet?'#72e8ec':'#d14b46';ctx.lineWidth=1.5;ctx.shadowColor=magnet?'#52dfea':'#ff493f';ctx.shadowBlur=6;ctx.stroke();ctx.shadowBlur=0;
 for(let i=15;i<arc.length;i+=20){const p=arc[i];ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.angle);line(-5,-2,0,0,'#d9e2e9',1);line(0,0,-5,2,'#d9e2e9',1);ctx.restore();}
-ctx.font='bold 56px Arial';ctx.fillStyle='#b6cddd0b';ctx.fillText('THE RAMP',155,285);
-ctx.fillStyle='#8495a3';ctx.font='10px monospace';ctx.fillText('01 / ACCELERATION',130,552);ctx.fillStyle='#ee8175';ctx.fillText('02 / 180° WALL',1000,552);ctx.fillStyle='#80cddf';ctx.fillText('03 / INVERTED CEILING — SPACE TO STOP',490,135);
+ctx.font='bold 56px Arial';ctx.fillStyle='#b6cddd0b';ctx.fillText('THE RAMP',155,310);
+ctx.fillStyle='#8495a3';ctx.font='10px monospace';ctx.fillText('01 / ACCELERATION',130,552);ctx.fillStyle='#ee8175';ctx.fillText('02 / 180° WALL',1000,552);ctx.fillStyle='#80cddf';ctx.fillText('03 / 180° INVERTED CEILING — SPACE TO STOP',470,115);
 for(let i=0;i<rings.length;i++){const r=rings[i];if(r.hit)continue;const pulse=Math.sin(time*3+i)*3;ctx.save();ctx.translate(r.x,r.y);ctx.shadowColor='#f3bc69';ctx.shadowBlur=17;ctx.strokeStyle='#f2bd72';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,0,18+pulse/2,27+pulse,0,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;ctx.strokeStyle='#f2bd7240';ctx.beginPath();ctx.ellipse(0,0,24+pulse/2,33+pulse,0,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#f2bd72';ctx.font='9px monospace';ctx.textAlign='center';ctx.fillText(String(i+1).padStart(2,'0'),0,-43);ctx.restore();}
 for(const p of particles){ctx.globalAlpha=Math.min(1,p.life)*(p.smoke?.16:1);ctx.fillStyle=p.smoke?'#b6d2dc':'#ffd69a';if(p.smoke){ctx.beginPath();ctx.arc(p.x,p.y,7+(1.3-p.life)*20,0,Math.PI*2);ctx.fill();}else ctx.fillRect(p.x,p.y,3,3);}ctx.globalAlpha=1;
 ctx.save();ctx.globalAlpha=Math.max(.07,.3-(B-car.y)/1800);ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(car.x,B+2,72+(B-car.y)*.1,5,0,0,Math.PI*2);ctx.fill();ctx.restore();
