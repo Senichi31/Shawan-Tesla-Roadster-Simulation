@@ -1,7 +1,7 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=19';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=19';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=20';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=20';
 const wheelRadius=91*160/1200;
 const W=1400,H=600,L=65,R=1335,T=100,B=510;
 // A circular wall meets the 15-degree uphill ceiling with a continuous tangent.
@@ -21,7 +21,7 @@ const ceilingRing=pathAt(ceilingStart+70);
 const keys=new Set(),rings=[{x:340,y:480},{x:780,y:480},{x:1055,y:365},{x:1040,y:230},{x:ceilingRing.x+17*Math.sin(ceilingAngle),y:ceilingRing.y-17*Math.cos(ceilingAngle)}];
 const magnet=true; // Surface adhesion is always available; no manual toggle.
 let car,flight=false,paused=false,score=0,last=0,time=0,toastUntil=6,particles=[];
-function reset(){car={x:160,y:B-17,vx:0,vy:0,angle:0,surface:'track',wheelRotation:0,wheelVelocity:0,speed:0,s:160,launched:false};score=0;rings.forEach(r=>r.hit=false);particles=[];flight=false;paused=false;keys.clear();toastUntil=time+6;document.querySelector('#toast').textContent='Tap arrows to roll. Space brakes. Air grip holds the track; the open end releases you.';sync();}
+function reset(){car={x:500,y:B-17,vx:0,vy:0,angle:0,facing:1,surface:'track',wheelRotation:0,wheelVelocity:0,speed:0,s:500,launched:false};score=0;rings.forEach(r=>r.hit=false);particles=[];flight=false;paused=false;keys.clear();toastUntil=time+6;document.querySelector('#toast').textContent='← / A drives left. → / D drives right. Space brakes. F flies.';sync();}
 function sync(){document.querySelector('#magnet').classList.toggle('active',!flight);document.querySelector('#flight').classList.toggle('active',flight);document.querySelector('#mode').textContent=flight?'● FLIGHT MODE':magnet?(car.surface==='track'&&Math.cos(car.angle)<-.9?'● INVERTED / AIR GRIP':'● AIR GRIP'):'● GROUND DRIVE';document.querySelector('#status').textContent=flight?'THRUSTERS ENGAGED':magnet?(car.surface==='track'?'AUTO GRIP / GRAVITY OFF':'AIR GRIP READY / OFF TRACK'):'GRIP SYSTEM READY';document.querySelector('#pause').textContent=paused?'▶':'Ⅱ';}
 function toggleFlight(){flight=!flight;if(flight){car.surface=null;car.vy=Math.min(car.vy,-95);}sync();}
 document.querySelector('#reset').onclick=reset;document.querySelector('#flight').onclick=toggleFlight;document.querySelector('#pause').onclick=()=>{paused=!paused;keys.clear();sync();};
@@ -62,6 +62,9 @@ if(oldSurface==='track'&&car.surface==='track'){car.wheelVelocity=(car.s-oldDist
 else if(oldSurface==='ground'&&car.surface==='ground'){car.wheelVelocity=(car.x-oldX)/dt/wheelRadius||0;}
 else {car.wheelVelocity*=Math.exp(-1.5*dt);}
 car.wheelRotation+=car.wheelVelocity*dt;
+// Turn the body to follow signed travel along the road, including reversed wall driving.
+const headingSpeed=(car.surface==='track'?car.speed:car.vx);
+if(Math.abs(headingSpeed)>2)car.facing=headingSpeed<0?-1:1;
 for(const r of rings)if(!r.hit&&Math.hypot(car.x-r.x,car.y-r.y)<45){r.hit=true;score++;toastUntil=time+4;document.querySelector('#toast').textContent=score===5?'All checkpoints cleared. The sky is yours. R to run again.':`Checkpoint ${score} / 5 collected. Keep exploring.`;for(let i=0;i<22;i++)particles.push({x:r.x,y:r.y,vx:(Math.random()-.5)*240,vy:(Math.random()-.5)*240,life:1});}
 if(flight&&Math.random()<dt*35){particles.push({x:car.x+(Math.random()-.5)*80,y:car.y+30,vx:-car.vx*.1+(Math.random()-.5)*25,vy:45+Math.random()*50,life:1.3,smoke:true});}
 particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;});particles=particles.filter(p=>p.life>0);sync();document.querySelector('#speed').textContent=String(Math.round(Math.hypot(car.vx,car.vy)*.36)).padStart(3,'0');document.querySelector('#score').textContent=`0${score} / 05`;document.querySelector('#toast').style.opacity=time<toastUntil?'1':'0';}
@@ -104,7 +107,7 @@ ctx.fillStyle='#8495a3';ctx.font='10px monospace';ctx.fillText('01 / ACCELERATIO
 for(let i=0;i<rings.length;i++){const r=rings[i];if(r.hit)continue;const pulse=Math.sin(time*3+i)*3;ctx.save();ctx.translate(r.x,r.y);ctx.shadowColor='#f3bc69';ctx.shadowBlur=17;ctx.strokeStyle='#f2bd72';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,0,18+pulse/2,27+pulse,0,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;ctx.strokeStyle='#f2bd7240';ctx.beginPath();ctx.ellipse(0,0,24+pulse/2,33+pulse,0,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#f2bd72';ctx.font='9px monospace';ctx.textAlign='center';ctx.fillText(String(i+1).padStart(2,'0'),0,-43);ctx.restore();}
 for(const p of particles){ctx.globalAlpha=Math.min(1,p.life)*(p.smoke?.16:1);ctx.fillStyle=p.smoke?'#b6d2dc':'#ffd69a';if(p.smoke){ctx.beginPath();ctx.arc(p.x,p.y,7+(1.3-p.life)*20,0,Math.PI*2);ctx.fill();}else ctx.fillRect(p.x,p.y,3,3);}ctx.globalAlpha=1;
 ctx.save();ctx.globalAlpha=Math.max(.07,.3-(B-car.y)/1800);ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(car.x,B+2,72+(B-car.y)*.1,5,0,0,Math.PI*2);ctx.fill();ctx.restore();
-ctx.save();ctx.translate(car.x,car.y);ctx.rotate(car.angle);
+ctx.save();ctx.translate(car.x,car.y);ctx.rotate(car.angle);ctx.scale(car.facing,1);
 if(flight){
  for(const x of [-43,42]){const length=55+Math.sin(time*27+x)*9+(keys.has('shift')?35:0);const plume=ctx.createLinearGradient(x,10,x,10+length);plume.addColorStop(0,'#dcfaff');plume.addColorStop(.12,'#80e7ffdd');plume.addColorStop(.55,'#24a4e580');plume.addColorStop(1,'#73d9f500');ctx.fillStyle=plume;ctx.beginPath();ctx.moveTo(x-3,11);ctx.bezierCurveTo(x-6,32,x-11,50,x-13,10+length);ctx.lineTo(x+13,10+length);ctx.bezierCurveTo(x+8,45,x+4,25,x+3,11);ctx.fill();}
  const jet=ctx.createLinearGradient(-70,0,-150,0);jet.addColorStop(0,'#caf7ffdd');jet.addColorStop(.4,'#3fc2ef80');jet.addColorStop(1,'#7ce6ff00');ctx.fillStyle=jet;ctx.beginPath();ctx.moveTo(-67,-6);ctx.lineTo(-150,4);ctx.lineTo(-67,6);ctx.fill();
@@ -112,10 +115,10 @@ if(flight){
 if(magnet&&car.surface==='track'){ctx.strokeStyle='#69e4ee99';ctx.beginPath();ctx.ellipse(0,17,62,5,0,0,Math.PI*2);ctx.stroke();for(const x of [-42,0,42]){line(x,6,x,15,'#8ae5f0aa',1.5);line(x,15,x-3,11,'#8ae5f0aa',1.5);line(x,15,x+3,11,'#8ae5f0aa',1.5);}}
 // Detailed silver Roadster study based on the supplied video close-ups.
 if(roadsterImage.complete&&roadsterImage.naturalWidth){ctx.drawImage(roadsterImage,-80,-26,160,42.67);
- if(wheelImage.complete&&wheelImage.naturalWidth){for(const [x,y] of [[-50.4,2],[46.1333,1.6]]){ctx.save();ctx.translate(x,y);ctx.rotate(car.wheelRotation);ctx.drawImage(wheelImage,-13.3333,-13.3333,26.6667,26.6667);ctx.restore();}}
+ if(wheelImage.complete&&wheelImage.naturalWidth){for(const [x,y] of [[-50.4,2],[46.1333,1.6]]){ctx.save();ctx.translate(x,y);ctx.rotate(car.wheelRotation*car.facing);ctx.drawImage(wheelImage,-13.3333,-13.3333,26.6667,26.6667);ctx.restore();}}
 }else{ctx.fillStyle='#b7ccd5';ctx.fillRect(-60,-12,120,24);}
 ctx.restore();
 if(paused){ctx.fillStyle='#080d17bb';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 36px Arial';ctx.fillText('PAUSED',W/2,H/2);ctx.font='14px Arial';ctx.fillStyle='#acb7c9';ctx.fillText('Press P or click ▶ to continue',W/2,H/2+34);ctx.textAlign='left';}}
 function frame(ts){const dt=Math.min((ts-last)/1000||0,.033);last=ts;if(!paused)update(dt);draw();requestAnimationFrame(frame);}reset();requestAnimationFrame(frame);
 // Read-only telemetry for automated smoke checks and development tools.
-window.roadsterState=()=>({x:car.x,y:car.y,vx:car.vx,vy:car.vy,surface:car.surface,launched:car.launched,angle:car.angle,distance:car.s,ceilingStart,trackEnd,wheelRotation:car.wheelRotation,wheelVelocity:car.wheelVelocity,inverted:car.surface==='track'&&Math.cos(car.angle)<-.9,magnet,flight,paused,score});
+window.roadsterState=()=>({x:car.x,y:car.y,vx:car.vx,vy:car.vy,surface:car.surface,launched:car.launched,angle:car.angle,distance:car.s,ceilingStart,trackEnd,facing:car.facing,wheelRotation:car.wheelRotation,wheelVelocity:car.wheelVelocity,inverted:car.surface==='track'&&Math.cos(car.angle)<-.9,magnet,flight,paused,score});

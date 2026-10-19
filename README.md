@@ -97,3 +97,7 @@ Current entry: `play-ceiling-v18.html` (`V18 · CEILING-END SCAFFOLD`). Corrects
 ## V19: small scaffold height adjustment
 
 Current entry: `play-ceiling-v19.html`. Raises the scaffold top by another 6 arena units to close the small gap at the upper track endpoint. Track geometry and driving behavior are unchanged. Rebuild with `python3 scripts/build-release.py`.
+
+## V20: left and right driving
+
+Current entry: `play-ceiling-v20.html` (`V20 · LEFT + RIGHT DRIVING`). Left/A moves toward decreasing track distance and turns the vehicle body left once travel reverses; Right/D returns it to forward travel. The same facing behavior works on the curved wall. Wheel rendering compensates for body mirroring so rolling direction stays correct. The reset position is x=500 to leave usable ground to both sides. Short coasting, automatic adhesion, the 15-degree ceiling and scaffold remain unchanged. Rebuild with `python3 scripts/build-release.py`.
