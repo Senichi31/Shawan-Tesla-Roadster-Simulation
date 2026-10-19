@@ -182,3 +182,8 @@ Current entry: `play-ceiling-v38.html`. All four underside nozzles now emit duri
 ## V39: rearward flight exhaust
 
 Current entry: `play-ceiling-v39.html`. Normal flight jets angle behind horizontal movement, increasing gradually with speed and leaning up to about 29 degrees during Shift boost. Leftward and rightward movement mirror the effect; hovering keeps the exhaust vertical. The four-corner axial-roll jets and front-wheel roll jet retain their directions. Rebuild with `python3 scripts/build-release.py`.
+
+
+## V40: right-shifted ramp and finite scrolling flight area
+
+Current entry: `play-ceiling-v40.html`. The curved/ceiling track, scaffold, checkpoints and starting car move 110 world units right, reducing the rear gap to 23 units. The ground and red line extend to x=-1600, with a finite left vehicle stop at x=-1520. A horizontal camera reveals this extension when the car passes the left third of the initial view; HUD and pause overlay remain fixed. The floor collision and ground vapor clipping cover the extended world. Reset restores the original view. Rebuild with `python3 scripts/build-release.py`.
