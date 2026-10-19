@@ -1,7 +1,7 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=22';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=22';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=23';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=23';
 const wheelRadius=91*160/1200;
 const W=1400,H=600,L=65,R=1335,T=100,B=510;
 // A circular wall meets the 15-degree uphill ceiling with a continuous tangent.
@@ -16,7 +16,12 @@ for(let distance=10;distance<=140;distance+=10){arc.push({x:ceilingJoin.x+distan
 const ceilingLeft=arc.at(-1).x;
 const trackEnd=arc.at(-1).s;
 function pathAt(distance){if(distance<=rampStart)return {x:distance,y:B,angle:0};const i=arc.findIndex(p=>p.s>=distance);if(i<0)return arc.at(-1);const a=arc[i-1],b=arc[i],u=(distance-a.s)/(b.s-a.s);return {x:a.x+(b.x-a.x)*u,y:a.y+(b.y-a.y)*u,angle:a.angle+(b.angle-a.angle)*u};}
-function placeOnTrack(){const p=pathAt(car.s);car.angle=p.angle;car.x=p.x+17*Math.sin(p.angle);car.y=p.y-17*Math.cos(p.angle);}
+function placeOnTrack(){const p=pathAt(car.s);car.angle=p.angle;
+ const position=offset=>{car.x=p.x+offset*Math.sin(p.angle);car.y=p.y-offset*Math.cos(p.angle);};
+ position(17);
+ // A long, rigid body also needs clearance where the straight upper road meets the curve.
+ if(bodyEntersScaffold(flightBody())){let low=17,high=65;for(let i=0;i<9;i++){const middle=(low+high)/2;position(middle);if(bodyEntersScaffold(flightBody()))low=middle;else high=middle;}position(high+.03);}
+}
 const ceilingRing=pathAt(ceilingStart+70);
 // One closed obstacle: road face, scaffold roof/rear/end cap, and stage floor.
 // The opaque collision boundary blocks the whole scaffold footprint, including its open-looking bays.
@@ -30,6 +35,23 @@ const scaffoldEdges=[
 const flightRoads=[{a:{x:L,y:B},b:{x:R,y:B}},...arc.slice(1).map((b,i)=>({a:arc[i],b})),...scaffoldEdges];
 const bodyOutline=[[-74,-16],[-42,-18],[-12,-26],[26,-23],[61,-11],[74,-2],[74,10],[58,17],[-63,17],[-74,8]];
 function flightBody(){const c=Math.cos(car.angle),s=Math.sin(car.angle);return bodyOutline.map(([x,y])=>{x*=car.facing;return {x:car.x+x*c-y*s,y:car.y+x*s+y*c};});}
+function bodyEntersScaffold(body){
+ if(Math.max(...body.map(p=>p.x))<ceilingLeft||Math.min(...body.map(p=>p.x))>scaffoldBack)return false;
+ const cross=(a,b,c)=>(b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
+ for(const point of body){let inside=false,onEdge=false;
+  for(let i=0,j=scaffoldBoundary.length-1;i<scaffoldBoundary.length;j=i++){
+   const a=scaffoldBoundary[j],b=scaffoldBoundary[i],dx=b.x-a.x,dy=b.y-a.y;
+   const u=Math.max(0,Math.min(1,((point.x-a.x)*dx+(point.y-a.y)*dy)/(dx*dx+dy*dy)));
+   if(Math.hypot(point.x-a.x-u*dx,point.y-a.y-u*dy)<.03)onEdge=true;
+   if((a.y>point.y)!==(b.y>point.y)&&point.x<(b.x-a.x)*(point.y-a.y)/(b.y-a.y)+a.x)inside=!inside;
+  }if(inside&&!onEdge)return true;
+ }
+ for(let i=0;i<body.length;i++)for(let j=0;j<scaffoldBoundary.length;j++){
+  const a=body[i],b=body[(i+1)%body.length],c=scaffoldBoundary[j],d=scaffoldBoundary[(j+1)%scaffoldBoundary.length];
+  if(cross(a,b,c)*cross(a,b,d)<-1e-7&&cross(c,d,a)*cross(c,d,b)<-1e-7)return true;
+ }
+ return false;
+}
 function roadOutline(road){const {a,b}=road,dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy),nx=-dy/len*6,ny=dx/len*6;return [{x:a.x+nx,y:a.y+ny},{x:b.x+nx,y:b.y+ny},{x:b.x-nx,y:b.y-ny},{x:a.x-nx,y:a.y-ny}];}
 const flightRoadShapes=flightRoads.map(roadOutline);
 function polygonContact(a,b){let depth=Infinity,normal=null;
@@ -45,25 +67,41 @@ function polygonContact(a,b){let depth=Infinity,normal=null;
  return {...normal,depth};
 }
 function resolveFlightContacts(){
+ const contacts=[];
  for(let pass=0;pass<6;pass++){
   let corrected=false;
-  for(const road of flightRoadShapes){
-   const body=flightBody();
+  for(let index=0;index<flightRoadShapes.length;index++){
+   const road=flightRoadShapes[index],body=flightBody();
    const minX=Math.min(...body.map(p=>p.x)),maxX=Math.max(...body.map(p=>p.x)),minY=Math.min(...body.map(p=>p.y)),maxY=Math.max(...body.map(p=>p.y));
    if(Math.max(...road.map(p=>p.x))<minX||Math.min(...road.map(p=>p.x))>maxX||Math.max(...road.map(p=>p.y))<minY||Math.min(...road.map(p=>p.y))>maxY)continue;
    const hit=polygonContact(body,road);if(!hit)continue;
+   contacts.push({index,nx:hit.x,ny:hit.y});
    car.x+=hit.x*(hit.depth+.02);car.y+=hit.y*(hit.depth+.02);
    const inward=car.vx*hit.x+car.vy*hit.y;if(inward<0){car.vx-=inward*hit.x;car.vy-=inward*hit.y;}
    corrected=true;
   }
   if(!corrected)break;
  }
+ return contacts;
 }
-function moveFlight(dt,targetAngle){
- const turn=(targetAngle-car.angle)*Math.min(1,dt*5);
+function landOnRoad(contacts){
+ for(const hit of contacts){
+  if(hit.index===0&&hit.ny<-.5){car.surface=car.x<=rampStart?'track':'ground';car.s=car.x;car.speed=car.vx;car.vy=0;car.angle=0;car.launched=false;if(car.surface==='track')placeOnTrack();return true;}
+  if(hit.index>0&&hit.index<arc.length){
+   const a=arc[hit.index-1],b=arc[hit.index],dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy);
+   // Only the inner driving face can reattach; steel roof/rear contacts remain ordinary supports.
+   if(hit.nx*dy/len-hit.ny*dx/len<.5)continue;
+   const u=Math.max(0,Math.min(1,((car.x-a.x)*dx+(car.y-a.y)*dy)/(len*len)));
+   car.s=a.s+u*len;car.speed=(car.vx*dx+car.vy*dy)/len;car.surface='track';car.launched=false;placeOnTrack();return true;
+  }
+ }
+ return false;
+}
+function moveFlight(dt,targetAngle,turnRate=5,allowLanding=false){
+ const turn=(targetAngle-car.angle)*Math.min(1,dt*turnRate);
  // Short linear and angular steps prevent boosted motion and rotation tunnelling through the road.
  const steps=Math.max(1,Math.ceil(Math.hypot(car.vx,car.vy)*dt/3),Math.ceil(Math.abs(turn)/.025));
- for(let step=0;step<steps;step++){car.x+=car.vx*dt/steps;car.y+=car.vy*dt/steps;car.angle+=turn/steps;resolveFlightContacts();}
+ for(let step=0;step<steps;step++){car.x+=car.vx*dt/steps;car.y+=car.vy*dt/steps;car.angle+=turn/steps;const contacts=resolveFlightContacts();if(allowLanding&&landOnRoad(contacts))break;}
 }
 const keys=new Set(),rings=[{x:340,y:480},{x:780,y:480},{x:1055,y:365},{x:1040,y:230},{x:ceilingRing.x+17*Math.sin(ceilingAngle),y:ceilingRing.y-17*Math.cos(ceilingAngle)}];
 const magnet=true; // Surface adhesion is always available; no manual toggle.
@@ -75,7 +113,7 @@ document.querySelector('#reset').onclick=reset;document.querySelector('#flight')
 window.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();const k=e.key.toLowerCase();if(!e.repeat){if(k==='f')toggleFlight();if(k==='r')reset();if(k==='p'||k==='escape'){paused=!paused;sync();}}keys.add(k);});
 window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>keys.clear());
 function update(dt){time+=dt;const right=keys.has('d')||keys.has('arrowright'),left=keys.has('a')||keys.has('arrowleft'),up=keys.has('w')||keys.has('arrowup'),down=keys.has('s')||keys.has('arrowdown'),boost=keys.has('shift'),power=boost?820:420,brake=keys.has(' ');
-const oldX=car.x,oldY=car.y,oldDistance=car.s,oldSurface=car.surface,attachedBefore=car.surface==='track';
+const oldX=car.x,oldDistance=car.s,oldSurface=car.surface;
 if(flight){car.surface=null;car.vx+=(Number(right)-Number(left))*power*dt;car.vy+=(Number(down)-Number(up))*power*dt;car.vx*=Math.exp(-.7*dt);car.vy*=Math.exp(-.7*dt);moveFlight(dt,(car.vx/650)*.18);}
 else if(car.surface==='track'){
  const angle=pathAt(car.s).angle,drive=Number(right||up)-Number(left||down);
@@ -88,24 +126,16 @@ else if(car.surface==='track'){
  placeOnTrack();car.vx=car.speed*Math.cos(car.angle);car.vy=car.speed*Math.sin(car.angle);
  if(car.s>=trackEnd){const overshoot=car.s-trackEnd;car.x+=overshoot*Math.cos(car.angle);car.y+=overshoot*Math.sin(car.angle);car.surface=null;car.launched=true;toastUntil=time+5;document.querySelector('#toast').textContent='CEILING EXIT / Press F for flight, or fall back to the ground.';}
 }else if(car.surface==='ground'){
- car.vx+=(Number(right||up)-Number(left||down))*(boost?1150:760)*dt;car.vx*=Math.exp(-((right||up||left||down)?.48:2.4)*dt);if(!right&&!up&&!left&&!down&&Math.abs(car.vx)<.4)car.vx=0;car.x+=car.vx*dt;car.y=B-17;car.angle=0;
+ car.vx+=(Number(right||up)-Number(left||down))*(boost?1150:760)*dt;car.vx*=Math.exp(-((right||up||left||down)?.48:2.4)*dt);if(!right&&!up&&!left&&!down&&Math.abs(car.vx)<.4)car.vx=0;car.angle=0;car.vy=0;moveFlight(dt,0);
  if(car.x<rampStart){car.surface='track';car.s=car.x;car.speed=car.vx;}
 }else{
- car.vx+=(Number(right)-Number(left))*power*.25*dt;car.vy+=420*dt;car.x+=car.vx*dt;car.y+=car.vy*dt;
- car.angle+=(0-car.angle)*Math.min(1,dt*1.5);
+ car.vx+=(Number(right)-Number(left))*power*.25*dt;car.vy+=420*dt;
+ moveFlight(dt,0,1.5,true);
 }
-// Sweep against the inner face of every arc segment, including the overhang.
-if(!flight&&car.surface===null&&!(attachedBefore&&car.launched)){for(let i=1;i<arc.length;i++){
- const a=arc[i-1],b=arc[i],dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy),nx=dy/len,ny=-dx/len;
- const before=(oldX-a.x)*nx+(oldY-a.y)*ny-17,after=(car.x-a.x)*nx+(car.y-a.y)*ny-17;
- if(before>0&&after<=0){const t=before/(before-after),hx=oldX+(car.x-oldX)*t,hy=oldY+(car.y-oldY)*t,u=((hx-a.x)*dx+(hy-a.y)*dy)/(len*len);
- if(u>=0&&u<=1){car.x=hx+nx*.1;car.y=hy+ny*.1;if(!flight){car.surface='track';car.s=a.s+u*len;car.speed=(car.vx*dx+car.vy*dy)/len;placeOnTrack();}else{const v=car.vx*nx+car.vy*ny;car.vx-=Math.min(0,v)*nx;car.vy-=Math.min(0,v)*ny;}break;}
- }
-}}
 if(car.x<L+55){car.x=L+55;car.vx=Math.max(0,car.vx);}if(car.x>R-55){car.x=R-55;car.vx=Math.min(0,car.vx);}
 if(car.y<35){car.y=35;car.vy=Math.max(0,car.vy);}if(car.y>B-17&&car.surface!=='track'){car.y=B-17;car.vy=0;if(!flight){car.angle=0;car.surface=car.x<=rampStart?'track':'ground';car.s=car.x;car.speed=car.vx;}}
 // Recheck after arena clamps, so a screen-edge correction cannot force the body into steelwork.
-if(flight)resolveFlightContacts();
+if(car.surface!=='track')resolveFlightContacts();
 // Rolling angle follows signed distance along the surface, including the ceiling.
 if(oldSurface==='track'&&car.surface==='track'){car.wheelVelocity=(car.s-oldDistance)/dt/wheelRadius||0;}
 else if(oldSurface==='ground'&&car.surface==='ground'){car.wheelVelocity=(car.x-oldX)/dt/wheelRadius||0;}
@@ -113,7 +143,7 @@ else {car.wheelVelocity*=Math.exp(-1.5*dt);}
 car.wheelRotation+=car.wheelVelocity*dt;
 // Turn the body to follow signed travel along the road, including reversed wall driving.
 const headingSpeed=(car.surface==='track'?car.speed:car.vx);
-if(Math.abs(headingSpeed)>2){const facing=headingSpeed<0?-1:1;if(car.facing!==facing){car.facing=facing;if(flight)resolveFlightContacts();}}
+if(Math.abs(headingSpeed)>2){const facing=headingSpeed<0?-1:1;if(car.facing!==facing){car.facing=facing;if(car.surface==='track')placeOnTrack();else resolveFlightContacts();}}
 for(const r of rings)if(!r.hit&&Math.hypot(car.x-r.x,car.y-r.y)<45){r.hit=true;score++;toastUntil=time+4;document.querySelector('#toast').textContent=score===5?'All checkpoints cleared. The sky is yours. R to run again.':`Checkpoint ${score} / 5 collected. Keep exploring.`;for(let i=0;i<22;i++)particles.push({x:r.x,y:r.y,vx:(Math.random()-.5)*240,vy:(Math.random()-.5)*240,life:1});}
 if(flight&&Math.random()<dt*35){particles.push({x:car.x+(Math.random()-.5)*80,y:car.y+30,vx:-car.vx*.1+(Math.random()-.5)*25,vy:45+Math.random()*50,life:1.3,smoke:true});}
 particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;});particles=particles.filter(p=>p.life>0);sync();document.querySelector('#speed').textContent=String(Math.round(Math.hypot(car.vx,car.vy)*.36)).padStart(3,'0');document.querySelector('#score').textContent=`0${score} / 05`;document.querySelector('#toast').style.opacity=time<toastUntil?'1':'0';}
