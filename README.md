@@ -1,204 +1,47 @@
-# Tesla Roadster Simulation
+# Tesla Roadster Simulation — Version 1
 
-A browser-based 2D driving playground: drive a Roadster-inspired car, accelerate up a full 180-degree curved wall with a horizontal inverted ceiling, or fly through five glowing checkpoints.
+A browser-based 2D driving game with an automatically gripping Roadster-inspired car, a curved wall and 15° inverted ceiling, four-corner vapor during the exit roll, and a finite scrolling flight area.
+
+[Play the game](https://senichi31.github.io/Tesla-Roadster-Simulation/)
 
 ## Run locally
 
-Requires Python 3. No package installation or build step is needed.
+Requires Python 3. No package installation is needed.
 
 ```sh
-python3 -m http.server 8000 --bind 0.0.0.0
+python3 -m http.server 8000 --bind 127.0.0.1
 ```
 
-Open `http://localhost:8000` in your browser. The game uses Canvas and plain JavaScript. Fonts are optional; system fonts work offline.
+Open `http://localhost:8000`.
 
 ## Controls
 
-- **Up arrow:** automatically enables flight and ascends.
-- **Down arrow:** descends in flight; has no ground-driving action. Touching the ground automatically exits flight.
-- **W / D / Right:** accelerate on the track; in flight W ascends and D/Right moves right.
-- **S / A / Left:** reverse/brake on the track; in flight S descends and A/Left moves left.
-- **Automatic air grip:** always available, with no M key or manual switch. The car automatically adheres to walls and the ceiling while on the track, even at rest. Flying suspends surface attachment; driving past the open endpoint releases it naturally.
-- **F:** toggle flight. Use WASD or arrow keys to move in four directions.
-- **Shift:** hold for extra thrust.
-- **P / Escape:** pause/resume.
-- **R:** reset the run.
+- **Left / A, Right / D:** drive or move horizontally in flight.
+- **Up arrow:** take off and ascend; **Down arrow:** descend. Landing on the ground or scaffold roof exits flight.
+- **W / S:** forward/reverse on attached surfaces; ascend/descend in flight.
+- **Space:** brake while attached.
+- **Shift:** extra thrust.
+- **F** or the flight button: toggle flight.
+- **P / Escape** or the pause button: pause/resume.
+- **R** or Reset run: reset before the first checkpoint.
 
-Hold D/Right or W to build speed, then climb the half-circle wall and drive fully upside down along the ceiling. Release directions to coast with inertia; hold Space to stop while attached. Air grip holds the car only while road exists. Driving past the ceiling’s open end releases it with its current velocity; press F for flight. Hold Shift for more launch speed; press F in the air for sustained flight. Collect all five rings in any order. Air grip and flight are mutually exclusive; their buttons also toggle the modes. Keyboard play is intended for desktop browsers.
+Grip is automatic on the driving track and scaffold roof. Drive through the five checkpoints, exit the ceiling, and roll upright into flight automatically. Fly left to reveal more space; a marked boundary limits the world.
 
-This is a fictional arcade simulation, not a model of real vehicle capabilities or an official Tesla product.
+## Files
 
-## Visual reference
+- `index.html`: main game page.
+- `game.js`: physics, controls and Canvas rendering.
+- `style.css`: page styling.
+- `assets/`: vehicle artwork.
+- `scripts/build-release.py`: builds the standalone game and derives the body/wheel artwork.
+- `play.html`: standalone game with embedded CSS, JavaScript and artwork; can be opened directly or downloaded for offline play.
 
-The tall open arc, rear steel truss, dark demonstration stage, silver bodywork and blue thrusters are inspired by the reference screenshot provided for “The Ramp | Roadster”. This is a 2D artistic interpretation of that screenshot.
-
-The silver vehicle sprite in `assets/roadster.svg` is a custom vector study of the user-supplied video: a low panoramic canopy, angular rear fascia, red rear light strip, large dark wheels and sculpted silver body. Flight adds blue underbody plumes, a rear jet and drifting vapor. It is a side-view interpretation, not a production CAD model.
-
-**Space** holds the brake. **M** toggles air grip (enabled at reset). Turn air grip off on the ceiling to fall under gravity; turn on **F** for free flight. Air grip and flight are separate arcade mechanics. The ceiling path is tangent-continuous with the 180-degree wall and supports forward and reverse travel.
-
-## Standalone ceiling release
-
-`play-ceiling-v6.html` contains the CSS, JavaScript and vehicle sprite in one file, so a page cannot combine an updated track with old cached assets. Its upper-left arena label reads `V6 · 180° WALL + INVERTED CEILING`. Rebuild it after editing the source files:
+Rebuild the standalone page after editing source files:
 
 ```sh
 python3 scripts/build-release.py
 ```
 
-The track is a true semicircle (180-unit radius), joined tangentially to the lower straight and an upper horizontal inverted section. Opening the release does not require a package manager or external network requests.
+Keep one standalone file, `play.html`, and replace it on updates.
 
-## V7: shortened ceiling and side-reference vehicle
-
-Open `play-ceiling-v7.html` for the current standalone release. Its label reads `V7 · SHORT CEILING / SILVER ROADSTER`. The leftmost three 120-unit truss bays were removed: the ceiling endpoint moves from x=450 to x=810, leaving a 140-unit ceiling. Brake with Space as you enter the ceiling if you want to stop before its open end. The half-circle wall is unchanged.
-
-The current silver vehicle is redrawn from the supplied side photograph, with a wedge nose, long black glazing, straight shoulder and large five-spoke wheels. It faces right to match forward driving in the game. Run `python3 scripts/build-release.py` after source changes to rebuild V7; V6 is retained as an older standalone release.
-
-## V8: independent rolling wheels
-
-The current standalone entry is `play-ceiling-v8.html`, labelled `V8 · FIVE-SPOKE WHEELS / LIVE ROTATION`. The silver car keeps its V7 body shape; the wheel design uses broad silver panels and heavy black five-spoke geometry based on the side reference. The build script derives `roadster-body.svg` and `roadster-wheel.svg` from the complete vehicle illustration. Canvas rotates each wheel independently according to signed surface distance divided by the visible tire radius, including wall/ceiling travel. Reversing reverses wheel rotation, braking stops it, and pause freezes it. Airborne wheels coast with damping. Run `python3 scripts/build-release.py` to regenerate the component assets and standalone V8 page.
-
-## V9: six-spoke reference correction
-
-Current entry: `play-ceiling-v9.html` (`V9 · SIX-SPOKE WHEELS / LIVE ROTATION`). Corrects the previous five-spoke interpretation to **six black spokes and six silver sectors**, spaced at 60 degrees, based on the supplied wheel close-up. Body shape, short ceiling and distance-based wheel rotation are retained. The build script regenerates V9 and both component wheel/body SVGs.
-
-## V10: gravity-free attached driving
-
-Current entry: `play-ceiling-v10.html` (`V10 · AIR GRIP / NO GRAVITY`). While air grip is enabled and the car is attached, gravity contributes no tangential acceleration. Releasing directional input smoothly brakes to a complete stop on ground, walls and the ceiling. The ceiling endpoint clamps position and speed instead of automatically detaching; reverse input moves away from it. Press M to explicitly release adhesion or F for flight. Gravity still acts after detaching. The silver body and animated six-spoke wheels are retained. Rebuild V10 with `python3 scripts/build-release.py`.
-
-## V11: inertia and open-end exit
-
-Current entry: `play-ceiling-v11.html` (`V11 · INERTIA / OPEN TRACK EXIT`). Releasing an arrow/WASD key now preserves momentum with gradual rolling drag; short taps move the car and let it coast. Only Space applies the strong brake. Gravity remains cancelled while air grip is attached, so a car braked on a wall stays still. The ceiling end is open again: driving past it detaches even with air grip enabled, preserves tangential velocity and resumes airborne gravity. Press F to fly instead of falling. Six-spoke rotating wheels and the shortened ceiling are retained. Rebuild V11 with `python3 scripts/build-release.py`.
-
-## V12: automatic surface adhesion
-
-Current entry: `play-ceiling-v12.html` (`V12 · AUTOMATIC AIR GRIP`). Removes the M key and clickable air-grip toggle. Surface adhesion is always available automatically, including after leaving flight mode. Wall/ceiling driving remains gravity-free. Short taps still coast with inertia, Space brakes, the ceiling end releases naturally, and F toggles flight. The grip card now displays status rather than acting as a control. Rebuild V12 with `python3 scripts/build-release.py`. Earlier version notes describe historical behavior.
-
-## V13: grounded steel scaffold
-
-Current entry: `play-ceiling-v13.html` (`V13 · GROUNDED STEEL SCAFFOLD`). Replaces the narrow curved truss with a rectangular rear steel tower: vertical grounded columns, a straight top beam, horizontal cross members, X braces and foot plates. Steelwork is clipped behind the road face. Track geometry, automatic grip, inertia, open-end exit and vehicle artwork are unchanged. Rebuild V13 with `python3 scripts/build-release.py`.
-
-## V14: shorter coasting
-
-Current entry: `play-ceiling-v14.html` (`V14 · SHORTER COASTING`). On the driving surface, releasing directional input uses 2.4/s rolling drag instead of 0.48/s, while held-input acceleration and drag stay unchanged. A deterministic 100 ms tap followed by five seconds of coasting travels about 78% less distance after release. Coasting is retained rather than stopping instantly. This applies to attached road/wall/ceiling travel and the lower landing ground. Automatic adhesion, the open ceiling exit, six-spoke rotating wheels and scaffold are retained. Rebuild V14 with `python3 scripts/build-release.py`.
-
-## V15: 20-degree uphill upper track
-
-Current entry: `play-ceiling-v15.html` (`V15 · UPHILL CEILING +20°`). The 140-unit upper section rises at 20 degrees in the car's forward direction toward the left exit. The circular wall retains its radius and meets it tangentially at a 160-degree sweep. The scaffold follows the revised envelope and the upper checkpoint follows the road. Automatic adhesion cancels slope gravity, including at rest; exiting preserves the uphill tangent velocity. Short coasting and six-spoke wheel animation are retained. Rebuild V15 with `python3 scripts/build-release.py`.
-
-## V16: 15-degree upper track
-
-Current entry: `play-ceiling-v16.html` (`V16 · UPHILL CEILING +15°`). Reduces the upper incline from 20 to 15 degrees, keeping its 140-unit length and a tangent-continuous connection to the curved wall. Adhesion, short coasting, rotating six-spoke wheels and open-end exit remain unchanged. Rebuild V16 with `python3 scripts/build-release.py`.
-
-## V17: trimmed upper scaffold
-
-Current entry: `play-ceiling-v17.html` (`V17 · +15° CEILING / TRIMMED SCAFFOLD`). Removes the highlighted uppermost row of steelwork, including its posts, cross braces and top beam. Remaining steel members begin at the previous row boundary. The 15-degree road and all driving behavior are unchanged. Rebuild V17 with `python3 scripts/build-release.py`.
-
-## V18: scaffold reaches the ceiling endpoint
-
-Current entry: `play-ceiling-v18.html` (`V18 · CEILING-END SCAFFOLD`). Corrects the over-trimmed support: the top beam and upright grid extend to the outer edge of the inclined ceiling endpoint, trimming only the excess above it. The 15-degree track and all driving logic remain unchanged. Rebuild with `python3 scripts/build-release.py`.
-
-## V19: small scaffold height adjustment
-
-Current entry: `play-ceiling-v19.html`. Raises the scaffold top by another 6 arena units to close the small gap at the upper track endpoint. Track geometry and driving behavior are unchanged. Rebuild with `python3 scripts/build-release.py`.
-
-## V20: left and right driving
-
-Current entry: `play-ceiling-v20.html` (`V20 · LEFT + RIGHT DRIVING`). Left/A moves toward decreasing track distance and turns the vehicle body left once travel reverses; Right/D returns it to forward travel. The same facing behavior works on the curved wall. Wheel rendering compensates for body mirroring so rolling direction stays correct. The reset position is x=500 to leave usable ground to both sides. Short coasting, automatic adhesion, the 15-degree ceiling and scaffold remain unchanged. Rebuild with `python3 scripts/build-release.py`.
-
-## V21: full-body flight collisions
-
-Current entry: `play-ceiling-v21.html` (`V21 · FULL-BODY FLIGHT COLLISION`). Flying now collides using a convex silhouette covering the nose, tail, roof and wheel envelope, against finite two-sided road segments with the visible deck thickness. Movement and rotation are substepped to prevent boosted motion from tunnelling through the road. Contact removes velocity into the surface while preserving motion along it. Facing changes are rechecked for overlap. Scaffold and exhaust remain decorative; attached driving keeps its existing path constraint. Validation covers nose, tail, roof, rotating into the curve, landing, boosted travel and existing automatic grip/coasting/open-end exit. Rebuild with `python3 scripts/build-release.py`.
-
-## V22: solid scaffold footprint
-
-Current entry: `play-ceiling-v22.html` (`V22 · SOLID SCAFFOLD COLLISION`). The scaffold roof, rear face and ceiling-end cap join the road face and floor as one closed flight-collision obstacle. Cars cannot enter its X-braced bays, including by flying down onto the roof or approaching from behind. Rendering and collision share the scaffold top/back coordinates. Contacts are rechecked after arena clamps. Validation checks independent polygon containment and edge crossings across repeated boosted approaches from above, behind, the tip and the road face, plus V21 flight collisions and normal driving. The visible track and scaffold design remain unchanged. Rebuild with `python3 scripts/build-release.py`.
-
-## V23: collisions after leaving flight mode
-
-Current entry: `play-ceiling-v23.html` (`V23 · SOLID COLLISION IN ALL MODES`). Free falling and landed ground movement now use the same substepped whole-body road/scaffold collision solver as powered flight. Disabling F never disables collision: the scaffold roof supports a falling vehicle, and the rear face blocks ground movement. Inner road contacts can reattach automatically; scaffold roof/rear contacts remain solid supports. Attached poses and facing changes also maintain body clearance at the straight-to-curve junction. Validation covers disabling and repeatedly toggling F while approaching from above, rear and the open tip; resting on the roof; ground movement into the rear; normal driving/landing; and existing flight nose/tail/roof/rotation collisions. Rebuild with `python3 scripts/build-release.py`.
-
-## V24: automatic longitudinal roll
-
-Current entry: `play-ceiling-v24.html` (`V24 · AUTOMATIC AXIAL ROLL`). Leaving the inverted upper track automatically rolls the vehicle upright around its nose-to-tail axis over 1.05 seconds. The nose retains its launch direction and momentum: this is not an end-over-end pitch or a front/back turn. A dedicated silver top-view sprite expands between the inverted and upright side views to represent the 3D roll in Canvas 2D. Projected whole-body collision follows the roll, including its visible width; road reattachment is deferred while the roll clears the lip. Pause freezes progress, F on/off does not cancel it, and landing/reset restores the standard pose. Validation covers start/midpoint/end orientation, roof visibility, pause/F controls, collisions in both modes and existing driving behavior. Rebuild with `python3 scripts/build-release.py`.
-
-## V25: show the underside during roll
-
-Current entry: `play-ceiling-v25.html` (`V25 · UNDERSIDE AXIAL ROLL`). Reverses the longitudinal roll direction and replaces the midpoint roof view with a stylized underbody view showing the flat undertray, suspension, wheels and air nozzles. Nose direction, roll timing and the collision envelope are retained. Rebuild with `python3 scripts/build-release.py`.
-
-## V26: wider rolling underbody
-
-Current entry: `play-ceiling-v26.html`. Increases the underside view's transverse size from 56 to 76 arena units (about 36%) while retaining vehicle length and side-profile artwork. The roll collision projection expands correspondingly, from 26 to 36 units of transverse half-width. Roll orientation and scaffold collision checks pass. Rebuild with `python3 scripts/build-release.py`.
-
-## V27: full-length red ground line
-
-Current entry: `play-ceiling-v27.html`. Extends the lower red accent and its glow from L to R, matching both endpoints of the ground road line. Driving and collision behavior are unchanged. Rebuild with `python3 scripts/build-release.py`.
-
-## V28: compressed-air vapor appearance
-
-Current entry: `play-ceiling-v28.html` (`V28 · COMPRESSED-AIR VAPOR`). Replaces the solid blue triangular jets and hard smoke discs with soft white/pale-blue vapor particles emitted from underbody and rear nozzles. Narrow jets widen and drift as they travel; floor contact turns them into spreading low fog. Particle origins and directions follow vehicle facing, pitch and axial roll. Emission stops with flight disabled while existing vapor fades out. A reusable radial texture keeps the cloud soft and particle lifetimes keep the count bounded. Validation covers underbody/rear emission, floor spread, dissipation after flight is turned off and browser rendering. Vehicle physics and collision remain unchanged. Rebuild with `python3 scripts/build-release.py`.
-
-## V29: restrained vapor with proximity-gated ground fog
-
-Current entry: `play-ceiling-v29.html` (`V29 · LIGHT VAPOR / LOW-ALTITUDE FOG`). Shortens vapor lifetime, reduces emission and limits plume widening. High-altitude jets dissipate before reaching the floor. Floor spread is only created for underbody vapor emitted near the ground while the vehicle is still within 90 arena units of it; intensity fades with distance. Rear vapor never creates floor fog. Close-range spread has less drift and a shorter lifetime. High/mid/low-altitude and post-flight dissipation checks pass. Rebuild with `python3 scripts/build-release.py`.
-
-## V30: stronger visible air jets
-
-Current entry: `play-ceiling-v30.html` (`V30 · STRONGER AIR JETS`). Increases vapor exit speed and near-nozzle opacity, adds soft continuous wisp cores, and raises rear emission to two particles per emission step with a broader rear plume. Short lifetimes still prevent high-altitude jets from becoming floor-to-car smoke columns. Ground fog retains V29 proximity gating and restrained spread. High/mid/low altitude and rear-volume/dissipation checks pass. Rebuild with `python3 scripts/build-release.py`.
-
-## V31: broad, soft-edged vapor plumes
-
-Current entry: `play-ceiling-v31.html` (`V31 · BROADER SOFT VAPOR PLUMES`). Replaces thin wisp cores with blurred, curved plumes that widen away from each nozzle and fade at irregular ends. Vapor particles are larger and stretched along their emission direction to avoid beaded lines; the rear plume is widened too. Cores stop at the floor, and ground fog still only forms close to the ground. High/mid/low altitude and dissipation checks pass. Rebuild with `python3 scripts/build-release.py`.
-
-## V32: underbody-only vapor with contact-driven ground spread
-
-Current entry: `play-ceiling-v32.html` (`V32 · UNDERBODY JETS / CONTACT FOG`). Removes both rear particle emission and the rear plume core. Underbody core length is reduced from 120 to 90 units, and vapor lifetime is shortened. Floor spread is now triggered by the visible particle envelope touching the floor while moving downward, independent of vehicle altitude and flight-mode state. Removes the previous 90-unit vehicle-clearance gate. Validation confirms no rear plume, shorter vapor, no spread before contact, floor spread with vehicle clearance above the old limit, and eventual dissipation. Rebuild with `python3 scripts/build-release.py`.
-
-## V33: particle-only pressure jets
-
-Current entry: `play-ceiling-v33.html` (`V33 · PARTICLE-ONLY PRESSURE JETS`). Removes the filled/blurred cone core entirely. The expanding plume silhouette comes only from soft vapor particles, with width increasing along the jet. Young jet particles are transported relative to the live underbody nozzle to avoid long world-space trails during fast vehicle motion. Shift increases emission rate and particle exit speed (roughly 500 to 925 units/s); shorter lifetimes retain compact plumes. New particles are distributed through their birth frame so there is no gap at the nozzle. After flight stops or vapor touches the floor, particles detach into normal drifting/spreading motion. Validation covers boosted jet speed/density, nozzle alignment at high car speed, absence of the cone layer, underbody-only emission, floor contact and dissipation. Rebuild with `python3 scripts/build-release.py`.
-
-## V34: drifting, rising contact smoke
-
-Current entry: `play-ceiling-v34.html` (`V34 · RISING CONTACT VAPOR`). Contact vapor now rises with upward velocity and buoyancy, drifts gently sideways, expands into soft rounded puffs, and fades. Removes the flattened ground ellipse/glow look; clips vapor below the stage surface. Pressure-jet emission and boosted nozzle behavior are unchanged. Validation confirms upward motion, visible lift, both lateral drift directions and eventual dissipation. Rebuild with `python3 scripts/build-release.py`.
-
-## V35: ground-rolling vapor with rising wisps
-
-Current entry: `play-ceiling-v35.html` (`V35 · GROUND-ROLLING VAPOR`). Ground contact now creates mostly low, rolling smoke that drifts sideways near the road, plus a smaller fraction of rising wisps. Ground-bound puffs gently settle toward a low layer instead of all rising away from the surface. Round, soft vapor particles and floor clipping are retained; no flat glow/cone overlay is introduced. Pressure jets remain unchanged. Validation confirms a majority near-floor layer, both sideways directions, some lifted wisps and no high-altitude contact fog. Rebuild with `python3 scripts/build-release.py`.
-
-## V36: arrow-key takeoff and automatic touchdown
-
-Current entry: `play-ceiling-v36.html` (`V36 · ↑ TAKEOFF / ↓ DESCEND`). Up arrow now enables flight on keydown and controls ascent; Down arrow controls descent without reversing on the ground. A descending full-body contact with the stage floor automatically disables flight and restores ground driving. Initial takeoff contact and contacts with walls/scaffold do not count as touchdown. Left/Right, WASD, Shift, F and the flight button retain their roles. Validation covers ground Down, Up-only takeoff/ascent, Down descent, automatic flight exit, ground driving and taking off again. Rebuild with `python3 scripts/build-release.py`.
-
-
-## V37: automatic flight after ceiling roll
-
-Current entry: `play-ceiling-v37.html`. Leaving the ceiling keeps the existing axial roll and momentum, then automatically engages flight once upright. During the roll, a downward pressure jet emits at the lower front-wheel position; normal underbody jets resume after the roll. Up/Down ascent/descent and automatic flight exit on touchdown remain available.
-
-
-## V38: four-corner vapor during the axial roll
-
-Current entry: `play-ceiling-v38.html`. All four underside nozzles now emit during the ceiling-exit roll, with their positions following the projected undertray and their jets fanning apart as the underside becomes visible. The downward front-wheel roll jet is retained. Normal side-view flight keeps its two overlapping pairs of jets, and completing the roll still engages flight automatically. Rebuild with `python3 scripts/build-release.py`.
-
-
-## V39: rearward flight exhaust
-
-Current entry: `play-ceiling-v39.html`. Normal flight jets angle behind horizontal movement, increasing gradually with speed and leaning up to about 29 degrees during Shift boost. Leftward and rightward movement mirror the effect; hovering keeps the exhaust vertical. The four-corner axial-roll jets and front-wheel roll jet retain their directions. Rebuild with `python3 scripts/build-release.py`.
-
-
-## V40: right-shifted ramp and finite scrolling flight area
-
-Current entry: `play-ceiling-v40.html`. The curved/ceiling track, scaffold, checkpoints and starting car move 110 world units right, reducing the rear gap to 23 units. The ground and red line extend to x=-1600, with a finite left vehicle stop at x=-1520. A horizontal camera reveals this extension when the car passes the left third of the initial view; HUD and pause overlay remain fixed. The floor collision and ground vapor clipping cover the extended world. Reset restores the original view. Rebuild with `python3 scripts/build-release.py`.
-
-
-## V41: scaffold roof driving and fixed scene labels
-
-Current entry: `play-ceiling-v41.html`. Landing on the scaffold roof switches to surface driving with automatic adhesion, the same acceleration/coasting/braking as the road, and distance-driven wheel rotation. Left/Right work on the roof; Up takes off again and leaving its edge releases the car. Full-body scaffold collision remains active. Scene captions return to their pre-shift screen positions and stay fixed during camera scrolling; the ramp, ground and checkpoints retain their V40 locations. Rebuild with `python3 scripts/build-release.py`.
-
-
-## V42: graphical pause control and English interface
-
-Current entry: `play-ceiling-v42.html`. The pause button uses a circular SVG pause/play icon with accessible state labels instead of a Roman-numeral character. The decorative grip ellipse and arrows beneath attached cars are removed; adhesion physics remain active. All Chinese page captions and control descriptions are translated into English. Rebuild with `python3 scripts/build-release.py`.
-
-
-## V43: reset before checkpoint 1 and align checkpoints to the road
-
-Current entry: `play-ceiling-v43.html`. Reset places the car 150 units before checkpoint 1. All checkpoints derive their positions from path distances, with 3 and 4 on the lower/upper thirds of the circular wall and 5 on the final ceiling section. Their centers sit 30 units inside the road face so normal attached driving collects them in order. The camera starts following near the left edge to keep the full stage visible from the new spawn. Rebuild with `python3 scripts/build-release.py`.
+This is a fictional arcade simulation and an artistic interpretation of supplied references, not an official Tesla product or a model of real vehicle capabilities.

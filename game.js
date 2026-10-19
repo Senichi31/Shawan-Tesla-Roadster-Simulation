@@ -1,8 +1,8 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=43';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=43';
-const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=43';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=1';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=1';
+const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=1';
 // Soft, transparent vapor texture; no solid cones or hard-edged smoke discs.
 const vaporTexture=document.createElement('canvas');vaporTexture.width=vaporTexture.height=64;
 const vaporCtx=vaporTexture.getContext('2d'),vaporGradient=vaporCtx.createRadialGradient(32,32,0,32,32,32);
