@@ -1,7 +1,7 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=17';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=17';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=18';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=18';
 const wheelRadius=91*160/1200;
 const W=1400,H=600,L=65,R=1335,T=100,B=510;
 // A circular wall meets the 15-degree uphill ceiling with a continuous tangent.
@@ -74,15 +74,16 @@ for(let x=100;x<1350;x+=45){ctx.fillStyle='#c1dbeb';ctx.shadowColor='#addefb';ct
 line(100,B+14,790,B+14,'#f34b40',2);line(100,B+19,790,B+19,'#f34b402a',3);
 // Grounded rectangular scaffold behind the ramp, as in the reference stage.
 // Clip the steelwork to the region outside the driving face so no brace crosses the road.
-const frameTop=arc.at(-1).y-38,frameBack=rampStart+rx+72;
+// The top beam meets the outer edge of the ceiling endpoint instead of cutting below it.
+const frameTop=arc.at(-1).y-4,frameBack=rampStart+rx+72;
 ctx.save();ctx.beginPath();ctx.moveTo(ceilingLeft,frameTop);ctx.lineTo(frameBack,frameTop);ctx.lineTo(frameBack,B);ctx.lineTo(rampStart,B);
 for(const p of arc.slice(1))ctx.lineTo(p.x,p.y);
 ctx.closePath();ctx.clip();
 const beam=(x,y,x2,y2,width=2.6)=>{line(x,y,x2,y2,'#71808c',width);line(x-1,y,x2-1,y2,'#c3cdd533',.8);};
 const columns=[];for(let x=ceilingLeft;x<frameBack;x+=65)columns.push(x);columns.push(frameBack);
-// Remove the highlighted top row; all steel members now begin at this cut line.
-const supportTop=B-2*ry;
-const levels=[supportTop];for(let y=B-2*ry+60;y<B;y+=60)levels.push(y);levels.push(B);
+// Trim only the excess height, retaining uprights and braces right up to the endpoint.
+const supportTop=frameTop;
+const levels=[supportTop,B-2*ry];for(let y=B-2*ry+60;y<B;y+=60)levels.push(y);levels.push(B);
 // Uprights stay vertical; cross members and X braces form rectangular bays.
 for(const x of columns)beam(x,supportTop,x,B,3);
 for(const y of levels)beam(ceilingLeft,y,frameBack,y,2.8);

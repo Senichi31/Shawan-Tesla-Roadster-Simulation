@@ -89,3 +89,7 @@ Current entry: `play-ceiling-v16.html` (`V16 · UPHILL CEILING +15°`). Reduces 
 ## V17: trimmed upper scaffold
 
 Current entry: `play-ceiling-v17.html` (`V17 · +15° CEILING / TRIMMED SCAFFOLD`). Removes the highlighted uppermost row of steelwork, including its posts, cross braces and top beam. Remaining steel members begin at the previous row boundary. The 15-degree road and all driving behavior are unchanged. Rebuild V17 with `python3 scripts/build-release.py`.
+
+## V18: scaffold reaches the ceiling endpoint
+
+Current entry: `play-ceiling-v18.html` (`V18 · CEILING-END SCAFFOLD`). Corrects the over-trimmed support: the top beam and upright grid extend to the outer edge of the inclined ceiling endpoint, trimming only the excess above it. The 15-degree track and all driving logic remain unchanged. Rebuild with `python3 scripts/build-release.py`.
