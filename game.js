@@ -145,19 +145,36 @@ const checkpointDistances=[340+stageShift,780+stageShift,rampStart+rx*Math.PI/3,
 const keys=new Set(),rings=checkpointDistances.map(distance=>{const p=pathAt(distance);return {x:p.x+30*Math.sin(p.angle),y:p.y-30*Math.cos(p.angle)};});
 const spawnX=rings[0].x-150;
 const magnet=true; // Surface adhesion is always available; no manual toggle.
+// Track each contact independently so direction and boost can be held together.
+const touchPointers=new Map();
+function releaseTouchControls(){touchPointers.clear();document.querySelectorAll('[data-key]').forEach(button=>button.classList.remove('pressed'));}
+function clearInputs(){keys.clear();releaseTouchControls();}
+function held(key){return keys.has(key)||[...touchPointers.values()].includes(key);}
+document.querySelectorAll('[data-key]').forEach(button=>{
+ button.addEventListener('pointerdown',event=>{
+  if(event.pointerType==='mouse'&&event.button!==0)return;
+  event.preventDefault();button.setPointerCapture(event.pointerId);
+  const key=button.dataset.key;touchPointers.set(event.pointerId,key);button.classList.add('pressed');
+  if(key==='arrowup'&&!flight&&!paused)toggleFlight();
+ });
+ const release=event=>{touchPointers.delete(event.pointerId);if(![...touchPointers.values()].includes(button.dataset.key))button.classList.remove('pressed');};
+ button.addEventListener('pointerup',release);button.addEventListener('pointercancel',release);button.addEventListener('lostpointercapture',release);
+ button.addEventListener('contextmenu',event=>event.preventDefault());
+});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)clearInputs();});
 let car,flight=false,paused=false,score=0,last=0,time=0,toastUntil=6,particles=[],vaporEmission=0,cameraX=0;
-function reset(){car={x:spawnX,y:B-17,vx:0,vy:0,angle:0,facing:1,roll:0,rollActive:false,rollElapsed:0,rollAxisAngle:0,surface:'track',wheelRotation:0,wheelVelocity:0,speed:0,s:spawnX,launched:false};score=0;rings.forEach(r=>r.hit=false);particles=[];vaporEmission=0;cameraX=0;flight=false;paused=false;keys.clear();toastUntil=time+6;document.querySelector('#toast').textContent='← → drive. ↑ takes off / rises. ↓ descends. Touch down to exit flight.';sync();}
+function reset(){car={x:spawnX,y:B-17,vx:0,vy:0,angle:0,facing:1,roll:0,rollActive:false,rollElapsed:0,rollAxisAngle:0,surface:'track',wheelRotation:0,wheelVelocity:0,speed:0,s:spawnX,launched:false};score=0;rings.forEach(r=>r.hit=false);particles=[];vaporEmission=0;cameraX=0;flight=false;paused=false;clearInputs();toastUntil=time+6;document.querySelector('#toast').textContent='← → drive. ↑ takes off / rises. ↓ descends. Touch down to exit flight.';sync();}
 function sync(){document.querySelector('#magnet').classList.toggle('active',!flight);document.querySelector('#flight').classList.toggle('active',flight);document.querySelector('#mode').textContent=flight?'● FLIGHT MODE':magnet?(car.surface==='track'&&Math.cos(car.angle)<-.9?'● INVERTED / AIR GRIP':'● AIR GRIP'):'● GROUND DRIVE';document.querySelector('#status').textContent=flight?'THRUSTERS ENGAGED':magnet?(onDrivingSurface()?'AUTO GRIP / GRAVITY OFF':'AIR GRIP READY / OFF TRACK'):'GRIP SYSTEM READY';const pauseButton=document.querySelector('#pause');pauseButton.setAttribute('aria-pressed',String(paused));pauseButton.setAttribute('aria-label',paused?'Resume game':'Pause game');pauseButton.title=paused?'Resume game':'Pause game';}
 function toggleFlight(){flight=!flight;if(flight){car.surface=null;car.vy=Math.min(car.vy,-95);}sync();}
-document.querySelector('#reset').onclick=reset;document.querySelector('#flight').onclick=toggleFlight;document.querySelector('#pause').onclick=()=>{paused=!paused;keys.clear();sync();};
-window.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();const k=e.key.toLowerCase();if(!e.repeat){if(k==='arrowup'&&!flight)toggleFlight();if(k==='f')toggleFlight();if(k==='r')reset();if(k==='p'||k==='escape'){paused=!paused;sync();}}keys.add(k);});
-window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>keys.clear());
-function update(dt){time+=dt;const right=keys.has('d')||keys.has('arrowright'),left=keys.has('a')||keys.has('arrowleft'),up=keys.has('w')||keys.has('arrowup'),down=keys.has('s')||keys.has('arrowdown'),boost=keys.has('shift'),power=boost?820:420,brake=keys.has(' ');
+document.querySelector('#reset').onclick=reset;document.querySelector('#flight').onclick=toggleFlight;document.querySelector('#pause').onclick=()=>{paused=!paused;clearInputs();sync();};
+window.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();const k=e.key.toLowerCase();if(!e.repeat){if(k==='arrowup'&&!flight)toggleFlight();if(k==='f')toggleFlight();if(k==='r')reset();if(k==='p'||k==='escape'){paused=!paused;clearInputs();sync();}}keys.add(k);});
+window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',clearInputs);
+function update(dt){time+=dt;const right=held('d')||held('arrowright'),left=held('a')||held('arrowleft'),up=held('w')||held('arrowup'),down=held('s')||held('arrowdown'),boost=held('shift'),power=boost?820:420,brake=held(' ');
 const oldX=car.x,oldDistance=car.s,oldSurface=car.surface;
 updateAutoRoll(dt);
 if(flight){car.surface=null;car.vx+=(Number(right)-Number(left))*power*dt;car.vy+=(Number(down)-Number(up))*power*dt;car.vx*=Math.exp(-.7*dt);car.vy*=Math.exp(-.7*dt);moveFlight(dt,car.rollActive?car.rollAxisAngle:(car.vx/650)*.18);}
 else if(onDrivingSurface()){
- const drive=Number(right||keys.has('w'))-Number(left||keys.has('s'));
+ const drive=Number(right||held('w'))-Number(left||held('s'));
  car.speed+=((brake?0:drive)*(boost?1270:880))*dt;
  // Air grip cancels gravity; releasing input keeps inertia. Only Space brakes.
  if(brake){car.speed*=Math.exp(-10*dt);if(Math.abs(car.speed)<2)car.speed=0;}
@@ -172,7 +189,7 @@ else if(onDrivingSurface()){
  if(car.s>=trackEnd){const overshoot=car.s-trackEnd;car.x+=overshoot*Math.cos(car.angle);car.y+=overshoot*Math.sin(car.angle);car.surface=null;car.launched=true;beginAutoRoll();toastUntil=time+5;document.querySelector('#toast').textContent='AUTO ROLL / Rolling upright. Flight engages automatically.';}
 }
 }else if(car.surface==='ground'){
- car.vx+=(Number(right||keys.has('w'))-Number(left||keys.has('s')))*(boost?1150:760)*dt;car.vx*=Math.exp(-((right||keys.has('w')||left||keys.has('s'))?.48:2.4)*dt);if(!right&&!keys.has('w')&&!left&&!keys.has('s')&&Math.abs(car.vx)<.4)car.vx=0;car.angle=0;car.vy=0;moveFlight(dt,0);
+ car.vx+=(Number(right||held('w'))-Number(left||held('s')))*(boost?1150:760)*dt;car.vx*=Math.exp(-((right||held('w')||left||held('s'))?.48:2.4)*dt);if(!right&&!held('w')&&!left&&!held('s')&&Math.abs(car.vx)<.4)car.vx=0;car.angle=0;car.vy=0;moveFlight(dt,0);
  if(car.x<rampStart){car.surface='track';car.s=car.x;car.speed=car.vx;}
 }else{
  car.vx+=(Number(right)-Number(left))*power*.25*dt;car.vy+=420*dt;

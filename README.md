@@ -2,7 +2,7 @@
 
 A browser-based 2D driving game with an automatically gripping Roadster-inspired car, a curved wall and 15° inverted ceiling, four-corner vapor during the exit roll, and a finite scrolling flight area.
 
-[Play the game](https://senichi31.github.io/Tesla-Roadster-Simulation/play.html?v=e29319c)
+[Play the game](https://senichi31.github.io/Tesla-Roadster-Simulation/play.html?v=touch-v3)
 
 ## Run locally
 
@@ -15,6 +15,8 @@ python3 -m http.server 8000 --bind 127.0.0.1
 Open `http://localhost:8000`.
 
 ## Controls
+
+On phones and tablets, use the on-screen arrows to drive or fly. Hold ↑ to take off/ascend and ↓ to descend. Hold BRAKE to slow down or BOOST for extra thrust; direction and boost support simultaneous touches. Use the flight, pause, and reset buttons for their respective actions.
 
 - **Left / A, Right / D:** drive or move horizontally in flight.
 - **Up arrow:** take off and ascend; **Down arrow:** descend. Landing on the ground or scaffold roof exits flight.
