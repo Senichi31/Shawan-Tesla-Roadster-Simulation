@@ -1,7 +1,7 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=13';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=13';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=14';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=14';
 const wheelRadius=91*160/1200;
 const W=1400,H=600,L=65,R=1335,T=100,B=510;
 // Arc-length parametrization: ground, full 180-degree wall, horizontal ceiling.
@@ -33,12 +33,12 @@ else if(car.surface==='track'){
  // Air grip cancels gravity; releasing input keeps inertia. Only Space brakes.
  if(brake){car.speed*=Math.exp(-10*dt);if(Math.abs(car.speed)<2)car.speed=0;}
  if(!drive&&Math.abs(car.speed)<.4)car.speed=0;
- car.speed*=Math.exp(-.48*dt);car.speed=Math.max(-650,Math.min(950,car.speed));car.s=Math.max(L+55,car.s+car.speed*dt);
+ car.speed*=Math.exp(-(drive?.48:2.4)*dt);car.speed=Math.max(-650,Math.min(950,car.speed));car.s=Math.max(L+55,car.s+car.speed*dt);
  if(car.s<=L+55)car.speed=Math.max(0,car.speed);
  placeOnTrack();car.vx=car.speed*Math.cos(car.angle);car.vy=car.speed*Math.sin(car.angle);
  if(car.s>=trackEnd){const overshoot=car.s-trackEnd;car.x+=overshoot*Math.cos(car.angle);car.y+=overshoot*Math.sin(car.angle);car.surface=null;car.launched=true;toastUntil=time+5;document.querySelector('#toast').textContent='CEILING EXIT / Press F for flight, or fall back to the ground.';}
 }else if(car.surface==='ground'){
- car.vx+=(Number(right||up)-Number(left||down))*(boost?1150:760)*dt;car.vx*=Math.exp(-.48*dt);car.x+=car.vx*dt;car.y=B-17;car.angle=0;
+ car.vx+=(Number(right||up)-Number(left||down))*(boost?1150:760)*dt;car.vx*=Math.exp(-((right||up||left||down)?.48:2.4)*dt);if(!right&&!up&&!left&&!down&&Math.abs(car.vx)<.4)car.vx=0;car.x+=car.vx*dt;car.y=B-17;car.angle=0;
  if(car.x<rampStart){car.surface='track';car.s=car.x;car.speed=car.vx;}
 }else{
  car.vx+=(Number(right)-Number(left))*power*.25*dt;car.vy+=420*dt;car.x+=car.vx*dt;car.y+=car.vy*dt;

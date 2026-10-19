@@ -73,3 +73,7 @@ Current entry: `play-ceiling-v12.html` (`V12 · AUTOMATIC AIR GRIP`). Removes th
 ## V13: grounded steel scaffold
 
 Current entry: `play-ceiling-v13.html` (`V13 · GROUNDED STEEL SCAFFOLD`). Replaces the narrow curved truss with a rectangular rear steel tower: vertical grounded columns, a straight top beam, horizontal cross members, X braces and foot plates. Steelwork is clipped behind the road face. Track geometry, automatic grip, inertia, open-end exit and vehicle artwork are unchanged. Rebuild V13 with `python3 scripts/build-release.py`.
+
+## V14: shorter coasting
+
+Current entry: `play-ceiling-v14.html` (`V14 · SHORTER COASTING`). On the driving surface, releasing directional input uses 2.4/s rolling drag instead of 0.48/s, while held-input acceleration and drag stay unchanged. A deterministic 100 ms tap followed by five seconds of coasting travels about 78% less distance after release. Coasting is retained rather than stopping instantly. This applies to attached road/wall/ceiling travel and the lower landing ground. Automatic adhesion, the open ceiling exit, six-spoke rotating wheels and scaffold are retained. Rebuild V14 with `python3 scripts/build-release.py`.
