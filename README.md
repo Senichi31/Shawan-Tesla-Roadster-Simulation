@@ -167,3 +167,8 @@ Current entry: `play-ceiling-v35.html` (`V35 · GROUND-ROLLING VAPOR`). Ground c
 ## V36: arrow-key takeoff and automatic touchdown
 
 Current entry: `play-ceiling-v36.html` (`V36 · ↑ TAKEOFF / ↓ DESCEND`). Up arrow now enables flight on keydown and controls ascent; Down arrow controls descent without reversing on the ground. A descending full-body contact with the stage floor automatically disables flight and restores ground driving. Initial takeoff contact and contacts with walls/scaffold do not count as touchdown. Left/Right, WASD, Shift, F and the flight button retain their roles. Validation covers ground Down, Up-only takeoff/ascent, Down descent, automatic flight exit, ground driving and taking off again. Rebuild with `python3 scripts/build-release.py`.
+
+
+## V37: automatic flight after ceiling roll
+
+Current entry: `play-ceiling-v37.html`. Leaving the ceiling keeps the existing axial roll and momentum, then automatically engages flight once upright. During the roll, a downward pressure jet emits at the lower front-wheel position; normal underbody jets resume after the roll. Up/Down ascent/descent and automatic flight exit on touchdown remain available.

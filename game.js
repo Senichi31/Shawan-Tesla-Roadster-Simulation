@@ -1,8 +1,8 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=36';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=36';
-const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=36';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=37';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=37';
+const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=37';
 // Soft, transparent vapor texture; no solid cones or hard-edged smoke discs.
 const vaporTexture=document.createElement('canvas');vaporTexture.width=vaporTexture.height=64;
 const vaporCtx=vaporTexture.getContext('2d'),vaporGradient=vaporCtx.createRadialGradient(32,32,0,32,32,32);
@@ -55,7 +55,7 @@ function beginAutoRoll(){
 }
 function updateAutoRoll(dt){
  if(!car.rollActive)return;car.rollElapsed+=dt;const t=Math.min(1,car.rollElapsed/1.05),smooth=t*t*(3-2*t);car.roll=-Math.PI*(1-smooth);
- if(t===1){car.roll=0;car.rollActive=false;}
+ if(t===1){car.roll=0;car.rollActive=false;flight=true;car.surface=null;}
 }
 function bodyEntersScaffold(body){
  if(Math.max(...body.map(p=>p.x))<ceilingLeft||Math.min(...body.map(p=>p.x))>scaffoldBack)return false;
@@ -155,7 +155,7 @@ else if(car.surface==='track'){
  car.speed*=Math.exp(-(drive?.48:2.4)*dt);car.speed=Math.max(-650,Math.min(950,car.speed));car.s=Math.max(L+55,car.s+car.speed*dt);
  if(car.s<=L+55)car.speed=Math.max(0,car.speed);
  placeOnTrack();car.vx=car.speed*Math.cos(car.angle);car.vy=car.speed*Math.sin(car.angle);
- if(car.s>=trackEnd){const overshoot=car.s-trackEnd;car.x+=overshoot*Math.cos(car.angle);car.y+=overshoot*Math.sin(car.angle);car.surface=null;car.launched=true;beginAutoRoll();toastUntil=time+5;document.querySelector('#toast').textContent='AUTO ROLL / Rolling upright. Press F to engage flight.';}
+ if(car.s>=trackEnd){const overshoot=car.s-trackEnd;car.x+=overshoot*Math.cos(car.angle);car.y+=overshoot*Math.sin(car.angle);car.surface=null;car.launched=true;beginAutoRoll();toastUntil=time+5;document.querySelector('#toast').textContent='AUTO ROLL / Rolling upright. Flight engages automatically.';}
 }else if(car.surface==='ground'){
  car.vx+=(Number(right||keys.has('w'))-Number(left||keys.has('s')))*(boost?1150:760)*dt;car.vx*=Math.exp(-((right||keys.has('w')||left||keys.has('s'))?.48:2.4)*dt);if(!right&&!keys.has('w')&&!left&&!keys.has('s')&&Math.abs(car.vx)<.4)car.vx=0;car.angle=0;car.vy=0;moveFlight(dt,0);
  if(car.x<rampStart){car.surface='track';car.s=car.x;car.speed=car.vx;}
@@ -176,19 +176,19 @@ car.wheelRotation+=car.wheelVelocity*dt;
 const headingSpeed=(car.surface==='track'?car.speed:car.vx);
 if(!car.rollActive&&Math.abs(headingSpeed)>2){const facing=headingSpeed<0?-1:1;if(car.facing!==facing){car.facing=facing;if(car.surface==='track')placeOnTrack();else resolveFlightContacts();}}
 for(const r of rings)if(!r.hit&&Math.hypot(car.x-r.x,car.y-r.y)<45){r.hit=true;score++;toastUntil=time+4;document.querySelector('#toast').textContent=score===5?'All checkpoints cleared. The sky is yours. R to run again.':`Checkpoint ${score} / 5 collected. Keep exploring.`;for(let i=0;i<22;i++)particles.push({x:r.x,y:r.y,vx:(Math.random()-.5)*240,vy:(Math.random()-.5)*240,life:1});}
-if(flight){
+if(flight||car.rollActive){
  const rate=boost?240:120;vaporEmission+=dt*rate;
  const emit=(nozzleX,nozzleZ)=>{const life=boost?.105+Math.random()*.035:.16+Math.random()*.06,speed=boost?850+Math.random()*150:460+Math.random()*80;
-  particles.push({x:car.x,y:car.y,vx:0,vy:0,life,maxLife:life,age:0,gas:true,newborn:true,anchored:true,nozzleX,nozzleZ,jetSpeed:speed,travel:0,boosted:boost,axis:0,radius:2.5,growth:16,scatter:(Math.random()-.5)*2,seed:Math.random()*100,spread:false});};
- while(vaporEmission>=1){vaporEmission--;for(const x of [-43,42])for(const z of [-8,8])emit(x,z);}
+  particles.push({x:car.x,y:car.y,vx:0,vy:0,life,maxLife:life,age:0,gas:true,newborn:true,anchored:true,rollJet:car.rollActive,nozzleX,nozzleZ,jetSpeed:speed,travel:0,boosted:boost,axis:0,radius:2.5,growth:16,scatter:(Math.random()-.5)*2,seed:Math.random()*100,spread:false});};
+ while(vaporEmission>=1){vaporEmission--;if(car.rollActive){emit(42,Math.sin(car.roll)*Math.cos(car.angle)<0?-30:30);}else{for(const x of [-43,42])for(const z of [-8,8])emit(x,z);}}
 }
 particles.forEach(p=>{
  const step=p.gas&&p.newborn?Math.random()*dt:dt;p.newborn=false;p.life-=step;
  if(p.gas){p.age+=step;
-  if(p.anchored&&flight){
+  if(p.anchored&&(p.rollJet?car.rollActive:flight)){
    // A short pressure-driven jet follows its current nozzle, rather than lagging behind the car.
    const c=Math.cos(car.angle),s=Math.sin(car.angle),vertical=Math.cos(car.roll||0),lateral=Math.sin(car.roll||0),px=p.nozzleX*car.facing,py=12*vertical+p.nozzleZ*lateral;
-   const dx=-s*vertical,dy=c*vertical;p.travel+=p.jetSpeed*step;
+   const dx=p.rollJet?0:-s*vertical,dy=p.rollJet?1:c*vertical;p.travel+=p.jetSpeed*step;
    const spread=(2+p.travel*.055)*p.scatter+Math.sin(time*25+p.seed)*p.travel*.008;
    p.x=car.x+px*c-py*s+dx*p.travel-dy*spread;p.y=car.y+px*s+py*c+dy*p.travel+dx*spread;
    p.vx=car.vx+dx*p.jetSpeed;p.vy=car.vy+dy*p.jetSpeed;p.axis=Math.atan2(dy,dx);p.radius=2.5+p.travel*.085;
