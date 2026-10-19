@@ -22,7 +22,7 @@ Open `http://localhost:8000` in your browser. The game uses Canvas and plain Jav
 - **P / Escape:** pause/resume.
 - **R:** reset the run.
 
-Hold D/Right or W/Up to build speed, then climb the half-circle wall and drive fully upside down along the ceiling. Hold Space to stop while attached. Drive off the ceiling’s left end to drop or engage flight. Hold Shift for more launch speed; press F in the air for sustained flight. Collect all five rings in any order. Air grip and flight are mutually exclusive; their buttons also toggle the modes. Keyboard play is intended for desktop browsers.
+Hold D/Right or W/Up to build speed, then climb the half-circle wall and drive fully upside down along the ceiling. Hold Space to stop while attached. With air grip enabled, the ceiling end stops the car without detaching. Press M to release or F to engage flight. Hold Shift for more launch speed; press F in the air for sustained flight. Collect all five rings in any order. Air grip and flight are mutually exclusive; their buttons also toggle the modes. Keyboard play is intended for desktop browsers.
 
 This is a fictional arcade simulation, not a model of real vehicle capabilities or an official Tesla product.
 
@@ -57,3 +57,7 @@ The current standalone entry is `play-ceiling-v8.html`, labelled `V8 · FIVE-SPO
 ## V9: six-spoke reference correction
 
 Current entry: `play-ceiling-v9.html` (`V9 · SIX-SPOKE WHEELS / LIVE ROTATION`). Corrects the previous five-spoke interpretation to **six black spokes and six silver sectors**, spaced at 60 degrees, based on the supplied wheel close-up. Body shape, short ceiling and distance-based wheel rotation are retained. The build script regenerates V9 and both component wheel/body SVGs.
+
+## V10: gravity-free attached driving
+
+Current entry: `play-ceiling-v10.html` (`V10 · AIR GRIP / NO GRAVITY`). While air grip is enabled and the car is attached, gravity contributes no tangential acceleration. Releasing directional input smoothly brakes to a complete stop on ground, walls and the ceiling. The ceiling endpoint clamps position and speed instead of automatically detaching; reverse input moves away from it. Press M to explicitly release adhesion or F for flight. Gravity still acts after detaching. The silver body and animated six-spoke wheels are retained. Rebuild V10 with `python3 scripts/build-release.py`.
