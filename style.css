@@ -7,12 +7,12 @@
 
 .touch-controls{display:none}
 @media(any-pointer:coarse),(max-width:800px){
- .touch-controls{display:grid;grid-template-columns:auto auto;justify-content:space-between;gap:8px 16px;position:sticky;bottom:8px;z-index:5;margin-top:12px;padding:12px 14px max(10px,env(safe-area-inset-bottom));background:#10151df2;border:1px solid #353740;border-radius:10px}
- .touch-dpad{display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(2,48px);gap:6px}
- .touch-dpad button:first-child{grid-column:2}.touch-dpad button:nth-child(2){grid-column:1;grid-row:2}.touch-dpad button:nth-child(3){grid-column:2;grid-row:2}.touch-dpad button:nth-child(4){grid-column:3;grid-row:2}
+ .touch-controls{display:grid;grid-template-columns:auto auto;justify-content:space-between;gap:6px 8px;position:sticky;bottom:8px;z-index:5;margin-top:12px;padding:8px 8px max(8px,env(safe-area-inset-bottom));background:#10151df2;border:1px solid #353740;border-radius:10px}
+ .touch-dpad{display:grid;grid-template-columns:repeat(4,48px);gap:4px}
+
  .touch-controls button{min-width:48px;min-height:48px;border:1px solid #4a5769;border-radius:8px;background:#202b3b;color:#e4efff;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;font-size:24px}
  .touch-controls button.pressed{background:#794039;border-color:var(--red)}
- .touch-actions{display:flex;flex-direction:column;gap:6px;justify-content:flex-end}.touch-actions button{padding:0 12px;font-size:11px;font-weight:700;letter-spacing:1px}
+ .touch-actions{display:flex;gap:4px;align-items:center}.touch-actions button{padding:0 6px;font-size:10px;font-weight:700;letter-spacing:1px}
  .touch-controls p{grid-column:1/-1;margin:0;color:#a8b5c8;font-size:10px;text-align:center}
 }
 
@@ -20,3 +20,5 @@
 .sim,.sim *,.touch-controls,.touch-controls *,.controls,.controls *,#reset,#reset *,.vehicle-detail img{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none}
 button{touch-action:manipulation}
 .touch-controls button{touch-action:none}
+
+@media(max-width:360px){.touch-controls{grid-template-columns:1fr;justify-items:center}.touch-actions{justify-content:center}}

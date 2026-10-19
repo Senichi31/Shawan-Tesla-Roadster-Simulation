@@ -8,12 +8,12 @@
 
 .touch-controls{display:none}
 @media(any-pointer:coarse),(max-width:800px){
- .touch-controls{display:grid;grid-template-columns:auto auto;justify-content:space-between;gap:8px 16px;position:sticky;bottom:8px;z-index:5;margin-top:12px;padding:12px 14px max(10px,env(safe-area-inset-bottom));background:#10151df2;border:1px solid #353740;border-radius:10px}
- .touch-dpad{display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(2,48px);gap:6px}
- .touch-dpad button:first-child{grid-column:2}.touch-dpad button:nth-child(2){grid-column:1;grid-row:2}.touch-dpad button:nth-child(3){grid-column:2;grid-row:2}.touch-dpad button:nth-child(4){grid-column:3;grid-row:2}
+ .touch-controls{display:grid;grid-template-columns:auto auto;justify-content:space-between;gap:6px 8px;position:sticky;bottom:8px;z-index:5;margin-top:12px;padding:8px 8px max(8px,env(safe-area-inset-bottom));background:#10151df2;border:1px solid #353740;border-radius:10px}
+ .touch-dpad{display:grid;grid-template-columns:repeat(4,48px);gap:4px}
+
  .touch-controls button{min-width:48px;min-height:48px;border:1px solid #4a5769;border-radius:8px;background:#202b3b;color:#e4efff;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;font-size:24px}
  .touch-controls button.pressed{background:#794039;border-color:var(--red)}
- .touch-actions{display:flex;flex-direction:column;gap:6px;justify-content:flex-end}.touch-actions button{padding:0 12px;font-size:11px;font-weight:700;letter-spacing:1px}
+ .touch-actions{display:flex;gap:4px;align-items:center}.touch-actions button{padding:0 6px;font-size:10px;font-weight:700;letter-spacing:1px}
  .touch-controls p{grid-column:1/-1;margin:0;color:#a8b5c8;font-size:10px;text-align:center}
 }
 
@@ -21,12 +21,14 @@
 .sim,.sim *,.touch-controls,.touch-controls *,.controls,.controls *,#reset,#reset *,.vehicle-detail img{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none}
 button{touch-action:manipulation}
 .touch-controls button{touch-action:none}
+
+@media(max-width:360px){.touch-controls{grid-template-columns:1fr;justify-items:center}.touch-actions{justify-content:center}}
 </style></head>
 <body><main><header><a class="brand" href="./"><span class="mark">T</span> ROADSTER <span class="edition">EXPERIMENTAL / 01</span></a><span class="live"><i></i> SIMULATION ONLINE</span></header>
 <section class="intro"><div><div class="eyebrow">NO ROADS. NO RULES.</div><h1>Beyond the road<span>.</span></h1><p>Drive up the wall. Hang upside down. Take flight.</p></div><button id="reset">↻ &nbsp; Reset run <kbd>R</kbd></button></section>
 <section class="sim" aria-label="Interactive 2D driving game"><canvas id="game" aria-label="Roadster test arena: use arrow keys or WASD to drive, automatic surface grip, Up arrow for takeoff/ascent, Down arrow for descent, touchdown exits flight" tabindex="0"></canvas><div class="arena-label">THE RAMP / ROADSTER <span>VERSION 1</span></div><div class="hud"><div><span class="small">VELOCITY</span><strong id="speed">000</strong><span class="unit">KM/H</span></div><div class="hud-line"></div><div><span class="small">CHECKPOINTS</span><b id="score">00 / 05</b></div></div><div class="mode-badge" id="mode">● GROUND DRIVE</div><div class="toast" id="toast">Tap arrows to roll. Space brakes. Drive off the open ceiling end.</div><div class="canvas-footer"><span>INFINITE POSSIBILITIES. ONE ROADSTER.</span><span id="status">GRIP SYSTEM READY</span></div><button id="pause" aria-label="Pause game" aria-pressed="false" title="Pause game"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.5"/><g class="pause-symbol" fill="currentColor"><rect x="8" y="7.5" width="3" height="9" rx="1"/><rect x="13" y="7.5" width="3" height="9" rx="1"/></g><path class="play-symbol" d="M10 7.5 17 12 10 16.5Z" fill="currentColor"/></svg></button></section>
 <section class="touch-controls" aria-label="Touch driving controls">
-<div class="touch-dpad"><button type="button" data-key="arrowup" aria-label="Take off or ascend">↑</button><button type="button" data-key="arrowleft" aria-label="Drive left">←</button><button type="button" data-key="arrowdown" aria-label="Descend">↓</button><button type="button" data-key="arrowright" aria-label="Drive right">→</button></div>
+<div class="touch-dpad"><button type="button" data-key="arrowleft" aria-label="Drive left">←</button><button type="button" data-key="arrowup" aria-label="Take off or ascend">↑</button><button type="button" data-key="arrowdown" aria-label="Descend">↓</button><button type="button" data-key="arrowright" aria-label="Drive right">→</button></div>
 <div class="touch-actions"><button type="button" data-key=" " aria-label="Brake">BRAKE</button><button type="button" data-key="shift" aria-label="Boost">BOOST</button></div>
 <p>Hold arrows to move · ↑ Take off · ↓ Descend</p>
 </section>
