@@ -117,3 +117,7 @@ Current entry: `play-ceiling-v23.html` (`V23 · SOLID COLLISION IN ALL MODES`). 
 ## V24: automatic longitudinal roll
 
 Current entry: `play-ceiling-v24.html` (`V24 · AUTOMATIC AXIAL ROLL`). Leaving the inverted upper track automatically rolls the vehicle upright around its nose-to-tail axis over 1.05 seconds. The nose retains its launch direction and momentum: this is not an end-over-end pitch or a front/back turn. A dedicated silver top-view sprite expands between the inverted and upright side views to represent the 3D roll in Canvas 2D. Projected whole-body collision follows the roll, including its visible width; road reattachment is deferred while the roll clears the lip. Pause freezes progress, F on/off does not cancel it, and landing/reset restores the standard pose. Validation covers start/midpoint/end orientation, roof visibility, pause/F controls, collisions in both modes and existing driving behavior. Rebuild with `python3 scripts/build-release.py`.
+
+## V25: show the underside during roll
+
+Current entry: `play-ceiling-v25.html` (`V25 · UNDERSIDE AXIAL ROLL`). Reverses the longitudinal roll direction and replaces the midpoint roof view with a stylized underbody view showing the flat undertray, suspension, wheels and air nozzles. Nose direction, roll timing and the collision envelope are retained. Rebuild with `python3 scripts/build-release.py`.

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420">
+<defs><linearGradient id="edge" x2="0" y2="1"><stop stop-color="#9aa6ab"/><stop offset=".3" stop-color="#ccd2d0"/><stop offset=".6" stop-color="#7a898f"/><stop offset="1" stop-color="#b8c3c7"/></linearGradient><linearGradient id="floor" x2="0" y2="1"><stop stop-color="#26343e"/><stop offset=".5" stop-color="#43525a"/><stop offset="1" stop-color="#17232c"/></linearGradient><radialGradient id="fan"><stop stop-color="#17242d"/><stop offset=".5" stop-color="#687d87"/><stop offset=".75" stop-color="#283f4b"/><stop offset="1" stop-color="#0b151e"/></radialGradient><g id="nozzle"><circle r="36" fill="#111e28" stroke="#a4b8c0" stroke-width="4"/><circle r="26" fill="url(#fan)" stroke="#4d6a79" stroke-width="3"/><circle r="12" fill="#0b1c28"/><path d="M-22-4H22M-4-22V22" stroke="#8ca8b5" stroke-width="3"/></g></defs>
+<!-- Stylized flat undertray and structural details, nose right. -->
+<g fill="#080e13" stroke="#3b464e" stroke-width="2"><rect x="175" y="26" width="130" height="60" rx="12"/><rect x="175" y="334" width="130" height="60" rx="12"/><rect x="915" y="26" width="130" height="60" rx="12"/><rect x="915" y="334" width="130" height="60" rx="12"/></g>
+<path d="M61 76Q180 35 293 48L416 66 744 67Q973 24 1080 72L1154 139 1173 210 1154 281 1080 348Q973 396 744 353L416 354 293 372Q180 385 61 344L42 279 42 141Z" fill="url(#edge)" stroke="#566b76" stroke-width="3"/>
+<path d="M95 99 196 70 319 88 849 85 1050 105 1116 162 1128 210 1116 258 1050 315 849 335 319 332 196 350 95 321 76 272 76 148Z" fill="#111e28"/>
+<path d="m327 95 530 0 31 43v144l-31 43H327l-24-38V133Z" fill="url(#floor)" stroke="#718590" stroke-width="3"/>
+<path d="M365 111v198M470 111v198M575 111v198M680 111v198M785 111v198M320 174h548M320 246h548" stroke="#75868c" stroke-width="2" opacity=".55"/>
+<path d="M233 93v234M981 86v248" stroke="#899ba3" stroke-width="13"/>
+<path d="m185 91 94 70-94 168M1030 89l-98 73 98 169" fill="none" stroke="#667f8d" stroke-width="9"/>
+<path d="M98 151h95v118H98M1052 145h46v130h-46" fill="#1d2e39" stroke="#758b96" stroke-width="3"/>
+<g stroke="#7595a4" stroke-width="3"><path d="M110 160v100M127 160v100M144 160v100M161 160v100M178 160v100M1062 160v100M1076 160v100M1090 160v100"/></g>
+<use href="#nozzle" x="245" y="123"/><use href="#nozzle" x="245" y="297"/><use href="#nozzle" x="978" y="120"/><use href="#nozzle" x="978" y="300"/>
+<path d="M85 90v240" stroke="#e84752" stroke-width="5"/>
+<path d="M1138 156v108" stroke="#b7d7df" stroke-width="4"/>
+</svg>

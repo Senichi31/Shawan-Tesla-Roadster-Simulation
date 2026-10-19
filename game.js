@@ -1,8 +1,8 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=24';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=24';
-const roofImage=new Image();roofImage.src='assets/roadster-top.svg?v=24';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=25';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=25';
+const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=25';
 const wheelRadius=91*160/1200;
 const W=1400,H=600,L=65,R=1335,T=100,B=510;
 // A circular wall meets the 15-degree uphill ceiling with a continuous tangent.
@@ -47,10 +47,10 @@ function flightBody(){const c=Math.cos(car.angle),s=Math.sin(car.angle),roll=car
 function beginAutoRoll(){
  if(Math.cos(car.angle)>=0)return;
  // Equivalent starting pose: retain the nose direction while rolling around the long axis.
- car.angle+=Math.PI;car.facing*=-1;car.roll=Math.PI;car.rollElapsed=0;car.rollActive=true;car.rollAxisAngle=car.angle;
+ car.angle+=Math.PI;car.facing*=-1;car.roll=-Math.PI;car.rollElapsed=0;car.rollActive=true;car.rollAxisAngle=car.angle;
 }
 function updateAutoRoll(dt){
- if(!car.rollActive)return;car.rollElapsed+=dt;const t=Math.min(1,car.rollElapsed/1.05),smooth=t*t*(3-2*t);car.roll=Math.PI*(1-smooth);
+ if(!car.rollActive)return;car.rollElapsed+=dt;const t=Math.min(1,car.rollElapsed/1.05),smooth=t*t*(3-2*t);car.roll=-Math.PI*(1-smooth);
  if(t===1){car.roll=0;car.rollActive=false;}
 }
 function bodyEntersScaffold(body){
@@ -208,7 +208,7 @@ for(let i=0;i<rings.length;i++){const r=rings[i];if(r.hit)continue;const pulse=M
 for(const p of particles){ctx.globalAlpha=Math.min(1,p.life)*(p.smoke?.16:1);ctx.fillStyle=p.smoke?'#b6d2dc':'#ffd69a';if(p.smoke){ctx.beginPath();ctx.arc(p.x,p.y,7+(1.3-p.life)*20,0,Math.PI*2);ctx.fill();}else ctx.fillRect(p.x,p.y,3,3);}ctx.globalAlpha=1;
 ctx.save();ctx.globalAlpha=Math.max(.07,.3-(B-car.y)/1800);ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(car.x,B+2,72+(B-car.y)*.1,5,0,0,Math.PI*2);ctx.fill();ctx.restore();
 ctx.save();ctx.translate(car.x,car.y);ctx.rotate(car.angle);ctx.scale(car.facing,1);
-const rollCos=Math.cos(car.roll||0),rollTop=Math.abs(Math.sin(car.roll||0));
+const rollCos=Math.cos(car.roll||0),rollUnderside=Math.abs(Math.sin(car.roll||0));
 ctx.save();ctx.scale(1,Math.abs(rollCos)<.015?.015:rollCos);
 if(flight){
  for(const x of [-43,42]){const length=55+Math.sin(time*27+x)*9+(keys.has('shift')?35:0);const plume=ctx.createLinearGradient(x,10,x,10+length);plume.addColorStop(0,'#dcfaff');plume.addColorStop(.12,'#80e7ffdd');plume.addColorStop(.55,'#24a4e580');plume.addColorStop(1,'#73d9f500');ctx.fillStyle=plume;ctx.beginPath();ctx.moveTo(x-3,11);ctx.bezierCurveTo(x-6,32,x-11,50,x-13,10+length);ctx.lineTo(x+13,10+length);ctx.bezierCurveTo(x+8,45,x+4,25,x+3,11);ctx.fill();}
@@ -220,10 +220,10 @@ if(roadsterImage.complete&&roadsterImage.naturalWidth){ctx.drawImage(roadsterIma
  if(wheelImage.complete&&wheelImage.naturalWidth){for(const [x,y] of [[-50.4,2],[46.1333,1.6]]){ctx.save();ctx.translate(x,y);ctx.rotate(car.wheelRotation*car.facing*(rollCos<0?-1:1));ctx.drawImage(wheelImage,-13.3333,-13.3333,26.6667,26.6667);ctx.restore();}}
 }else{ctx.fillStyle='#b7ccd5';ctx.fillRect(-60,-12,120,24);}
 ctx.restore();
-// The top view expands between the two side views, making the axial roll visible in 2D.
-if(rollTop>.01&&roofImage.complete&&roofImage.naturalWidth){ctx.globalAlpha=rollTop;ctx.drawImage(roofImage,-80,-28*rollTop,160,56*rollTop);ctx.globalAlpha=1;}
+// Roll in the opposite direction to expose the underside between the two side views.
+if(rollUnderside>.01&&undersideImage.complete&&undersideImage.naturalWidth){ctx.globalAlpha=rollUnderside;ctx.drawImage(undersideImage,-80,-28*rollUnderside,160,56*rollUnderside);ctx.globalAlpha=1;}
 ctx.restore();
 if(paused){ctx.fillStyle='#080d17bb';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 36px Arial';ctx.fillText('PAUSED',W/2,H/2);ctx.font='14px Arial';ctx.fillStyle='#acb7c9';ctx.fillText('Press P or click ▶ to continue',W/2,H/2+34);ctx.textAlign='left';}}
 function frame(ts){const dt=Math.min((ts-last)/1000||0,.033);last=ts;if(!paused)update(dt);draw();requestAnimationFrame(frame);}reset();requestAnimationFrame(frame);
 // Read-only telemetry for automated smoke checks and development tools.
-window.roadsterState=()=>({x:car.x,y:car.y,vx:car.vx,vy:car.vy,surface:car.surface,launched:car.launched,angle:car.angle,distance:car.s,ceilingStart,trackEnd,facing:car.facing,roll:car.roll,rollActive:car.rollActive,rollElapsed:car.rollElapsed,roofVisible:Math.abs(Math.sin(car.roll||0)),noseAngle:car.angle+(car.facing<0?Math.PI:0),wheelRotation:car.wheelRotation,wheelVelocity:car.wheelVelocity,inverted:car.surface==='track'&&Math.cos(car.angle)<-.9,magnet,flight,paused,score});
+window.roadsterState=()=>({x:car.x,y:car.y,vx:car.vx,vy:car.vy,surface:car.surface,launched:car.launched,angle:car.angle,distance:car.s,ceilingStart,trackEnd,facing:car.facing,roll:car.roll,rollActive:car.rollActive,rollElapsed:car.rollElapsed,undersideVisible:Math.abs(Math.sin(car.roll||0)),noseAngle:car.angle+(car.facing<0?Math.PI:0),wheelRotation:car.wheelRotation,wheelVelocity:car.wheelVelocity,inverted:car.surface==='track'&&Math.cos(car.angle)<-.9,magnet,flight,paused,score});
