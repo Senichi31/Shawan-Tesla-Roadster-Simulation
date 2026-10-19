@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320">
+<defs>
+ <linearGradient id="body" x1="0" y1="0" x2=".15" y2="1"><stop stop-color="#f0f0ed"/><stop offset=".23" stop-color="#d6d7d5"/><stop offset=".45" stop-color="#aaacac"/><stop offset=".8" stop-color="#8b8d90"/><stop offset="1" stop-color="#565b5f"/></linearGradient>
+ <linearGradient id="side" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#a6a7a8"/><stop offset=".52" stop-color="#9b9d9f"/><stop offset="1" stop-color="#62666a"/></linearGradient>
+ <linearGradient id="front" x1="0" y1="0" x2="1" y2=".8"><stop stop-color="#d5d6d2"/><stop offset=".45" stop-color="#acafaf"/><stop offset="1" stop-color="#6a7174"/></linearGradient>
+ <linearGradient id="glass" x1="0" y1="0" x2=".4" y2="1"><stop stop-color="#1b2224"/><stop offset=".6" stop-color="#030a0c"/><stop offset="1" stop-color="#0c1113"/></linearGradient>
+ <linearGradient id="reflection" x1="0" y1="0" x2="1" y2=".3"><stop stop-color="#bcbfbe"/><stop offset=".45" stop-color="#f7f6ef"/><stop offset="1" stop-color="#d0d1ce"/></linearGradient>
+ <linearGradient id="rim" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#c7cac9"/><stop offset=".4" stop-color="#a3a8a8"/><stop offset="1" stop-color="#535c62"/></linearGradient>
+ <radialGradient id="rubber"><stop offset=".72" stop-color="#080c0e"/><stop offset=".85" stop-color="#171d20"/><stop offset="1" stop-color="#040809"/></radialGradient>
+ <g id="wheel">
+  <circle r="91" fill="url(#rubber)" stroke="#20292c" stroke-width="2"/>
+  <circle r="74" fill="#0b1115" stroke="#424b50" stroke-width="2"/>
+  <!-- Five broad brushed-silver panels separated by straight, heavy black spokes. -->
+  <g fill="url(#rim)" stroke="#424b50" stroke-width="1.5">
+   <path id="panel" d="M-15-69A71 71 0 0 1 53-47L20-17 1-24Z"/>
+   <use href="#panel" transform="rotate(72)"/><use href="#panel" transform="rotate(144)"/><use href="#panel" transform="rotate(216)"/><use href="#panel" transform="rotate(288)"/>
+  </g>
+  <g fill="#091216" stroke="#303a3f" stroke-width="1.5">
+   <path id="spoke" d="m-8-17-8-54 13-3 15 56 3 16-13 10Z"/>
+   <use href="#spoke" transform="rotate(72)"/><use href="#spoke" transform="rotate(144)"/><use href="#spoke" transform="rotate(216)"/><use href="#spoke" transform="rotate(288)"/>
+  </g>
+  <g stroke="#647076" stroke-width="1.8" opacity=".85"><path id="edge" d="m-6-28-7-37"/><use href="#edge" transform="rotate(72)"/><use href="#edge" transform="rotate(144)"/><use href="#edge" transform="rotate(216)"/><use href="#edge" transform="rotate(288)"/></g>
+  <circle r="19" fill="#0c1419" stroke="#4a555a" stroke-width="2"/><circle r="11" fill="#182327"/>
+  <g fill="#838b8c"><circle cx="0" cy="-14" r="2"/><circle cx="13" cy="-4" r="2"/><circle cx="8" cy="11" r="2"/><circle cx="-8" cy="11" r="2"/><circle cx="-13" cy="-4" r="2"/></g>
+ </g>
+</defs>
+<!-- Traced proportions of the supplied side reference, mirrored to face forward in-game. -->
+<g transform="translate(1200 0) scale(-1 1)">
+ <path d="M59 167Q129 119 197 96Q230 88 279 88L477 23Q536 4 603 10L744 17Q812 21 873 39L1005 77 1139 86 1135 130 1104 154 1111 199 1086 224 1046 238 165 239 61 226Z" fill="url(#body)" stroke="#747b7d" stroke-width="1.5"/>
+ <!-- The straight shoulder separates the light roof skin from the darker slab sides. -->
+ <path d="m398 123 323-28 186-17 168 8 29 68-31 69-677 15Z" fill="url(#side)"/>
+ <path d="M59 167 196 101Q234 92 277 92L397 123 420 230 160 233 62 222Z" fill="url(#front)"/>
+ <path d="M307 88 489 33 529 23 496 78 456 97Z" fill="url(#glass)"/>
+ <path d="M500 77 540 23Q629 17 731 26L867 49 789 69 722 82 506 99 456 97Z" fill="url(#glass)"/>
+ <!-- Reflected light band across the glazing, exactly above the dark side window. -->
+ <path d="m504 41 37-18q99-3 177 6l-20 27-174-14Z" fill="url(#reflection)"/>
+ <path d="m739 29 112 17-60 21-69-10Z" fill="url(#reflection)"/>
+ <path d="m716 25 4 1-24 51-5 2Z" fill="#626b6f"/>
+ <path d="m738 28 4 1-22 51-6 1Z" fill="#424d51"/>
+ <path d="M303 88 484 29Q552 6 605 15L739 21 866 47" fill="none" stroke="#ebedeb" stroke-width="3"/>
+ <path d="m526 24 12-1-42 56-9 1Z" fill="#7e878a"/>
+ <!-- Flush, almost featureless door and angular shut lines. -->
+ <path d="m398 123 25 108M722 85l-53 139M1073 87l29 50" fill="none" stroke="#575f63" stroke-width="1.5"/>
+ <path d="m717 84 7 1 1 11-12 2" fill="none" stroke="#c0c3c1" stroke-width="1.2"/>
+ <path d="M397 123 722 93 907 78" fill="none" stroke="#e3e5e2" stroke-width="2.2"/>
+ <!-- Dark side repeater and its small amber marker. -->
+ <path d="m330 130 65-9 4 10-55 8Z" fill="#252b2e"/><path d="m378 125 18-2" stroke="#db9d5b" stroke-width="2.3"/>
+ <!-- Oversized wheel arches; the body runs level between them. -->
+ <path d="M155 241v-35a99 99 0 0 1 198 0v32Zm724-4v-27a99 99 0 0 1 198 0v29Z" fill="#070d10"/>
+ <path d="M156 206a98 98 0 0 1 196 0M880 210a98 98 0 0 1 196 0" fill="none" stroke="#848d8e" stroke-width="1.8"/>
+ <!-- Thick black rocker, front splitter and tall rear diffuser. -->
+ <path d="m350 232 318-4 212-26-2 42-501 14-31-7Z" fill="#101b20"/>
+ <path d="m350 234 318-4 208-26" fill="none" stroke="#343f43" stroke-width="2"/>
+ <path d="m58 222 99 5-2 34-99-18-1-10Z" fill="#10191d" stroke="#354147"/>
+ <path d="m1077 158 55-26-14 64-17 30-27 13Z" fill="#091216"/>
+ <path d="m1080 154 27-13" stroke="#c6cbca" stroke-width="1.8"/><path d="m1077 155 4-2" stroke="#ff6b65" stroke-width="2.5"/>
+ <path d="m63 170 1 39" stroke="#daddd6" stroke-width="2" opacity=".65"/>
+ 
+</g>
+</svg>

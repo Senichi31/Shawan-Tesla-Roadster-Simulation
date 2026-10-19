@@ -1,6 +1,8 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster.svg?v=7';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=8';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=8';
+const wheelRadius=91*160/1200;
 const W=1400,H=600,L=65,R=1335,T=100,B=510;
 // Arc-length parametrization: ground, full 180-degree wall, horizontal ceiling.
 const rampStart=950,rx=180,ry=180,endTheta=Math.PI;
@@ -15,7 +17,7 @@ function pathAt(distance){if(distance<=rampStart)return {x:distance,y:B,angle:0}
 function placeOnTrack(){const p=pathAt(car.s);car.angle=p.angle;car.x=p.x+17*Math.sin(p.angle);car.y=p.y-17*Math.cos(p.angle);}
 const keys=new Set(),rings=[{x:340,y:480},{x:780,y:480},{x:1055,y:365},{x:1040,y:230},{x:830,y:170}];
 let car,magnet=false,flight=false,paused=false,score=0,last=0,time=0,toastUntil=6,particles=[];
-function reset(){car={x:160,y:B-17,vx:0,vy:0,angle:0,surface:'track',speed:0,s:160,launched:false};score=0;rings.forEach(r=>r.hit=false);particles=[];magnet=true;flight=false;paused=false;keys.clear();toastUntil=time+6;document.querySelector('#toast').textContent='Hold D to climb onto the ceiling. Space brakes. M toggles air grip. F flies.';sync();}
+function reset(){car={x:160,y:B-17,vx:0,vy:0,angle:0,surface:'track',wheelRotation:0,wheelVelocity:0,speed:0,s:160,launched:false};score=0;rings.forEach(r=>r.hit=false);particles=[];magnet=true;flight=false;paused=false;keys.clear();toastUntil=time+6;document.querySelector('#toast').textContent='Hold D to climb onto the ceiling. Space brakes. M toggles air grip. F flies.';sync();}
 function sync(){document.querySelector('#magnet').classList.toggle('active',magnet);document.querySelector('#flight').classList.toggle('active',flight);document.querySelector('#mode').textContent=flight?'● FLIGHT MODE':magnet?(car.surface==='track'&&Math.cos(car.angle)<-.99?'● INVERTED / AIR GRIP':'● AIR GRIP'):'● GROUND DRIVE';document.querySelector('#status').textContent=flight?'THRUSTERS ENGAGED':magnet?'AIR GRIP ACTIVE / M TO RELEASE':'GRIP SYSTEM READY';document.querySelector('#pause').textContent=paused?'▶':'Ⅱ';}
 function toggleMagnet(){magnet=!magnet;if(magnet)flight=false;else if(car.surface==='track'&&Math.cos(car.angle)<0){car.surface=null;car.vx=car.speed*Math.cos(car.angle);car.vy=car.speed*Math.sin(car.angle);}sync();}
 function toggleFlight(){flight=!flight;if(flight){magnet=false;car.surface=null;car.vy=Math.min(car.vy,-95);}sync();}
@@ -23,7 +25,7 @@ document.querySelector('#reset').onclick=reset;document.querySelector('#magnet')
 window.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();const k=e.key.toLowerCase();if(!e.repeat){if(k==='m')toggleMagnet();if(k==='f')toggleFlight();if(k==='r')reset();if(k==='p'||k==='escape'){paused=!paused;sync();}}keys.add(k);});
 window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>keys.clear());
 function update(dt){time+=dt;const right=keys.has('d')||keys.has('arrowright'),left=keys.has('a')||keys.has('arrowleft'),up=keys.has('w')||keys.has('arrowup'),down=keys.has('s')||keys.has('arrowdown'),boost=keys.has('shift'),power=boost?820:420,brake=keys.has(' ');
-const oldX=car.x,oldY=car.y,attachedBefore=car.surface==='track';
+const oldX=car.x,oldY=car.y,oldDistance=car.s,oldSurface=car.surface,attachedBefore=car.surface==='track';
 if(flight){car.surface=null;car.vx+=(Number(right)-Number(left))*power*dt;car.vy+=(Number(down)-Number(up))*power*dt;car.vx*=Math.exp(-.7*dt);car.vy*=Math.exp(-.7*dt);car.angle+=((car.vx/650)*.18-car.angle)*Math.min(1,dt*5);car.x+=car.vx*dt;car.y+=car.vy*dt;}
 else if(car.surface==='track'){
  const angle=pathAt(car.s).angle,drive=Number(right||up)-Number(left||down);
@@ -51,6 +53,11 @@ if(car.surface===null&&!(attachedBefore&&car.launched)){for(let i=1;i<arc.length
 }}
 if(car.x<L+55){car.x=L+55;car.vx=Math.max(0,car.vx);}if(car.x>R-55){car.x=R-55;car.vx=Math.min(0,car.vx);}
 if(car.y<35){car.y=35;car.vy=Math.max(0,car.vy);}if(car.y>B-17&&car.surface!=='track'){car.y=B-17;car.vy=0;if(!flight){car.angle=0;car.surface=car.x<=rampStart?'track':'ground';car.s=car.x;car.speed=car.vx;}}
+// Rolling angle follows signed distance along the surface, including the ceiling.
+if(oldSurface==='track'&&car.surface==='track'){car.wheelVelocity=(car.s-oldDistance)/dt/wheelRadius||0;}
+else if(oldSurface==='ground'&&car.surface==='ground'){car.wheelVelocity=(car.x-oldX)/dt/wheelRadius||0;}
+else {car.wheelVelocity*=Math.exp(-1.5*dt);}
+car.wheelRotation+=car.wheelVelocity*dt;
 for(const r of rings)if(!r.hit&&Math.hypot(car.x-r.x,car.y-r.y)<45){r.hit=true;score++;toastUntil=time+4;document.querySelector('#toast').textContent=score===5?'All checkpoints cleared. The sky is yours. R to run again.':`Checkpoint ${score} / 5 collected. Keep exploring.`;for(let i=0;i<22;i++)particles.push({x:r.x,y:r.y,vx:(Math.random()-.5)*240,vy:(Math.random()-.5)*240,life:1});}
 if(flight&&Math.random()<dt*35){particles.push({x:car.x+(Math.random()-.5)*80,y:car.y+30,vx:-car.vx*.1+(Math.random()-.5)*25,vy:45+Math.random()*50,life:1.3,smoke:true});}
 particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;});particles=particles.filter(p=>p.life>0);sync();document.querySelector('#speed').textContent=String(Math.round(Math.hypot(car.vx,car.vy)*.36)).padStart(3,'0');document.querySelector('#score').textContent=`0${score} / 05`;document.querySelector('#toast').style.opacity=time<toastUntil?'1':'0';}
@@ -82,9 +89,11 @@ if(flight){
 }
 if(magnet&&car.surface==='track'){ctx.strokeStyle='#69e4ee99';ctx.beginPath();ctx.ellipse(0,17,62,5,0,0,Math.PI*2);ctx.stroke();for(const x of [-42,0,42]){line(x,6,x,15,'#8ae5f0aa',1.5);line(x,15,x-3,11,'#8ae5f0aa',1.5);line(x,15,x+3,11,'#8ae5f0aa',1.5);}}
 // Detailed silver Roadster study based on the supplied video close-ups.
-if(roadsterImage.complete&&roadsterImage.naturalWidth){ctx.drawImage(roadsterImage,-80,-26,160,42.67);}else{ctx.fillStyle='#b7ccd5';ctx.fillRect(-60,-12,120,24);}
+if(roadsterImage.complete&&roadsterImage.naturalWidth){ctx.drawImage(roadsterImage,-80,-26,160,42.67);
+ if(wheelImage.complete&&wheelImage.naturalWidth){for(const [x,y] of [[-50.4,2],[46.1333,1.6]]){ctx.save();ctx.translate(x,y);ctx.rotate(car.wheelRotation);ctx.drawImage(wheelImage,-13.3333,-13.3333,26.6667,26.6667);ctx.restore();}}
+}else{ctx.fillStyle='#b7ccd5';ctx.fillRect(-60,-12,120,24);}
 ctx.restore();
 if(paused){ctx.fillStyle='#080d17bb';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 36px Arial';ctx.fillText('PAUSED',W/2,H/2);ctx.font='14px Arial';ctx.fillStyle='#acb7c9';ctx.fillText('Press P or click ▶ to continue',W/2,H/2+34);ctx.textAlign='left';}}
 function frame(ts){const dt=Math.min((ts-last)/1000||0,.033);last=ts;if(!paused)update(dt);draw();requestAnimationFrame(frame);}reset();requestAnimationFrame(frame);
 // Read-only telemetry for automated smoke checks and development tools.
-window.roadsterState=()=>({x:car.x,y:car.y,vx:car.vx,vy:car.vy,surface:car.surface,launched:car.launched,angle:car.angle,distance:car.s,ceilingStart,trackEnd,inverted:car.surface==='track'&&Math.cos(car.angle)<-.99,magnet,flight,paused,score});
+window.roadsterState=()=>({x:car.x,y:car.y,vx:car.vx,vy:car.vy,surface:car.surface,launched:car.launched,angle:car.angle,distance:car.s,ceilingStart,trackEnd,wheelRotation:car.wheelRotation,wheelVelocity:car.wheelVelocity,inverted:car.surface==='track'&&Math.cos(car.angle)<-.99,magnet,flight,paused,score});

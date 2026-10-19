@@ -9,15 +9,19 @@
  <radialGradient id="rubber"><stop offset=".72" stop-color="#080c0e"/><stop offset=".85" stop-color="#171d20"/><stop offset="1" stop-color="#040809"/></radialGradient>
  <g id="wheel">
   <circle r="91" fill="url(#rubber)" stroke="#20292c" stroke-width="2"/>
-  <circle r="71" fill="url(#rim)" stroke="#293237" stroke-width="3"/>
-  <circle r="63" fill="none" stroke="#747d80" stroke-width="1"/>
-  <g fill="#0b1318" stroke="#252f34" stroke-width="2">
-   <path id="spoke" d="m-10-12-19-53 13-6 29 55 4 23-12 6Z"/>
+  <circle r="74" fill="#0b1115" stroke="#424b50" stroke-width="2"/>
+  <!-- Five broad brushed-silver panels separated by straight, heavy black spokes. -->
+  <g fill="url(#rim)" stroke="#424b50" stroke-width="1.5">
+   <path id="panel" d="M-15-69A71 71 0 0 1 53-47L20-17 1-24Z"/>
+   <use href="#panel" transform="rotate(72)"/><use href="#panel" transform="rotate(144)"/><use href="#panel" transform="rotate(216)"/><use href="#panel" transform="rotate(288)"/>
+  </g>
+  <g fill="#091216" stroke="#303a3f" stroke-width="1.5">
+   <path id="spoke" d="m-8-17-8-54 13-3 15 56 3 16-13 10Z"/>
    <use href="#spoke" transform="rotate(72)"/><use href="#spoke" transform="rotate(144)"/><use href="#spoke" transform="rotate(216)"/><use href="#spoke" transform="rotate(288)"/>
   </g>
-  <g stroke="#4b565b" stroke-width="2" opacity=".9"><path id="edge" d="m-13-25-14-37"/><use href="#edge" transform="rotate(72)"/><use href="#edge" transform="rotate(144)"/><use href="#edge" transform="rotate(216)"/><use href="#edge" transform="rotate(288)"/></g>
-  <circle r="20" fill="#0c1419" stroke="#344044" stroke-width="2"/>
-  <circle r="8" fill="#202b2f"/><g fill="#7d8585"><circle cx="0" cy="-14" r="2"/><circle cx="13" cy="-4" r="2"/><circle cx="8" cy="11" r="2"/><circle cx="-8" cy="11" r="2"/><circle cx="-13" cy="-4" r="2"/></g>
+  <g stroke="#647076" stroke-width="1.8" opacity=".85"><path id="edge" d="m-6-28-7-37"/><use href="#edge" transform="rotate(72)"/><use href="#edge" transform="rotate(144)"/><use href="#edge" transform="rotate(216)"/><use href="#edge" transform="rotate(288)"/></g>
+  <circle r="19" fill="#0c1419" stroke="#4a555a" stroke-width="2"/><circle r="11" fill="#182327"/>
+  <g fill="#838b8c"><circle cx="0" cy="-14" r="2"/><circle cx="13" cy="-4" r="2"/><circle cx="8" cy="11" r="2"/><circle cx="-8" cy="11" r="2"/><circle cx="-13" cy="-4" r="2"/></g>
  </g>
 </defs>
 <!-- Traced proportions of the supplied side reference, mirrored to face forward in-game. -->

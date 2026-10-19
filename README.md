@@ -49,3 +49,7 @@ The track is a true semicircle (180-unit radius), joined tangentially to the low
 Open `play-ceiling-v7.html` for the current standalone release. Its label reads `V7 · SHORT CEILING / SILVER ROADSTER`. The leftmost three 120-unit truss bays were removed: the ceiling endpoint moves from x=450 to x=810, leaving a 140-unit ceiling. Brake with Space as you enter the ceiling if you want to stop before its open end. The half-circle wall is unchanged.
 
 The current silver vehicle is redrawn from the supplied side photograph, with a wedge nose, long black glazing, straight shoulder and large five-spoke wheels. It faces right to match forward driving in the game. Run `python3 scripts/build-release.py` after source changes to rebuild V7; V6 is retained as an older standalone release.
+
+## V8: independent rolling wheels
+
+The current standalone entry is `play-ceiling-v8.html`, labelled `V8 · FIVE-SPOKE WHEELS / LIVE ROTATION`. The silver car keeps its V7 body shape; the wheel design uses broad silver panels and heavy black five-spoke geometry based on the side reference. The build script derives `roadster-body.svg` and `roadster-wheel.svg` from the complete vehicle illustration. Canvas rotates each wheel independently according to signed surface distance divided by the visible tire radius, including wall/ceiling travel. Reversing reverses wheel rotation, braking stops it, and pause freezes it. Airborne wheels coast with damping. Run `python3 scripts/build-release.py` to regenerate the component assets and standalone V8 page.
