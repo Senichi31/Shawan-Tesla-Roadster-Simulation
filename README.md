@@ -141,3 +141,7 @@ Current entry: `play-ceiling-v29.html` (`V29 · LIGHT VAPOR / LOW-ALTITUDE FOG`)
 ## V30: stronger visible air jets
 
 Current entry: `play-ceiling-v30.html` (`V30 · STRONGER AIR JETS`). Increases vapor exit speed and near-nozzle opacity, adds soft continuous wisp cores, and raises rear emission to two particles per emission step with a broader rear plume. Short lifetimes still prevent high-altitude jets from becoming floor-to-car smoke columns. Ground fog retains V29 proximity gating and restrained spread. High/mid/low altitude and rear-volume/dissipation checks pass. Rebuild with `python3 scripts/build-release.py`.
+
+## V31: broad, soft-edged vapor plumes
+
+Current entry: `play-ceiling-v31.html` (`V31 · BROADER SOFT VAPOR PLUMES`). Replaces thin wisp cores with blurred, curved plumes that widen away from each nozzle and fade at irregular ends. Vapor particles are larger and stretched along their emission direction to avoid beaded lines; the rear plume is widened too. Cores stop at the floor, and ground fog still only forms close to the ground. High/mid/low altitude and dissipation checks pass. Rebuild with `python3 scripts/build-release.py`.
