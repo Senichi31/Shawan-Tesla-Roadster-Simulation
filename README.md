@@ -121,3 +121,7 @@ Current entry: `play-ceiling-v24.html` (`V24 · AUTOMATIC AXIAL ROLL`). Leaving 
 ## V25: show the underside during roll
 
 Current entry: `play-ceiling-v25.html` (`V25 · UNDERSIDE AXIAL ROLL`). Reverses the longitudinal roll direction and replaces the midpoint roof view with a stylized underbody view showing the flat undertray, suspension, wheels and air nozzles. Nose direction, roll timing and the collision envelope are retained. Rebuild with `python3 scripts/build-release.py`.
+
+## V26: wider rolling underbody
+
+Current entry: `play-ceiling-v26.html`. Increases the underside view's transverse size from 56 to 76 arena units (about 36%) while retaining vehicle length and side-profile artwork. The roll collision projection expands correspondingly, from 26 to 36 units of transverse half-width. Roll orientation and scaffold collision checks pass. Rebuild with `python3 scripts/build-release.py`.

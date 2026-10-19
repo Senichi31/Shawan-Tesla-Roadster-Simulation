@@ -1,8 +1,8 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=25';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=25';
-const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=25';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=26';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=26';
+const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=26';
 const wheelRadius=91*160/1200;
 const W=1400,H=600,L=65,R=1335,T=100,B=510;
 // A circular wall meets the 15-degree uphill ceiling with a continuous tangent.
@@ -40,7 +40,7 @@ function convexHull(points){
  const lower=[],upper=[];for(const p of sorted){while(lower.length>1&&cross(lower.at(-2),lower.at(-1),p)<=1e-8)lower.pop();lower.push(p);}
  for(const p of [...sorted].reverse()){while(upper.length>1&&cross(upper.at(-2),upper.at(-1),p)<=1e-8)upper.pop();upper.push(p);}return [...lower.slice(0,-1),...upper.slice(0,-1)];
 }
-function flightBody(){const c=Math.cos(car.angle),s=Math.sin(car.angle),roll=car.roll||0,vertical=Math.cos(roll),width=26*Math.abs(Math.sin(roll));
+function flightBody(){const c=Math.cos(car.angle),s=Math.sin(car.angle),roll=car.roll||0,vertical=Math.cos(roll),width=36*Math.abs(Math.sin(roll));
  const points=bodyOutline.flatMap(([x,y])=>{x*=car.facing;return (width>1e-6?[-width,width]:[0]).map(offset=>{const projectedY=y*vertical+offset;return {x:car.x+x*c-projectedY*s,y:car.y+x*s+projectedY*c};});});
  return width>1e-6?convexHull(points):points;
 }
@@ -221,7 +221,7 @@ if(roadsterImage.complete&&roadsterImage.naturalWidth){ctx.drawImage(roadsterIma
 }else{ctx.fillStyle='#b7ccd5';ctx.fillRect(-60,-12,120,24);}
 ctx.restore();
 // Roll in the opposite direction to expose the underside between the two side views.
-if(rollUnderside>.01&&undersideImage.complete&&undersideImage.naturalWidth){ctx.globalAlpha=rollUnderside;ctx.drawImage(undersideImage,-80,-28*rollUnderside,160,56*rollUnderside);ctx.globalAlpha=1;}
+if(rollUnderside>.01&&undersideImage.complete&&undersideImage.naturalWidth){ctx.globalAlpha=rollUnderside;ctx.drawImage(undersideImage,-80,-38*rollUnderside,160,76*rollUnderside);ctx.globalAlpha=1;}
 ctx.restore();
 if(paused){ctx.fillStyle='#080d17bb';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font='bold 36px Arial';ctx.fillText('PAUSED',W/2,H/2);ctx.font='14px Arial';ctx.fillStyle='#acb7c9';ctx.fillText('Press P or click ▶ to continue',W/2,H/2+34);ctx.textAlign='left';}}
 function frame(ts){const dt=Math.min((ts-last)/1000||0,.033);last=ts;if(!paused)update(dt);draw();requestAnimationFrame(frame);}reset();requestAnimationFrame(frame);
