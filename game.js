@@ -1,7 +1,7 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=11';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=11';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=12';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=12';
 const wheelRadius=91*160/1200;
 const W=1400,H=600,L=65,R=1335,T=100,B=510;
 // Arc-length parametrization: ground, full 180-degree wall, horizontal ceiling.
@@ -16,27 +16,26 @@ const trackEnd=arc.at(-1).s;
 function pathAt(distance){if(distance<=rampStart)return {x:distance,y:B,angle:0};const i=arc.findIndex(p=>p.s>=distance);if(i<0)return arc.at(-1);const a=arc[i-1],b=arc[i],u=(distance-a.s)/(b.s-a.s);return {x:a.x+(b.x-a.x)*u,y:a.y+(b.y-a.y)*u,angle:a.angle+(b.angle-a.angle)*u};}
 function placeOnTrack(){const p=pathAt(car.s);car.angle=p.angle;car.x=p.x+17*Math.sin(p.angle);car.y=p.y-17*Math.cos(p.angle);}
 const keys=new Set(),rings=[{x:340,y:480},{x:780,y:480},{x:1055,y:365},{x:1040,y:230},{x:830,y:170}];
-let car,magnet=false,flight=false,paused=false,score=0,last=0,time=0,toastUntil=6,particles=[];
-function reset(){car={x:160,y:B-17,vx:0,vy:0,angle:0,surface:'track',wheelRotation:0,wheelVelocity:0,speed:0,s:160,launched:false};score=0;rings.forEach(r=>r.hit=false);particles=[];magnet=true;flight=false;paused=false;keys.clear();toastUntil=time+6;document.querySelector('#toast').textContent='Tap arrows to roll. Space brakes. Air grip holds the track; the open end releases you.';sync();}
-function sync(){document.querySelector('#magnet').classList.toggle('active',magnet);document.querySelector('#flight').classList.toggle('active',flight);document.querySelector('#mode').textContent=flight?'● FLIGHT MODE':magnet?(car.surface==='track'&&Math.cos(car.angle)<-.99?'● INVERTED / AIR GRIP':'● AIR GRIP'):'● GROUND DRIVE';document.querySelector('#status').textContent=flight?'THRUSTERS ENGAGED':magnet?(car.surface==='track'?'AIR GRIP / GRAVITY OFF / M TO RELEASE':'AIR GRIP READY / OFF TRACK'):'GRIP SYSTEM READY';document.querySelector('#pause').textContent=paused?'▶':'Ⅱ';}
-function toggleMagnet(){magnet=!magnet;if(magnet)flight=false;else if(car.surface==='track'&&Math.cos(car.angle)<0){car.surface=null;car.vx=car.speed*Math.cos(car.angle);car.vy=car.speed*Math.sin(car.angle);}sync();}
-function toggleFlight(){flight=!flight;if(flight){magnet=false;car.surface=null;car.vy=Math.min(car.vy,-95);}sync();}
-document.querySelector('#reset').onclick=reset;document.querySelector('#magnet').onclick=toggleMagnet;document.querySelector('#flight').onclick=toggleFlight;document.querySelector('#pause').onclick=()=>{paused=!paused;keys.clear();sync();};
-window.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();const k=e.key.toLowerCase();if(!e.repeat){if(k==='m')toggleMagnet();if(k==='f')toggleFlight();if(k==='r')reset();if(k==='p'||k==='escape'){paused=!paused;sync();}}keys.add(k);});
+const magnet=true; // Surface adhesion is always available; no manual toggle.
+let car,flight=false,paused=false,score=0,last=0,time=0,toastUntil=6,particles=[];
+function reset(){car={x:160,y:B-17,vx:0,vy:0,angle:0,surface:'track',wheelRotation:0,wheelVelocity:0,speed:0,s:160,launched:false};score=0;rings.forEach(r=>r.hit=false);particles=[];flight=false;paused=false;keys.clear();toastUntil=time+6;document.querySelector('#toast').textContent='Tap arrows to roll. Space brakes. Air grip holds the track; the open end releases you.';sync();}
+function sync(){document.querySelector('#magnet').classList.toggle('active',!flight);document.querySelector('#flight').classList.toggle('active',flight);document.querySelector('#mode').textContent=flight?'● FLIGHT MODE':magnet?(car.surface==='track'&&Math.cos(car.angle)<-.99?'● INVERTED / AIR GRIP':'● AIR GRIP'):'● GROUND DRIVE';document.querySelector('#status').textContent=flight?'THRUSTERS ENGAGED':magnet?(car.surface==='track'?'AUTO GRIP / GRAVITY OFF':'AIR GRIP READY / OFF TRACK'):'GRIP SYSTEM READY';document.querySelector('#pause').textContent=paused?'▶':'Ⅱ';}
+function toggleFlight(){flight=!flight;if(flight){car.surface=null;car.vy=Math.min(car.vy,-95);}sync();}
+document.querySelector('#reset').onclick=reset;document.querySelector('#flight').onclick=toggleFlight;document.querySelector('#pause').onclick=()=>{paused=!paused;keys.clear();sync();};
+window.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();const k=e.key.toLowerCase();if(!e.repeat){if(k==='f')toggleFlight();if(k==='r')reset();if(k==='p'||k==='escape'){paused=!paused;sync();}}keys.add(k);});
 window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>keys.clear());
 function update(dt){time+=dt;const right=keys.has('d')||keys.has('arrowright'),left=keys.has('a')||keys.has('arrowleft'),up=keys.has('w')||keys.has('arrowup'),down=keys.has('s')||keys.has('arrowdown'),boost=keys.has('shift'),power=boost?820:420,brake=keys.has(' ');
 const oldX=car.x,oldY=car.y,oldDistance=car.s,oldSurface=car.surface,attachedBefore=car.surface==='track';
 if(flight){car.surface=null;car.vx+=(Number(right)-Number(left))*power*dt;car.vy+=(Number(down)-Number(up))*power*dt;car.vx*=Math.exp(-.7*dt);car.vy*=Math.exp(-.7*dt);car.angle+=((car.vx/650)*.18-car.angle)*Math.min(1,dt*5);car.x+=car.vx*dt;car.y+=car.vy*dt;}
 else if(car.surface==='track'){
  const angle=pathAt(car.s).angle,drive=Number(right||up)-Number(left||down);
- car.speed+=((brake?0:drive)*((boost?1150:760)+(magnet?120:0))+(magnet?0:420*Math.sin(angle)))*dt;
+ car.speed+=((brake?0:drive)*(boost?1270:880))*dt;
  // Air grip cancels gravity; releasing input keeps inertia. Only Space brakes.
  if(brake){car.speed*=Math.exp(-10*dt);if(Math.abs(car.speed)<2)car.speed=0;}
  if(!drive&&Math.abs(car.speed)<.4)car.speed=0;
  car.speed*=Math.exp(-.48*dt);car.speed=Math.max(-650,Math.min(950,car.speed));car.s=Math.max(L+55,car.s+car.speed*dt);
  if(car.s<=L+55)car.speed=Math.max(0,car.speed);
  placeOnTrack();car.vx=car.speed*Math.cos(car.angle);car.vy=car.speed*Math.sin(car.angle);
- if(!magnet&&Math.cos(car.angle)<0){car.surface=null;}
  if(car.s>=trackEnd){const overshoot=car.s-trackEnd;car.x+=overshoot*Math.cos(car.angle);car.y+=overshoot*Math.sin(car.angle);car.surface=null;car.launched=true;toastUntil=time+5;document.querySelector('#toast').textContent='CEILING EXIT / Press F for flight, or fall back to the ground.';}
 }else if(car.surface==='ground'){
  car.vx+=(Number(right||up)-Number(left||down))*(boost?1150:760)*dt;car.vx*=Math.exp(-.48*dt);car.x+=car.vx*dt;car.y=B-17;car.angle=0;
@@ -50,7 +49,7 @@ if(car.surface===null&&!(attachedBefore&&car.launched)){for(let i=1;i<arc.length
  const a=arc[i-1],b=arc[i],dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy),nx=dy/len,ny=-dx/len;
  const before=(oldX-a.x)*nx+(oldY-a.y)*ny-17,after=(car.x-a.x)*nx+(car.y-a.y)*ny-17;
  if(before>0&&after<=0){const t=before/(before-after),hx=oldX+(car.x-oldX)*t,hy=oldY+(car.y-oldY)*t,u=((hx-a.x)*dx+(hy-a.y)*dy)/(len*len);
- if(u>=0&&u<=1){car.x=hx+nx*.1;car.y=hy+ny*.1;if(!flight&&(magnet||Math.cos(b.angle)>=0)){car.surface='track';car.s=a.s+u*len;car.speed=(car.vx*dx+car.vy*dy)/len;placeOnTrack();}else{const v=car.vx*nx+car.vy*ny;car.vx-=Math.min(0,v)*nx;car.vy-=Math.min(0,v)*ny;}break;}
+ if(u>=0&&u<=1){car.x=hx+nx*.1;car.y=hy+ny*.1;if(!flight){car.surface='track';car.s=a.s+u*len;car.speed=(car.vx*dx+car.vy*dy)/len;placeOnTrack();}else{const v=car.vx*nx+car.vy*ny;car.vx-=Math.min(0,v)*nx;car.vy-=Math.min(0,v)*ny;}break;}
  }
 }}
 if(car.x<L+55){car.x=L+55;car.vx=Math.max(0,car.vx);}if(car.x>R-55){car.x=R-55;car.vx=Math.min(0,car.vx);}

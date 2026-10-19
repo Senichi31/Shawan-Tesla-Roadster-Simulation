@@ -16,7 +16,7 @@ Open `http://localhost:8000` in your browser. The game uses Canvas and plain Jav
 
 - **W / Up / D / Right:** accelerate; in flight, W/Up goes up and D/Right goes right.
 - **S / Down / A / Left:** reverse/brake; in flight, S/Down goes down and A/Left goes left.
-- **M:** toggle air grip. Air grip is on by default and holds the car on the vertical wall and inverted ceiling, even at rest. Toggle it off while inverted to drop. The game models this as an arcade air-grip constraint.
+- **Automatic air grip:** always available, with no M key or manual switch. The car automatically adheres to walls and the ceiling while on the track, even at rest. Flying suspends surface attachment; driving past the open endpoint releases it naturally.
 - **F:** toggle flight. Use WASD or arrow keys to move in four directions.
 - **Shift:** hold for extra thrust.
 - **P / Escape:** pause/resume.
@@ -65,3 +65,7 @@ Current entry: `play-ceiling-v10.html` (`V10 · AIR GRIP / NO GRAVITY`). While a
 ## V11: inertia and open-end exit
 
 Current entry: `play-ceiling-v11.html` (`V11 · INERTIA / OPEN TRACK EXIT`). Releasing an arrow/WASD key now preserves momentum with gradual rolling drag; short taps move the car and let it coast. Only Space applies the strong brake. Gravity remains cancelled while air grip is attached, so a car braked on a wall stays still. The ceiling end is open again: driving past it detaches even with air grip enabled, preserves tangential velocity and resumes airborne gravity. Press F to fly instead of falling. Six-spoke rotating wheels and the shortened ceiling are retained. Rebuild V11 with `python3 scripts/build-release.py`.
+
+## V12: automatic surface adhesion
+
+Current entry: `play-ceiling-v12.html` (`V12 · AUTOMATIC AIR GRIP`). Removes the M key and clickable air-grip toggle. Surface adhesion is always available automatically, including after leaving flight mode. Wall/ceiling driving remains gravity-free. Short taps still coast with inertia, Space brakes, the ceiling end releases naturally, and F toggles flight. The grip card now displays status rather than acting as a control. Rebuild V12 with `python3 scripts/build-release.py`. Earlier version notes describe historical behavior.
