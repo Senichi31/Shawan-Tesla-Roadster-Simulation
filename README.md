@@ -2,7 +2,7 @@
 
 A browser-based 2D driving game with an automatically gripping Roadster-inspired car, a curved wall and 15° inverted ceiling, four-corner vapor during the exit roll, and a finite scrolling flight area.
 
-[Play the game](https://senichi31.github.io/Tesla-Roadster-Simulation/play.html?v=touch-v5)
+[Play the game](https://senichi31.github.io/Tesla-Roadster-Simulation/)
 
 ## Run locally
 
