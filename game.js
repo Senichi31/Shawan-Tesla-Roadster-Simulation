@@ -161,6 +161,14 @@ document.querySelectorAll('[data-key]').forEach(button=>{
  button.addEventListener('pointerup',release);button.addEventListener('pointercancel',release);button.addEventListener('lostpointercapture',release);
  button.addEventListener('contextmenu',event=>event.preventDefault());
 });
+// iOS can start native selection/drag gestures despite pointer-event cancellation.
+const touchPanel=document.querySelector('.touch-controls');
+for(const type of ['touchstart','touchmove'])touchPanel.addEventListener(type,event=>event.preventDefault(),{passive:false});
+for(const type of ['contextmenu','selectstart','dragstart']){
+ document.addEventListener(type,event=>{
+  if(event.target instanceof Element&&event.target.closest('.sim,.touch-controls,.controls,#reset,.vehicle-detail img'))event.preventDefault();
+ });
+}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)clearInputs();});
 let car,flight=false,paused=false,score=0,last=0,time=0,toastUntil=6,particles=[],vaporEmission=0,cameraX=0;
 function reset(){car={x:spawnX,y:B-17,vx:0,vy:0,angle:0,facing:1,roll:0,rollActive:false,rollElapsed:0,rollAxisAngle:0,surface:'track',wheelRotation:0,wheelVelocity:0,speed:0,s:spawnX,launched:false};score=0;rings.forEach(r=>r.hit=false);particles=[];vaporEmission=0;cameraX=0;flight=false;paused=false;clearInputs();toastUntil=time+6;document.querySelector('#toast').textContent='← → drive. ↑ takes off / rises. ↓ descends. Touch down to exit flight.';sync();}
