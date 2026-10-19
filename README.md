@@ -81,3 +81,7 @@ Current entry: `play-ceiling-v14.html` (`V14 · SHORTER COASTING`). On the drivi
 ## V15: 20-degree uphill upper track
 
 Current entry: `play-ceiling-v15.html` (`V15 · UPHILL CEILING +20°`). The 140-unit upper section rises at 20 degrees in the car's forward direction toward the left exit. The circular wall retains its radius and meets it tangentially at a 160-degree sweep. The scaffold follows the revised envelope and the upper checkpoint follows the road. Automatic adhesion cancels slope gravity, including at rest; exiting preserves the uphill tangent velocity. Short coasting and six-spoke wheel animation are retained. Rebuild V15 with `python3 scripts/build-release.py`.
+
+## V16: 15-degree upper track
+
+Current entry: `play-ceiling-v16.html` (`V16 · UPHILL CEILING +15°`). Reduces the upper incline from 20 to 15 degrees, keeping its 140-unit length and a tangent-continuous connection to the curved wall. Adhesion, short coasting, rotating six-spoke wheels and open-end exit remain unchanged. Rebuild V16 with `python3 scripts/build-release.py`.
