@@ -18,9 +18,9 @@ wheel = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -100 200 200">' +
 js = (root / 'game.js').read_text()
 for filename in ['roadster.svg', 'roadster-body.svg', 'roadster-wheel.svg', 'roadster-underside.svg']:
     data_url = 'data:image/svg+xml;base64,' + base64.b64encode((root / 'assets' / filename).read_bytes()).decode()
-    js = js.replace('assets/' + filename + '?v=29', data_url)
-    html = html.replace('assets/' + filename + '?v=29', data_url)
+    js = js.replace('assets/' + filename + '?v=30', data_url)
+    html = html.replace('assets/' + filename + '?v=30', data_url)
 html = re.sub(r'<link rel="stylesheet" href="[^"]+">', lambda _: '<style>' + css + '</style>', html)
 html = re.sub(r'<script src="game.js[^\"]*"></script>', lambda _: '<script>' + js + '</script>', html)
-(root / 'play-ceiling-v29.html').write_text(html)
-print('Built play-ceiling-v29.html (standalone, no external assets)')
+(root / 'play-ceiling-v30.html').write_text(html)
+print('Built play-ceiling-v30.html (standalone, no external assets)')

@@ -137,3 +137,7 @@ Current entry: `play-ceiling-v28.html` (`V28 · COMPRESSED-AIR VAPOR`). Replaces
 ## V29: restrained vapor with proximity-gated ground fog
 
 Current entry: `play-ceiling-v29.html` (`V29 · LIGHT VAPOR / LOW-ALTITUDE FOG`). Shortens vapor lifetime, reduces emission and limits plume widening. High-altitude jets dissipate before reaching the floor. Floor spread is only created for underbody vapor emitted near the ground while the vehicle is still within 90 arena units of it; intensity fades with distance. Rear vapor never creates floor fog. Close-range spread has less drift and a shorter lifetime. High/mid/low-altitude and post-flight dissipation checks pass. Rebuild with `python3 scripts/build-release.py`.
+
+## V30: stronger visible air jets
+
+Current entry: `play-ceiling-v30.html` (`V30 · STRONGER AIR JETS`). Increases vapor exit speed and near-nozzle opacity, adds soft continuous wisp cores, and raises rear emission to two particles per emission step with a broader rear plume. Short lifetimes still prevent high-altitude jets from becoming floor-to-car smoke columns. Ground fog retains V29 proximity gating and restrained spread. High/mid/low altitude and rear-volume/dissipation checks pass. Rebuild with `python3 scripts/build-release.py`.

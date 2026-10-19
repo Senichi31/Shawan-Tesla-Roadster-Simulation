@@ -1,8 +1,8 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=29';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=29';
-const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=29';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=30';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=30';
+const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=30';
 // Soft, transparent vapor texture; no solid cones or hard-edged smoke discs.
 const vaporTexture=document.createElement('canvas');vaporTexture.width=vaporTexture.height=64;
 const vaporCtx=vaporTexture.getContext('2d'),vaporGradient=vaporCtx.createRadialGradient(32,32,0,32,32,32);
@@ -171,13 +171,14 @@ const headingSpeed=(car.surface==='track'?car.speed:car.vx);
 if(!car.rollActive&&Math.abs(headingSpeed)>2){const facing=headingSpeed<0?-1:1;if(car.facing!==facing){car.facing=facing;if(car.surface==='track')placeOnTrack();else resolveFlightContacts();}}
 for(const r of rings)if(!r.hit&&Math.hypot(car.x-r.x,car.y-r.y)<45){r.hit=true;score++;toastUntil=time+4;document.querySelector('#toast').textContent=score===5?'All checkpoints cleared. The sky is yours. R to run again.':`Checkpoint ${score} / 5 collected. Keep exploring.`;for(let i=0;i<22;i++)particles.push({x:r.x,y:r.y,vx:(Math.random()-.5)*240,vy:(Math.random()-.5)*240,life:1});}
 if(flight){
- vaporEmission+=dt*50;
+ vaporEmission+=dt*70;
  const nearGround=Math.max(0,Math.min(1,1-(B-car.y-17)/90));
  const c=Math.cos(car.angle),s=Math.sin(car.angle),vertical=Math.cos(car.roll||0),lateral=Math.sin(car.roll||0);
  const project=(x,y,z=0)=>{x*=car.facing;const py=y*vertical+z*lateral;return {x:car.x+x*c-py*s,y:car.y+x*s+py*c};};
- const emit=(point,dx,dy,tail=false)=>{const life=tail?.4+Math.random()*.2:.38+Math.random()*.24,speed=tail?220+Math.random()*60:270+Math.random()*60;
-  particles.push({x:point.x+(Math.random()-.5)*2,y:point.y+(Math.random()-.5)*2,vx:dx*speed+car.vx*.25+(Math.random()-.5)*(tail?8:20),vy:dy*speed+car.vy*.15+(Math.random()-.5)*(tail?24:8),life,maxLife:life,age:0,gas:true,tail,radius:tail?1.8:2.2,growth:tail?11:16,groundFactor:nearGround,seed:Math.random()*100,spread:false});};
- while(vaporEmission>=1){vaporEmission--;for(const x of [-43,42])for(const z of [-8,8])emit(project(x,12,z),-s*vertical,c*vertical);emit(project(-69,0),-c*car.facing,-s*car.facing,true);}
+ const emit=(point,dx,dy,tail=false)=>{const life=tail?.42+Math.random()*.18:.34+Math.random()*.18,speed=tail?360+Math.random()*80:360+Math.random()*80;
+  const offset=Math.random()*speed/70;
+  particles.push({x:point.x+dx*offset+(Math.random()-.5)*2,y:point.y+dy*offset+(Math.random()-.5)*2,vx:dx*speed+car.vx*.25+(Math.random()-.5)*(tail?8:20),vy:dy*speed+car.vy*.15+(Math.random()-.5)*(tail?24:8),life,maxLife:life,age:0,gas:true,tail,radius:tail?2.8:3,growth:tail?14:16,groundFactor:nearGround,seed:Math.random()*100,spread:false});};
+ while(vaporEmission>=1){vaporEmission--;for(const x of [-43,42])for(const z of [-8,8])emit(project(x,12,z),-s*vertical,c*vertical);for(let rear=0;rear<2;rear++)emit(project(-69,0),-c*car.facing,-s*car.facing,true);}
 }
 particles.forEach(p=>{
  p.life-=dt;
@@ -187,6 +188,14 @@ particles.forEach(p=>{
    if(!p.spread&&p.y>=B-7)p.life=0;
  }else{p.x+=p.vx*dt;p.y+=p.vy*dt;}
 });particles=particles.filter(p=>p.life>0);sync();document.querySelector('#speed').textContent=String(Math.round(Math.hypot(car.vx,car.vy)*.36)).padStart(3,'0');document.querySelector('#score').textContent=`0${score} / 05`;document.querySelector('#toast').style.opacity=time<toastUntil?'1':'0';}
+function drawVaporCores(){
+ if(!flight)return;
+ const c=Math.cos(car.angle),s=Math.sin(car.angle),vertical=Math.cos(car.roll||0);
+ const stream=(x,y,dx,dy,length,width,opacity)=>{const gradient=ctx.createLinearGradient(x,y,x+dx*length,y+dy*length);gradient.addColorStop(0,'#e5f4ffcc');gradient.addColorStop(.35,'#a9ccdf88');gradient.addColorStop(1,'#9fc3da00');ctx.save();ctx.globalAlpha=opacity;ctx.strokeStyle=gradient;ctx.lineCap='round';ctx.lineWidth=width;ctx.shadowColor='#bad8e677';ctx.shadowBlur=4;
+  const sway=Math.sin(time*18+x)*2;ctx.beginPath();ctx.moveTo(x,y);ctx.bezierCurveTo(x+dx*length*.3-dy*sway,y+dy*length*.3+dx*sway,x+dx*length*.7+dy*sway,y+dy*length*.7-dx*sway,x+dx*length,y+dy*length);ctx.stroke();ctx.restore();};
+ for(const x of [-43,42]){const px=x*car.facing,py=12*vertical;stream(car.x+px*c-py*s,car.y+px*s+py*c,-s*vertical,c*vertical,105,3.5,.34*Math.abs(vertical));}
+ const rear=-69*car.facing;stream(car.x+rear*c,car.y+rear*s,-c*car.facing,-s*car.facing,125,5,.5);
+}
 function line(x,y,x2,y2,color,width=1){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();}
 function draw(){const dpr=devicePixelRatio||1,cw=canvas.clientWidth,ch=canvas.clientHeight;if(canvas.width!==cw*dpr||canvas.height!==ch*dpr){canvas.width=cw*dpr;canvas.height=ch*dpr;}ctx.setTransform(canvas.width/W,0,0,canvas.height/H,0,0);ctx.fillStyle='#030609';ctx.fillRect(0,0,W,H);
 const glow=ctx.createRadialGradient(1000,400,15,1000,400,600);glow.addColorStop(0,'#14202a');glow.addColorStop(1,'#030609');ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
@@ -224,8 +233,9 @@ for(let i=15;i<arc.length;i+=20){const p=arc[i];ctx.save();ctx.translate(p.x,p.y
 ctx.font='bold 56px Arial';ctx.fillStyle='#b6cddd0b';ctx.fillText('THE RAMP',155,310);
 ctx.fillStyle='#8495a3';ctx.font='10px monospace';ctx.fillText('01 / ACCELERATION',130,552);ctx.fillStyle='#ee8175';ctx.fillText('02 / CURVED WALL',1000,552);ctx.fillStyle='#80cddf';ctx.fillText('03 / CEILING +15°',ceilingLeft-12,frameTop-12);
 for(let i=0;i<rings.length;i++){const r=rings[i];if(r.hit)continue;const pulse=Math.sin(time*3+i)*3;ctx.save();ctx.translate(r.x,r.y);ctx.shadowColor='#f3bc69';ctx.shadowBlur=17;ctx.strokeStyle='#f2bd72';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,0,18+pulse/2,27+pulse,0,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;ctx.strokeStyle='#f2bd7240';ctx.beginPath();ctx.ellipse(0,0,24+pulse/2,33+pulse,0,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#f2bd72';ctx.font='9px monospace';ctx.textAlign='center';ctx.fillText(String(i+1).padStart(2,'0'),0,-43);ctx.restore();}
+drawVaporCores();
 for(const p of particles){
- if(p.gas){const fade=Math.min(1,p.age/.045)*Math.min(1,p.life/.55);ctx.globalAlpha=fade*(p.tail?.22:p.spread?.12*p.groundFactor:.3);const rx=p.radius*(p.spread?2:1),ry=p.radius*(p.spread?.48:1.35);ctx.drawImage(vaporTexture,p.x-rx,p.y-ry,rx*2,ry*2);}
+ if(p.gas){const fade=Math.min(1,p.age/.012)*Math.min(1,p.life/.25);ctx.globalAlpha=fade*(p.tail?.5:p.spread?.12*p.groundFactor:.46);const rx=p.radius*(p.spread?2:1),ry=p.radius*(p.spread?.48:1.35);ctx.drawImage(vaporTexture,p.x-rx,p.y-ry,rx*2,ry*2);}
  else{ctx.globalAlpha=Math.min(1,p.life);ctx.fillStyle='#ffd69a';ctx.fillRect(p.x,p.y,3,3);}
 }ctx.globalAlpha=1;
 ctx.save();ctx.globalAlpha=Math.max(.07,.3-(B-car.y)/1800);ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(car.x,B+2,72+(B-car.y)*.1,5,0,0,Math.PI*2);ctx.fill();ctx.restore();
