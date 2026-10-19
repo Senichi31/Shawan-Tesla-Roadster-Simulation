@@ -1,7 +1,7 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=16';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=16';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=17';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=17';
 const wheelRadius=91*160/1200;
 const W=1400,H=600,L=65,R=1335,T=100,B=510;
 // A circular wall meets the 15-degree uphill ceiling with a continuous tangent.
@@ -80,15 +80,17 @@ for(const p of arc.slice(1))ctx.lineTo(p.x,p.y);
 ctx.closePath();ctx.clip();
 const beam=(x,y,x2,y2,width=2.6)=>{line(x,y,x2,y2,'#71808c',width);line(x-1,y,x2-1,y2,'#c3cdd533',.8);};
 const columns=[];for(let x=ceilingLeft;x<frameBack;x+=65)columns.push(x);columns.push(frameBack);
-const levels=[frameTop,B-2*ry];for(let y=B-2*ry+60;y<B;y+=60)levels.push(y);levels.push(B);
+// Remove the highlighted top row; all steel members now begin at this cut line.
+const supportTop=B-2*ry;
+const levels=[supportTop];for(let y=B-2*ry+60;y<B;y+=60)levels.push(y);levels.push(B);
 // Uprights stay vertical; cross members and X braces form rectangular bays.
-for(const x of columns)beam(x,frameTop,x,B,3);
+for(const x of columns)beam(x,supportTop,x,B,3);
 for(const y of levels)beam(ceilingLeft,y,frameBack,y,2.8);
 for(let i=0;i<columns.length-1;i++)for(let j=0;j<levels.length-1;j++){
  const x=columns[i],x2=columns[i+1],y=levels[j],y2=levels[j+1];
  beam(x+3,y+3,x2-3,y2-3,1.6);beam(x2-3,y+3,x+3,y2-3,1.6);
 }
-beam(frameBack,frameTop,frameBack,B,4);beam(ceilingLeft,frameTop,frameBack,frameTop,4);ctx.restore();
+beam(frameBack,supportTop,frameBack,B,4);beam(ceilingLeft,supportTop,frameBack,supportTop,4);ctx.restore();
 // Foot plates anchor the rear tower and the lower ramp supports on the stage floor.
 for(const x of columns.filter(x=>x>=rampStart)){ctx.fillStyle='#61707c';ctx.fillRect(x-9,B,18,4);line(x-7,B+4,x+7,B+4,'#a0aeb8',1);}
 const deck=()=>{ctx.moveTo(L,B);ctx.lineTo(rampStart,B);arc.forEach(p=>ctx.lineTo(p.x,p.y));};

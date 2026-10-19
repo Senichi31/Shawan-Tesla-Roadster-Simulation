@@ -85,3 +85,7 @@ Current entry: `play-ceiling-v15.html` (`V15 · UPHILL CEILING +20°`). The 140-
 ## V16: 15-degree upper track
 
 Current entry: `play-ceiling-v16.html` (`V16 · UPHILL CEILING +15°`). Reduces the upper incline from 20 to 15 degrees, keeping its 140-unit length and a tangent-continuous connection to the curved wall. Adhesion, short coasting, rotating six-spoke wheels and open-end exit remain unchanged. Rebuild V16 with `python3 scripts/build-release.py`.
+
+## V17: trimmed upper scaffold
+
+Current entry: `play-ceiling-v17.html` (`V17 · +15° CEILING / TRIMMED SCAFFOLD`). Removes the highlighted uppermost row of steelwork, including its posts, cross braces and top beam. Remaining steel members begin at the previous row boundary. The 15-degree road and all driving behavior are unchanged. Rebuild V17 with `python3 scripts/build-release.py`.
