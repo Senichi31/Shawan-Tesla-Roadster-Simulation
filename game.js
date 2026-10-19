@@ -1,7 +1,7 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=18';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=18';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=19';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=19';
 const wheelRadius=91*160/1200;
 const W=1400,H=600,L=65,R=1335,T=100,B=510;
 // A circular wall meets the 15-degree uphill ceiling with a continuous tangent.
@@ -75,7 +75,7 @@ line(100,B+14,790,B+14,'#f34b40',2);line(100,B+19,790,B+19,'#f34b402a',3);
 // Grounded rectangular scaffold behind the ramp, as in the reference stage.
 // Clip the steelwork to the region outside the driving face so no brace crosses the road.
 // The top beam meets the outer edge of the ceiling endpoint instead of cutting below it.
-const frameTop=arc.at(-1).y-4,frameBack=rampStart+rx+72;
+const frameTop=arc.at(-1).y-10,frameBack=rampStart+rx+72;
 ctx.save();ctx.beginPath();ctx.moveTo(ceilingLeft,frameTop);ctx.lineTo(frameBack,frameTop);ctx.lineTo(frameBack,B);ctx.lineTo(rampStart,B);
 for(const p of arc.slice(1))ctx.lineTo(p.x,p.y);
 ctx.closePath();ctx.clip();

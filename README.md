@@ -93,3 +93,7 @@ Current entry: `play-ceiling-v17.html` (`V17 · +15° CEILING / TRIMMED SCAFFOLD
 ## V18: scaffold reaches the ceiling endpoint
 
 Current entry: `play-ceiling-v18.html` (`V18 · CEILING-END SCAFFOLD`). Corrects the over-trimmed support: the top beam and upright grid extend to the outer edge of the inclined ceiling endpoint, trimming only the excess above it. The 15-degree track and all driving logic remain unchanged. Rebuild with `python3 scripts/build-release.py`.
+
+## V19: small scaffold height adjustment
+
+Current entry: `play-ceiling-v19.html`. Raises the scaffold top by another 6 arena units to close the small gap at the upper track endpoint. Track geometry and driving behavior are unchanged. Rebuild with `python3 scripts/build-release.py`.
