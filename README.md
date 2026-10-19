@@ -22,7 +22,7 @@ Open `http://localhost:8000` in your browser. The game uses Canvas and plain Jav
 - **P / Escape:** pause/resume.
 - **R:** reset the run.
 
-Hold D/Right or W/Up to build speed, then climb the half-circle wall and drive fully upside down along the ceiling. Hold Space to stop while attached. With air grip enabled, the ceiling end stops the car without detaching. Press M to release or F to engage flight. Hold Shift for more launch speed; press F in the air for sustained flight. Collect all five rings in any order. Air grip and flight are mutually exclusive; their buttons also toggle the modes. Keyboard play is intended for desktop browsers.
+Hold D/Right or W/Up to build speed, then climb the half-circle wall and drive fully upside down along the ceiling. Release directions to coast with inertia; hold Space to stop while attached. Air grip holds the car only while road exists. Driving past the ceiling’s open end releases it with its current velocity; press F for flight. Hold Shift for more launch speed; press F in the air for sustained flight. Collect all five rings in any order. Air grip and flight are mutually exclusive; their buttons also toggle the modes. Keyboard play is intended for desktop browsers.
 
 This is a fictional arcade simulation, not a model of real vehicle capabilities or an official Tesla product.
 
@@ -61,3 +61,7 @@ Current entry: `play-ceiling-v9.html` (`V9 · SIX-SPOKE WHEELS / LIVE ROTATION`)
 ## V10: gravity-free attached driving
 
 Current entry: `play-ceiling-v10.html` (`V10 · AIR GRIP / NO GRAVITY`). While air grip is enabled and the car is attached, gravity contributes no tangential acceleration. Releasing directional input smoothly brakes to a complete stop on ground, walls and the ceiling. The ceiling endpoint clamps position and speed instead of automatically detaching; reverse input moves away from it. Press M to explicitly release adhesion or F for flight. Gravity still acts after detaching. The silver body and animated six-spoke wheels are retained. Rebuild V10 with `python3 scripts/build-release.py`.
+
+## V11: inertia and open-end exit
+
+Current entry: `play-ceiling-v11.html` (`V11 · INERTIA / OPEN TRACK EXIT`). Releasing an arrow/WASD key now preserves momentum with gradual rolling drag; short taps move the car and let it coast. Only Space applies the strong brake. Gravity remains cancelled while air grip is attached, so a car braked on a wall stays still. The ceiling end is open again: driving past it detaches even with air grip enabled, preserves tangential velocity and resumes airborne gravity. Press F to fly instead of falling. Six-spoke rotating wheels and the shortened ceiling are retained. Rebuild V11 with `python3 scripts/build-release.py`.
