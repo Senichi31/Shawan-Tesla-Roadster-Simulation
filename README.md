@@ -145,3 +145,7 @@ Current entry: `play-ceiling-v30.html` (`V30 · STRONGER AIR JETS`). Increases v
 ## V31: broad, soft-edged vapor plumes
 
 Current entry: `play-ceiling-v31.html` (`V31 · BROADER SOFT VAPOR PLUMES`). Replaces thin wisp cores with blurred, curved plumes that widen away from each nozzle and fade at irregular ends. Vapor particles are larger and stretched along their emission direction to avoid beaded lines; the rear plume is widened too. Cores stop at the floor, and ground fog still only forms close to the ground. High/mid/low altitude and dissipation checks pass. Rebuild with `python3 scripts/build-release.py`.
+
+## V32: underbody-only vapor with contact-driven ground spread
+
+Current entry: `play-ceiling-v32.html` (`V32 · UNDERBODY JETS / CONTACT FOG`). Removes both rear particle emission and the rear plume core. Underbody core length is reduced from 120 to 90 units, and vapor lifetime is shortened. Floor spread is now triggered by the visible particle envelope touching the floor while moving downward, independent of vehicle altitude and flight-mode state. Removes the previous 90-unit vehicle-clearance gate. Validation confirms no rear plume, shorter vapor, no spread before contact, floor spread with vehicle clearance above the old limit, and eventual dissipation. Rebuild with `python3 scripts/build-release.py`.

@@ -1,8 +1,8 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=31';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=31';
-const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=31';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=32';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=32';
+const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=32';
 // Soft, transparent vapor texture; no solid cones or hard-edged smoke discs.
 const vaporTexture=document.createElement('canvas');vaporTexture.width=vaporTexture.height=64;
 const vaporCtx=vaporTexture.getContext('2d'),vaporGradient=vaporCtx.createRadialGradient(32,32,0,32,32,32);
@@ -172,19 +172,20 @@ if(!car.rollActive&&Math.abs(headingSpeed)>2){const facing=headingSpeed<0?-1:1;i
 for(const r of rings)if(!r.hit&&Math.hypot(car.x-r.x,car.y-r.y)<45){r.hit=true;score++;toastUntil=time+4;document.querySelector('#toast').textContent=score===5?'All checkpoints cleared. The sky is yours. R to run again.':`Checkpoint ${score} / 5 collected. Keep exploring.`;for(let i=0;i<22;i++)particles.push({x:r.x,y:r.y,vx:(Math.random()-.5)*240,vy:(Math.random()-.5)*240,life:1});}
 if(flight){
  vaporEmission+=dt*70;
- const nearGround=Math.max(0,Math.min(1,1-(B-car.y-17)/90));
  const c=Math.cos(car.angle),s=Math.sin(car.angle),vertical=Math.cos(car.roll||0),lateral=Math.sin(car.roll||0);
  const project=(x,y,z=0)=>{x*=car.facing;const py=y*vertical+z*lateral;return {x:car.x+x*c-py*s,y:car.y+x*s+py*c};};
- const emit=(point,dx,dy,tail=false)=>{const life=tail?.42+Math.random()*.18:.34+Math.random()*.18,speed=tail?360+Math.random()*80:360+Math.random()*80;
+ const emit=(point,dx,dy)=>{const life=.25+Math.random()*.15,speed=360+Math.random()*80;
   const offset=Math.random()*speed/70;
-  particles.push({x:point.x+dx*offset+(Math.random()-.5)*2,y:point.y+dy*offset+(Math.random()-.5)*2,vx:dx*speed+car.vx*.25+(Math.random()-.5)*(tail?8:20),vy:dy*speed+car.vy*.15+(Math.random()-.5)*(tail?24:8),life,maxLife:life,age:0,gas:true,tail,axis:Math.atan2(dy,dx),radius:3.5,growth:tail?25:28,groundFactor:nearGround,seed:Math.random()*100,spread:false});};
- while(vaporEmission>=1){vaporEmission--;for(const x of [-43,42])for(const z of [-8,8])emit(project(x,12,z),-s*vertical,c*vertical);for(let rear=0;rear<2;rear++)emit(project(-69,0),-c*car.facing,-s*car.facing,true);}
+  particles.push({x:point.x+dx*offset+(Math.random()-.5)*2,y:point.y+dy*offset+(Math.random()-.5)*2,vx:dx*speed+car.vx*.25+(Math.random()-.5)*20,vy:dy*speed+car.vy*.15+(Math.random()-.5)*8,life,maxLife:life,age:0,gas:true,axis:Math.atan2(dy,dx),radius:3.5,growth:28,seed:Math.random()*100,spread:false});};
+ while(vaporEmission>=1){vaporEmission--;for(const x of [-43,42])for(const z of [-8,8])emit(project(x,12,z),-s*vertical,c*vertical);}
 }
 particles.forEach(p=>{
  p.life-=dt;
  if(p.gas){p.age+=dt;p.radius+=p.growth*dt;const drag=Math.exp(-(p.spread?1.1:.35)*dt);p.vx=p.vx*drag+Math.sin(time*9+p.seed+p.age*7)*10*dt;p.vy=p.vy*drag+Math.cos(time*8+p.seed)*5*dt;
   p.x+=p.vx*dt;p.y+=p.vy*dt;
-  if(!p.spread&&!p.tail&&p.groundFactor>0&&flight&&B-car.y-17<90&&p.y>=B-7&&p.vy>0){p.spread=true;p.y=B-7;p.vx+=(Math.random()<.5?-1:1)*(30+Math.random()*40);p.vy=-6-Math.random()*10;p.radius=Math.max(8,p.radius);p.growth=12;p.life=Math.max(.3,p.life);p.maxLife=Math.max(p.maxLife,p.age+p.life);}
+  // Ground response follows the visible vapor edge, independent of vehicle altitude or mode.
+  const verticalExtent=p.radius*Math.hypot(1.8*Math.sin(p.axis),.85*Math.cos(p.axis));
+  if(!p.spread&&p.life>0&&p.y+verticalExtent>=B-7&&p.vy>0){p.spread=true;p.y=B-7;p.vx+=(Math.random()<.5?-1:1)*(30+Math.random()*40);p.vy=-6-Math.random()*10;p.radius=Math.max(8,p.radius);p.growth=12;p.life=Math.max(.3,p.life);p.maxLife=Math.max(p.maxLife,p.age+p.life);}
    if(!p.spread&&p.y>=B-7)p.life=0;
  }else{p.x+=p.vx*dt;p.y+=p.vy*dt;}
 });particles=particles.filter(p=>p.life>0);sync();document.querySelector('#speed').textContent=String(Math.round(Math.hypot(car.vx,car.vy)*.36)).padStart(3,'0');document.querySelector('#score').textContent=`0${score} / 05`;document.querySelector('#toast').style.opacity=time<toastUntil?'1':'0';}
@@ -203,8 +204,7 @@ function drawVaporCores(){
   ctx.lineTo(x+dx*length-nx*width,y+dy*length-ny*width);
   ctx.bezierCurveTo(x+dx*length*.6-nx*(width*.85+sway),y+dy*length*.6-ny*(width*.85+sway),x+dx*length*.25-nx*(width*.25-sway),y+dy*length*.25-ny*(width*.25-sway),x-nx*2,y-ny*2);ctx.closePath();ctx.fill();ctx.restore();
  };
- for(const x of [-43,42]){const px=x*car.facing,py=12*vertical;stream(car.x+px*c-py*s,car.y+px*s+py*c,-s*vertical,c*vertical,120,16,.7*Math.abs(vertical));}
- const rear=-69*car.facing;stream(car.x+rear*c,car.y+rear*s,-c*car.facing,-s*car.facing,120,17,.7);
+ for(const x of [-43,42]){const px=x*car.facing,py=12*vertical;stream(car.x+px*c-py*s,car.y+px*s+py*c,-s*vertical,c*vertical,90,16,.7*Math.abs(vertical));}
 }
 function line(x,y,x2,y2,color,width=1){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x2,y2);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();}
 function draw(){const dpr=devicePixelRatio||1,cw=canvas.clientWidth,ch=canvas.clientHeight;if(canvas.width!==cw*dpr||canvas.height!==ch*dpr){canvas.width=cw*dpr;canvas.height=ch*dpr;}ctx.setTransform(canvas.width/W,0,0,canvas.height/H,0,0);ctx.fillStyle='#030609';ctx.fillRect(0,0,W,H);
@@ -245,7 +245,7 @@ ctx.fillStyle='#8495a3';ctx.font='10px monospace';ctx.fillText('01 / ACCELERATIO
 for(let i=0;i<rings.length;i++){const r=rings[i];if(r.hit)continue;const pulse=Math.sin(time*3+i)*3;ctx.save();ctx.translate(r.x,r.y);ctx.shadowColor='#f3bc69';ctx.shadowBlur=17;ctx.strokeStyle='#f2bd72';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,0,18+pulse/2,27+pulse,0,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;ctx.strokeStyle='#f2bd7240';ctx.beginPath();ctx.ellipse(0,0,24+pulse/2,33+pulse,0,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#f2bd72';ctx.font='9px monospace';ctx.textAlign='center';ctx.fillText(String(i+1).padStart(2,'0'),0,-43);ctx.restore();}
 drawVaporCores();
 for(const p of particles){
- if(p.gas){const fade=Math.min(1,p.age/.012)*Math.min(1,p.life/.25);ctx.globalAlpha=fade*(p.tail?.42:p.spread?.12*p.groundFactor:.4);ctx.save();ctx.translate(p.x,p.y);if(!p.spread)ctx.rotate(p.axis);const rx=p.radius*(p.spread?2:1.8),ry=p.radius*(p.spread?.48:.85);ctx.drawImage(vaporTexture,-rx,-ry,rx*2,ry*2);ctx.restore();}
+ if(p.gas){const fade=Math.min(1,p.age/.012)*Math.min(1,p.life/.25);ctx.globalAlpha=fade*(p.spread?.12:.4);ctx.save();ctx.translate(p.x,p.y);if(!p.spread)ctx.rotate(p.axis);const rx=p.radius*(p.spread?2:1.8),ry=p.radius*(p.spread?.48:.85);ctx.drawImage(vaporTexture,-rx,-ry,rx*2,ry*2);ctx.restore();}
  else{ctx.globalAlpha=Math.min(1,p.life);ctx.fillStyle='#ffd69a';ctx.fillRect(p.x,p.y,3,3);}
 }ctx.globalAlpha=1;
 ctx.save();ctx.globalAlpha=Math.max(.07,.3-(B-car.y)/1800);ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(car.x,B+2,72+(B-car.y)*.1,5,0,0,Math.PI*2);ctx.fill();ctx.restore();
