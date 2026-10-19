@@ -125,3 +125,7 @@ Current entry: `play-ceiling-v25.html` (`V25 · UNDERSIDE AXIAL ROLL`). Reverses
 ## V26: wider rolling underbody
 
 Current entry: `play-ceiling-v26.html`. Increases the underside view's transverse size from 56 to 76 arena units (about 36%) while retaining vehicle length and side-profile artwork. The roll collision projection expands correspondingly, from 26 to 36 units of transverse half-width. Roll orientation and scaffold collision checks pass. Rebuild with `python3 scripts/build-release.py`.
+
+## V27: full-length red ground line
+
+Current entry: `play-ceiling-v27.html`. Extends the lower red accent and its glow from L to R, matching both endpoints of the ground road line. Driving and collision behavior are unchanged. Rebuild with `python3 scripts/build-release.py`.

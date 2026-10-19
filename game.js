@@ -1,8 +1,8 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=26';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=26';
-const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=26';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=27';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=27';
+const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=27';
 const wheelRadius=91*160/1200;
 const W=1400,H=600,L=65,R=1335,T=100,B=510;
 // A circular wall meets the 15-degree uphill ceiling with a continuous tangent.
@@ -174,7 +174,7 @@ const glow=ctx.createRadialGradient(1000,400,15,1000,400,600);glow.addColorStop(
 // Dark demonstration stage with ground lights and an exposed curved steel truss.
 ctx.fillStyle='#0c1117';ctx.fillRect(0,B,W,H-B);line(L,B,R,B,'#89939d',2);
 for(let x=100;x<1350;x+=45){ctx.fillStyle='#c1dbeb';ctx.shadowColor='#addefb';ctx.shadowBlur=8;ctx.fillRect(x,B+5,3,2);}ctx.shadowBlur=0;
-line(100,B+14,790,B+14,'#f34b40',2);line(100,B+19,790,B+19,'#f34b402a',3);
+line(L,B+14,R,B+14,'#f34b40',2);line(L,B+19,R,B+19,'#f34b402a',3);
 // Grounded rectangular scaffold behind the ramp, as in the reference stage.
 // Clip the steelwork to the region outside the driving face so no brace crosses the road.
 // The top beam meets the outer edge of the ceiling endpoint instead of cutting below it.
