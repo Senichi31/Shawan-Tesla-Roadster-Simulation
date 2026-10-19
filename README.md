@@ -101,3 +101,7 @@ Current entry: `play-ceiling-v19.html`. Raises the scaffold top by another 6 are
 ## V20: left and right driving
 
 Current entry: `play-ceiling-v20.html` (`V20 · LEFT + RIGHT DRIVING`). Left/A moves toward decreasing track distance and turns the vehicle body left once travel reverses; Right/D returns it to forward travel. The same facing behavior works on the curved wall. Wheel rendering compensates for body mirroring so rolling direction stays correct. The reset position is x=500 to leave usable ground to both sides. Short coasting, automatic adhesion, the 15-degree ceiling and scaffold remain unchanged. Rebuild with `python3 scripts/build-release.py`.
+
+## V21: full-body flight collisions
+
+Current entry: `play-ceiling-v21.html` (`V21 · FULL-BODY FLIGHT COLLISION`). Flying now collides using a convex silhouette covering the nose, tail, roof and wheel envelope, against finite two-sided road segments with the visible deck thickness. Movement and rotation are substepped to prevent boosted motion from tunnelling through the road. Contact removes velocity into the surface while preserving motion along it. Facing changes are rechecked for overlap. Scaffold and exhaust remain decorative; attached driving keeps its existing path constraint. Validation covers nose, tail, roof, rotating into the curve, landing, boosted travel and existing automatic grip/coasting/open-end exit. Rebuild with `python3 scripts/build-release.py`.

@@ -1,7 +1,7 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=20';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=20';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=21';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=21';
 const wheelRadius=91*160/1200;
 const W=1400,H=600,L=65,R=1335,T=100,B=510;
 // A circular wall meets the 15-degree uphill ceiling with a continuous tangent.
@@ -18,6 +18,45 @@ const trackEnd=arc.at(-1).s;
 function pathAt(distance){if(distance<=rampStart)return {x:distance,y:B,angle:0};const i=arc.findIndex(p=>p.s>=distance);if(i<0)return arc.at(-1);const a=arc[i-1],b=arc[i],u=(distance-a.s)/(b.s-a.s);return {x:a.x+(b.x-a.x)*u,y:a.y+(b.y-a.y)*u,angle:a.angle+(b.angle-a.angle)*u};}
 function placeOnTrack(){const p=pathAt(car.s);car.angle=p.angle;car.x=p.x+17*Math.sin(p.angle);car.y=p.y-17*Math.cos(p.angle);}
 const ceilingRing=pathAt(ceilingStart+70);
+// Finite, two-sided road surfaces. Scaffold and exhaust are decorative.
+const flightRoads=[{a:{x:L,y:B},b:{x:R,y:B}},...arc.slice(1).map((b,i)=>({a:arc[i],b}))];
+const bodyOutline=[[-74,-16],[-42,-18],[-12,-26],[26,-23],[61,-11],[74,-2],[74,10],[58,17],[-63,17],[-74,8]];
+function flightBody(){const c=Math.cos(car.angle),s=Math.sin(car.angle);return bodyOutline.map(([x,y])=>{x*=car.facing;return {x:car.x+x*c-y*s,y:car.y+x*s+y*c};});}
+function roadOutline(road){const {a,b}=road,dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy),nx=-dy/len*6,ny=dx/len*6;return [{x:a.x+nx,y:a.y+ny},{x:b.x+nx,y:b.y+ny},{x:b.x-nx,y:b.y-ny},{x:a.x-nx,y:a.y-ny}];}
+const flightRoadShapes=flightRoads.map(roadOutline);
+function polygonContact(a,b){let depth=Infinity,normal=null;
+ for(const polygon of [a,b])for(let i=0;i<polygon.length;i++){
+  const p=polygon[i],q=polygon[(i+1)%polygon.length],len=Math.hypot(q.x-p.x,q.y-p.y),nx=-(q.y-p.y)/len,ny=(q.x-p.x)/len;
+  let amin=Infinity,amax=-Infinity,bmin=Infinity,bmax=-Infinity;
+  for(const p of a){const d=p.x*nx+p.y*ny;amin=Math.min(amin,d);amax=Math.max(amax,d);}
+  for(const p of b){const d=p.x*nx+p.y*ny;bmin=Math.min(bmin,d);bmax=Math.max(bmax,d);}
+  if(amax<=bmin||bmax<=amin)return null;
+  const positive=bmax-amin,negative=amax-bmin,d=Math.min(positive,negative);
+  if(d<depth){depth=d;const sign=positive<negative?1:-1;normal={x:nx*sign,y:ny*sign};}
+ }
+ return {...normal,depth};
+}
+function resolveFlightContacts(){
+ for(let pass=0;pass<6;pass++){
+  let corrected=false;
+  for(const road of flightRoadShapes){
+   const body=flightBody();
+   const minX=Math.min(...body.map(p=>p.x)),maxX=Math.max(...body.map(p=>p.x)),minY=Math.min(...body.map(p=>p.y)),maxY=Math.max(...body.map(p=>p.y));
+   if(Math.max(...road.map(p=>p.x))<minX||Math.min(...road.map(p=>p.x))>maxX||Math.max(...road.map(p=>p.y))<minY||Math.min(...road.map(p=>p.y))>maxY)continue;
+   const hit=polygonContact(body,road);if(!hit)continue;
+   car.x+=hit.x*(hit.depth+.02);car.y+=hit.y*(hit.depth+.02);
+   const inward=car.vx*hit.x+car.vy*hit.y;if(inward<0){car.vx-=inward*hit.x;car.vy-=inward*hit.y;}
+   corrected=true;
+  }
+  if(!corrected)break;
+ }
+}
+function moveFlight(dt,targetAngle){
+ const turn=(targetAngle-car.angle)*Math.min(1,dt*5);
+ // Short linear and angular steps prevent boosted motion and rotation tunnelling through the road.
+ const steps=Math.max(1,Math.ceil(Math.hypot(car.vx,car.vy)*dt/3),Math.ceil(Math.abs(turn)/.025));
+ for(let step=0;step<steps;step++){car.x+=car.vx*dt/steps;car.y+=car.vy*dt/steps;car.angle+=turn/steps;resolveFlightContacts();}
+}
 const keys=new Set(),rings=[{x:340,y:480},{x:780,y:480},{x:1055,y:365},{x:1040,y:230},{x:ceilingRing.x+17*Math.sin(ceilingAngle),y:ceilingRing.y-17*Math.cos(ceilingAngle)}];
 const magnet=true; // Surface adhesion is always available; no manual toggle.
 let car,flight=false,paused=false,score=0,last=0,time=0,toastUntil=6,particles=[];
@@ -29,7 +68,7 @@ window.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','Arr
 window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>keys.clear());
 function update(dt){time+=dt;const right=keys.has('d')||keys.has('arrowright'),left=keys.has('a')||keys.has('arrowleft'),up=keys.has('w')||keys.has('arrowup'),down=keys.has('s')||keys.has('arrowdown'),boost=keys.has('shift'),power=boost?820:420,brake=keys.has(' ');
 const oldX=car.x,oldY=car.y,oldDistance=car.s,oldSurface=car.surface,attachedBefore=car.surface==='track';
-if(flight){car.surface=null;car.vx+=(Number(right)-Number(left))*power*dt;car.vy+=(Number(down)-Number(up))*power*dt;car.vx*=Math.exp(-.7*dt);car.vy*=Math.exp(-.7*dt);car.angle+=((car.vx/650)*.18-car.angle)*Math.min(1,dt*5);car.x+=car.vx*dt;car.y+=car.vy*dt;}
+if(flight){car.surface=null;car.vx+=(Number(right)-Number(left))*power*dt;car.vy+=(Number(down)-Number(up))*power*dt;car.vx*=Math.exp(-.7*dt);car.vy*=Math.exp(-.7*dt);moveFlight(dt,(car.vx/650)*.18);}
 else if(car.surface==='track'){
  const angle=pathAt(car.s).angle,drive=Number(right||up)-Number(left||down);
  car.speed+=((brake?0:drive)*(boost?1270:880))*dt;
@@ -48,7 +87,7 @@ else if(car.surface==='track'){
  car.angle+=(0-car.angle)*Math.min(1,dt*1.5);
 }
 // Sweep against the inner face of every arc segment, including the overhang.
-if(car.surface===null&&!(attachedBefore&&car.launched)){for(let i=1;i<arc.length;i++){
+if(!flight&&car.surface===null&&!(attachedBefore&&car.launched)){for(let i=1;i<arc.length;i++){
  const a=arc[i-1],b=arc[i],dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy),nx=dy/len,ny=-dx/len;
  const before=(oldX-a.x)*nx+(oldY-a.y)*ny-17,after=(car.x-a.x)*nx+(car.y-a.y)*ny-17;
  if(before>0&&after<=0){const t=before/(before-after),hx=oldX+(car.x-oldX)*t,hy=oldY+(car.y-oldY)*t,u=((hx-a.x)*dx+(hy-a.y)*dy)/(len*len);
@@ -64,7 +103,7 @@ else {car.wheelVelocity*=Math.exp(-1.5*dt);}
 car.wheelRotation+=car.wheelVelocity*dt;
 // Turn the body to follow signed travel along the road, including reversed wall driving.
 const headingSpeed=(car.surface==='track'?car.speed:car.vx);
-if(Math.abs(headingSpeed)>2)car.facing=headingSpeed<0?-1:1;
+if(Math.abs(headingSpeed)>2){const facing=headingSpeed<0?-1:1;if(car.facing!==facing){car.facing=facing;if(flight)resolveFlightContacts();}}
 for(const r of rings)if(!r.hit&&Math.hypot(car.x-r.x,car.y-r.y)<45){r.hit=true;score++;toastUntil=time+4;document.querySelector('#toast').textContent=score===5?'All checkpoints cleared. The sky is yours. R to run again.':`Checkpoint ${score} / 5 collected. Keep exploring.`;for(let i=0;i<22;i++)particles.push({x:r.x,y:r.y,vx:(Math.random()-.5)*240,vy:(Math.random()-.5)*240,life:1});}
 if(flight&&Math.random()<dt*35){particles.push({x:car.x+(Math.random()-.5)*80,y:car.y+30,vx:-car.vx*.1+(Math.random()-.5)*25,vy:45+Math.random()*50,life:1.3,smoke:true});}
 particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;});particles=particles.filter(p=>p.life>0);sync();document.querySelector('#speed').textContent=String(Math.round(Math.hypot(car.vx,car.vy)*.36)).padStart(3,'0');document.querySelector('#score').textContent=`0${score} / 05`;document.querySelector('#toast').style.opacity=time<toastUntil?'1':'0';}
