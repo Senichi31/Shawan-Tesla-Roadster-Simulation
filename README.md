@@ -153,3 +153,7 @@ Current entry: `play-ceiling-v32.html` (`V32 · UNDERBODY JETS / CONTACT FOG`). 
 ## V33: particle-only pressure jets
 
 Current entry: `play-ceiling-v33.html` (`V33 · PARTICLE-ONLY PRESSURE JETS`). Removes the filled/blurred cone core entirely. The expanding plume silhouette comes only from soft vapor particles, with width increasing along the jet. Young jet particles are transported relative to the live underbody nozzle to avoid long world-space trails during fast vehicle motion. Shift increases emission rate and particle exit speed (roughly 500 to 925 units/s); shorter lifetimes retain compact plumes. New particles are distributed through their birth frame so there is no gap at the nozzle. After flight stops or vapor touches the floor, particles detach into normal drifting/spreading motion. Validation covers boosted jet speed/density, nozzle alignment at high car speed, absence of the cone layer, underbody-only emission, floor contact and dissipation. Rebuild with `python3 scripts/build-release.py`.
+
+## V34: drifting, rising contact smoke
+
+Current entry: `play-ceiling-v34.html` (`V34 · RISING CONTACT VAPOR`). Contact vapor now rises with upward velocity and buoyancy, drifts gently sideways, expands into soft rounded puffs, and fades. Removes the flattened ground ellipse/glow look; clips vapor below the stage surface. Pressure-jet emission and boosted nozzle behavior are unchanged. Validation confirms upward motion, visible lift, both lateral drift directions and eventual dissipation. Rebuild with `python3 scripts/build-release.py`.
