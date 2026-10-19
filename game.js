@@ -1,8 +1,8 @@
 'use strict';
 const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d');
-const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=42';
-const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=42';
-const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=42';
+const roadsterImage=new Image();roadsterImage.src='assets/roadster-body.svg?v=43';
+const wheelImage=new Image();wheelImage.src='assets/roadster-wheel.svg?v=43';
+const undersideImage=new Image();undersideImage.src='assets/roadster-underside.svg?v=43';
 // Soft, transparent vapor texture; no solid cones or hard-edged smoke discs.
 const vaporTexture=document.createElement('canvas');vaporTexture.width=vaporTexture.height=64;
 const vaporCtx=vaporTexture.getContext('2d'),vaporGradient=vaporCtx.createRadialGradient(32,32,0,32,32,32);
@@ -29,7 +29,6 @@ function placeOnTrack(){car.roll=0;car.rollActive=false;const p=pathAt(car.s);ca
  // A long, rigid body also needs clearance where the straight upper road meets the curve.
  if(bodyEntersScaffold(flightBody())){let low=17,high=65;for(let i=0;i<9;i++){const middle=(low+high)/2;position(middle);if(bodyEntersScaffold(flightBody()))low=middle;else high=middle;}position(high+.03);}
 }
-const ceilingRing=pathAt(ceilingStart+70);
 // One closed obstacle: road face, scaffold roof/rear/end cap, and stage floor.
 // The opaque collision boundary blocks the whole scaffold footprint, including its open-looking bays.
 const scaffoldTop=arc.at(-1).y-10,scaffoldBack=rampStart+rx+72;
@@ -141,10 +140,13 @@ function moveFlight(dt,targetAngle,turnRate=5,allowLanding=false){
   if(allowLanding&&landOnRoad(contacts))break;
  }
 }
-const keys=new Set(),rings=[{x:340+stageShift,y:480},{x:780+stageShift,y:480},{x:1055+stageShift,y:365},{x:1040+stageShift,y:230},{x:ceilingRing.x+17*Math.sin(ceilingAngle),y:ceilingRing.y-17*Math.cos(ceilingAngle)}];
+// Derive checkpoints from the driving path so they stay inside the road after geometry changes.
+const checkpointDistances=[340+stageShift,780+stageShift,rampStart+rx*Math.PI/3,rampStart+rx*2*Math.PI/3,ceilingStart+90];
+const keys=new Set(),rings=checkpointDistances.map(distance=>{const p=pathAt(distance);return {x:p.x+30*Math.sin(p.angle),y:p.y-30*Math.cos(p.angle)};});
+const spawnX=rings[0].x-150;
 const magnet=true; // Surface adhesion is always available; no manual toggle.
 let car,flight=false,paused=false,score=0,last=0,time=0,toastUntil=6,particles=[],vaporEmission=0,cameraX=0;
-function reset(){car={x:500+stageShift,y:B-17,vx:0,vy:0,angle:0,facing:1,roll:0,rollActive:false,rollElapsed:0,rollAxisAngle:0,surface:'track',wheelRotation:0,wheelVelocity:0,speed:0,s:500+stageShift,launched:false};score=0;rings.forEach(r=>r.hit=false);particles=[];vaporEmission=0;cameraX=0;flight=false;paused=false;keys.clear();toastUntil=time+6;document.querySelector('#toast').textContent='← → drive. ↑ takes off / rises. ↓ descends. Touch down to exit flight.';sync();}
+function reset(){car={x:spawnX,y:B-17,vx:0,vy:0,angle:0,facing:1,roll:0,rollActive:false,rollElapsed:0,rollAxisAngle:0,surface:'track',wheelRotation:0,wheelVelocity:0,speed:0,s:spawnX,launched:false};score=0;rings.forEach(r=>r.hit=false);particles=[];vaporEmission=0;cameraX=0;flight=false;paused=false;keys.clear();toastUntil=time+6;document.querySelector('#toast').textContent='← → drive. ↑ takes off / rises. ↓ descends. Touch down to exit flight.';sync();}
 function sync(){document.querySelector('#magnet').classList.toggle('active',!flight);document.querySelector('#flight').classList.toggle('active',flight);document.querySelector('#mode').textContent=flight?'● FLIGHT MODE':magnet?(car.surface==='track'&&Math.cos(car.angle)<-.9?'● INVERTED / AIR GRIP':'● AIR GRIP'):'● GROUND DRIVE';document.querySelector('#status').textContent=flight?'THRUSTERS ENGAGED':magnet?(onDrivingSurface()?'AUTO GRIP / GRAVITY OFF':'AIR GRIP READY / OFF TRACK'):'GRIP SYSTEM READY';const pauseButton=document.querySelector('#pause');pauseButton.setAttribute('aria-pressed',String(paused));pauseButton.setAttribute('aria-label',paused?'Resume game':'Pause game');pauseButton.title=paused?'Resume game':'Pause game';}
 function toggleFlight(){flight=!flight;if(flight){car.surface=null;car.vy=Math.min(car.vy,-95);}sync();}
 document.querySelector('#reset').onclick=reset;document.querySelector('#flight').onclick=toggleFlight;document.querySelector('#pause').onclick=()=>{paused=!paused;keys.clear();sync();};
@@ -188,8 +190,8 @@ car.wheelRotation+=car.wheelVelocity*dt;
 // Turn the body to follow signed travel along the road, including reversed wall driving.
 const headingSpeed=(onDrivingSurface()?car.speed:car.vx);
 if(!car.rollActive&&Math.abs(headingSpeed)>2){const facing=headingSpeed<0?-1:1;if(car.facing!==facing){car.facing=facing;if(car.surface==='track')placeOnTrack();else if(car.surface==='scaffold')placeOnScaffold();else resolveFlightContacts();}}
-// The stage remains fixed until the car enters the left third; then reveal the finite extension.
-const cameraTarget=Math.max(cameraMin,Math.min(0,car.x-420));
+// The stage remains fixed until the car nears the left edge; then reveal the finite extension.
+const cameraTarget=Math.max(cameraMin,Math.min(0,car.x-280));
 cameraX+=(cameraTarget-cameraX)*(1-Math.exp(-6*dt));
 for(const r of rings)if(!r.hit&&Math.hypot(car.x-r.x,car.y-r.y)<45){r.hit=true;score++;toastUntil=time+4;document.querySelector('#toast').textContent=score===5?'All checkpoints cleared. The sky is yours. R to run again.':`Checkpoint ${score} / 5 collected. Keep exploring.`;for(let i=0;i<22;i++)particles.push({x:r.x,y:r.y,vx:(Math.random()-.5)*240,vy:(Math.random()-.5)*240,life:1});}
 if(flight||car.rollActive){

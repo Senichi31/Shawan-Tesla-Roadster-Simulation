@@ -197,3 +197,8 @@ Current entry: `play-ceiling-v41.html`. Landing on the scaffold roof switches to
 ## V42: graphical pause control and English interface
 
 Current entry: `play-ceiling-v42.html`. The pause button uses a circular SVG pause/play icon with accessible state labels instead of a Roman-numeral character. The decorative grip ellipse and arrows beneath attached cars are removed; adhesion physics remain active. All Chinese page captions and control descriptions are translated into English. Rebuild with `python3 scripts/build-release.py`.
+
+
+## V43: reset before checkpoint 1 and align checkpoints to the road
+
+Current entry: `play-ceiling-v43.html`. Reset places the car 150 units before checkpoint 1. All checkpoints derive their positions from path distances, with 3 and 4 on the lower/upper thirds of the circular wall and 5 on the final ceiling section. Their centers sit 30 units inside the road face so normal attached driving collects them in order. The camera starts following near the left edge to keep the full stage visible from the new spawn. Rebuild with `python3 scripts/build-release.py`.
