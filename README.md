@@ -43,3 +43,9 @@ python3 scripts/build-release.py
 ```
 
 The track is a true semicircle (180-unit radius), joined tangentially to the lower straight and an upper horizontal inverted section. Opening the release does not require a package manager or external network requests.
+
+## V7: shortened ceiling and side-reference vehicle
+
+Open `play-ceiling-v7.html` for the current standalone release. Its label reads `V7 · SHORT CEILING / SILVER ROADSTER`. The leftmost three 120-unit truss bays were removed: the ceiling endpoint moves from x=450 to x=810, leaving a 140-unit ceiling. Brake with Space as you enter the ceiling if you want to stop before its open end. The half-circle wall is unchanged.
+
+The current silver vehicle is redrawn from the supplied side photograph, with a wedge nose, long black glazing, straight shoulder and large five-spoke wheels. It faces right to match forward driving in the game. Run `python3 scripts/build-release.py` after source changes to rebuild V7; V6 is retained as an older standalone release.
